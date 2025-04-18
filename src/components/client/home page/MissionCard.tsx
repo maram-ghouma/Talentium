@@ -1,6 +1,7 @@
 import React from 'react';
 import { Clock, DollarSign, Circle } from 'lucide-react';
-import { Mission } from '../types';
+import { Mission } from '../../../types';
+import '../../../Styles/client/missionCard.css';
 interface MissionCardProps {
   mission: Mission;
   isDarkMode: boolean;
