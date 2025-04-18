@@ -11,6 +11,10 @@ import {
   Repeat,
   Briefcase,
   CalendarCheck,
+  ChevronDown,
+  Laptop,
+  Building,
+  Handshake,
 } from 'lucide-react';
 import '../../Styles/sidebar.css';
 
@@ -43,12 +47,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const AdminMenuItems = [
     { icon: Briefcase, label: 'Dashboard' }, 
     { icon: Bell, label: 'Notifications', badge: 3 },
-    { icon: User, label: 'Users' }, 
   ];
   const FreelancerMenuItems = [
     { icon: Bell, label: 'Notifications', badge: 3 },
     { icon: MessageSquare, label: 'Chat', badge: 2 },
   ];
+  const [userDropdownOpen, setUserDropdownOpen] = React.useState(false);
+const toggleUserDropdown = () => setUserDropdownOpen(prev => !prev);
 
   // Determine which menu to render based on userType
   const menuItems = userType === 'admin' 
@@ -107,6 +112,36 @@ export const Sidebar: React.FC<SidebarProps> = ({
               {isOpen && <span className="button-label">{item.label}</span>}
             </button>
           ))}
+            {/* Admin-specific "Users" dropdown */}
+  {userType === 'admin' && (
+    <div className="sidebar-dropdown">
+      <button onClick={toggleUserDropdown} className="sidebar-button">
+        <div className="icon-container">
+          <User size={20} />
+        </div>
+        {isOpen && (
+          <>
+            <span className="button-label">Users</span>
+            <ChevronDown size={16} style={{ marginLeft: 'auto' }} />
+          </>
+        )}
+      </button>
+
+      {isOpen && userDropdownOpen && (
+        <div className="dropdown-content">
+          <button className="sidebar-button ">
+          <div className="icon-container">
+                <Handshake size={20} style={{ marginLeft: '10px'}}/>
+              </div>
+              {isOpen && <span className="button-label">Clients</span>}</button>
+              <button className="sidebar-button ">
+          <div className="icon-container">
+                <Laptop size={20} style={{ marginLeft: '10px'}}/>
+              </div>
+              {isOpen && <span className="button-label">Freelancers</span>}</button>        </div>
+      )}
+    </div>
+  )}
         </nav>
       </div>
 

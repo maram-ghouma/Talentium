@@ -273,3 +273,27 @@
   .sidebar.dark-mode .sidebar-button:hover {
     background: rgba(197, 216, 229, 0.1);
   }
+  .sidebar-dropdown {
+    position: relative;
+  }
+  
+  .dropdown-content {
+    padding-left: 2rem;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .sidebar-sub-button {
+    background: none;
+    border: none;
+    padding: 0.5rem 0;
+    text-align: left;
+    font-size: 0.9rem;
+    cursor: pointer;
+    color: inherit;
+  }
+  
+  .sidebar-sub-button:hover {
+    color: var(--primary-color);
+  }
+  
