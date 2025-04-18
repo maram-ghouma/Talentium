@@ -209,3 +209,78 @@
       grid-template-columns: 1fr;
     }
   }
+  
+  .freelancer-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: var(--card-background);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  }
+  
+  .freelancer-table th,
+  .freelancer-table td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--powder);
+    text-align: center;
+  }
+  
+  .freelancer-table th {
+    background: var(--powder);
+    color: var(--navy-primary);
+    font-weight: 600;
+    
+  }
+  
+  .freelancer-table tr:last-child td {
+    border-bottom: none;
+  }
+  
+  .status-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+  
+  .status-badge.available {
+    background-color: #4CAF50;
+    color: white;
+  }
+  
+  .status-badge.busy {
+    background-color: #FFA726;
+    color: white;
+  }
+  
+  .status-badge.offline {
+    background-color: var(--slate);
+    color: white;
+  }
+  
+  .view-profile-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background-color: var(--powder);
+    color: var(--navy-primary);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .view-profile-btn:hover {
+    background-color: var(--navy-primary);
+    color: white;
+  }
+  
+  .overflow-x-auto {
+    overflow-x: auto;
+    margin: 1rem 0;
+    border-radius: 16px;
+  }

@@ -1,8 +1,11 @@
-import { MainLayout } from '../components/layout/MainLayout';
-import { useState } from 'react';
-import { HomePage } from '../components/client/home page/homePage';
 
-const ClientHome= () => {
+import '../../Styles/admin.css';
+import Stats from '../../components/admin/stats';
+import Rankings from '../../components/admin/rankings';
+import { MainLayout } from '../../components/layout/MainLayout';
+import { useState } from 'react';
+
+const AdminDashboard = () => {
      const [isSidebarOpen, setIsSidebarOpen] = useState(true);
       const [isDarkMode, setIsDarkMode] = useState(false);
       
@@ -10,22 +13,24 @@ const ClientHome= () => {
         console.log("Search query:", query);
       };
   return (
-    <MainLayout
+<MainLayout
       isDarkMode={isDarkMode}
       toggleDarkMode={() => setIsDarkMode(!isDarkMode)}
       isSidebarOpen={isSidebarOpen}
       toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
       onSearch={handleSearch}
-      usertype='client'
-      profileName = "Alex Morgan"
-      profileRole = "UI/UX Designer"
+      usertype='admin'
+      profileName = "Admin"
+      profileRole = ""
     >
-      <HomePage 
-        isDarkMode={isDarkMode}
-        toggleDarkMode={() => setIsDarkMode(!isDarkMode)}
-        isSidebarOpen={isSidebarOpen} 
-        
-      />
+       <Stats  isDarkMode={isDarkMode} />
+       <Rankings  isDarkMode={isDarkMode} />
     </MainLayout>
-  )}
-  export default ClientHome;
+   
+    
+
+     
+  );
+};
+
+export default AdminDashboard;

@@ -1,4 +1,6 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
+
 import {
   Bell,
   User,
@@ -37,20 +39,20 @@ export const Sidebar: React.FC<SidebarProps> = ({
 }) => {
   // Admin menu items
   const ClientMenuItems = [
-    { icon: Bell, label: 'Notifications', badge: 3 },
-    { icon: CalendarCheck, label: 'Schedule' },
-    { icon: MessageSquare, label: 'Chat', badge: 2 },
-    { icon: History, label: 'History' },
+    { icon: Bell, label: 'Notifications', badge: 3, path: "" },
+    { icon: CalendarCheck, label: 'Schedule', path: "" },
+    { icon: MessageSquare, label: 'Chat', badge: 2 , path: ""},
+    { icon: History, label: 'History',path: "" },
   ];
 
   // Client menu items
   const AdminMenuItems = [
-    { icon: Briefcase, label: 'Dashboard' }, 
-    { icon: Bell, label: 'Notifications', badge: 3 },
+    { icon: Briefcase, label: 'Dashboard' ,path: "/admin"}, 
+    { icon: Bell, label: 'Notifications', badge: 3,path: "" },
   ];
   const FreelancerMenuItems = [
-    { icon: Bell, label: 'Notifications', badge: 3 },
-    { icon: MessageSquare, label: 'Chat', badge: 2 },
+    { icon: Bell, label: 'Notifications', badge: 3 ,path: ""},
+    { icon: MessageSquare, label: 'Chat', badge: 2 ,path: ""},
   ];
   const [userDropdownOpen, setUserDropdownOpen] = React.useState(false);
 const toggleUserDropdown = () => setUserDropdownOpen(prev => !prev);
@@ -104,6 +106,8 @@ const toggleUserDropdown = () => setUserDropdownOpen(prev => !prev);
         {/* Navigation Menu */}
         <nav className="nav-menu">
           {menuItems.map((item) => (
+            <Link to= {item.path} style={{ textDecoration: 'none'}}>
+
             <button key={item.label} className="sidebar-button">
               <div className="icon-container">
                 <item.icon size={20} />
@@ -111,6 +115,7 @@ const toggleUserDropdown = () => setUserDropdownOpen(prev => !prev);
               </div>
               {isOpen && <span className="button-label">{item.label}</span>}
             </button>
+            </Link>
           ))}
             {/* Admin-specific "Users" dropdown */}
   {userType === 'admin' && (
@@ -129,16 +134,22 @@ const toggleUserDropdown = () => setUserDropdownOpen(prev => !prev);
 
       {isOpen && userDropdownOpen && (
         <div className="dropdown-content">
+           <Link to="/admin/clients" style={{ textDecoration: 'none'}}>
           <button className="sidebar-button ">
           <div className="icon-container">
                 <Handshake size={20} style={{ marginLeft: '10px'}}/>
               </div>
               {isOpen && <span className="button-label">Clients</span>}</button>
+          </Link>
+          <Link to="/admin/freelancers" style={{ textDecoration: 'none'}}>
+
               <button className="sidebar-button ">
           <div className="icon-container">
                 <Laptop size={20} style={{ marginLeft: '10px'}}/>
               </div>
-              {isOpen && <span className="button-label">Freelancers</span>}</button>        </div>
+              {isOpen && <span className="button-label">Freelancers</span>}</button>  
+              </Link>   
+             </div>
       )}
     </div>
   )}
