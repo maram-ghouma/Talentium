@@ -32,9 +32,14 @@ const HeroComponent: React.FC = () => {
           <nav className="navbar navbar-expand-lg fixed-top" style={{
             backgroundColor: 'var(--navy-primary)'}}>
           <div className="container">
-            <a className="navbar-brand d-flex align-items-center gap-2 " style={{color: 'white'}} href="#" >
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-briefcase "><rect width="20" height="14" x="2" y="7" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
-                <span >FreelanceHub</span></a>
+          <div className="logo-container">
+            <Briefcase className="logo-icon" size={20} />
+          </div>              
+            <div className="brand-name">
+                    <span className="brand-text">Talent</span>
+                    <span className="brand-highlight">ium</span>
+                  </div>
+                
             <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                     <span className="navbar-toggler-icon"></span>
             </button>

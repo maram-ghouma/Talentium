@@ -13,21 +13,50 @@ import {
   CalendarCheck,
 } from 'lucide-react';
 import '../../Styles/sidebar.css';
+
 interface SidebarProps {
   isOpen: boolean;
   toggleSidebar: () => void;
   isDarkMode: boolean;
   profileName?: string;
   profileRole?: string;
+  userType: 'admin' | 'client' | 'freelancer'; // Add userType prop to determine sidebar type
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({ 
   isOpen, 
   toggleSidebar, 
   isDarkMode,
-  profileName = "Alex Morgan",
-  profileRole = "UI/UX Designer"
+  profileName ,
+  profileRole ,
+  userType // Receive the userType (admin or client) prop
 }) => {
+  // Admin menu items
+  const ClientMenuItems = [
+    { icon: Bell, label: 'Notifications', badge: 3 },
+    { icon: CalendarCheck, label: 'Schedule' },
+    { icon: MessageSquare, label: 'Chat', badge: 2 },
+    { icon: History, label: 'History' },
+  ];
+
+  // Client menu items
+  const AdminMenuItems = [
+    { icon: Briefcase, label: 'Dashboard' }, 
+    { icon: Bell, label: 'Notifications', badge: 3 },
+    { icon: User, label: 'Users' }, 
+  ];
+  const FreelancerMenuItems = [
+    { icon: Bell, label: 'Notifications', badge: 3 },
+    { icon: MessageSquare, label: 'Chat', badge: 2 },
+  ];
+
+  // Determine which menu to render based on userType
+  const menuItems = userType === 'admin' 
+  ? AdminMenuItems 
+  : userType === 'client' 
+  ? ClientMenuItems 
+  : FreelancerMenuItems;
+
   return (
     <div className={`sidebar ${isOpen ? 'open' : 'closed'} ${isDarkMode ? 'dark-mode' : ''}`}>
       <div className="sidebar-content">
@@ -69,12 +98,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
         {/* Navigation Menu */}
         <nav className="nav-menu">
-          {[
-            { icon: Bell, label: 'Notifications', badge: 3 },
-            { icon: CalendarCheck, label: 'Schedule'},
-            { icon: MessageSquare, label: 'Chat', badge: 2 },
-            { icon: History, label: 'History' },
-          ].map((item) => (
+          {menuItems.map((item) => (
             <button key={item.label} className="sidebar-button">
               <div className="icon-container">
                 <item.icon size={20} />
@@ -87,17 +111,27 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </div>
 
       <div className="footer-menu">
-        {[
-          { icon: Repeat, label: 'Switch Role' },
-          { icon: LogOut, label: 'Sign Out' },
-        ].map((item) => (
-          <button key={item.label} className="sidebar-button">
+        {/* Admin specific footer items */}
+        {userType === 'admin' && (
+          <>
+            <button key="sign-out" className="sidebar-button">
+              <div className="icon-container">
+                <LogOut size={20} />
+              </div>
+              {isOpen && <span className="button-label">Sign Out</span>}
+            </button>
+          </>
+        )}
+
+        {/* Client specific footer items */}
+        {(userType === 'client' || userType === 'freelancer') && (
+          <button key="sign-out" className="sidebar-button">
             <div className="icon-container">
-              <item.icon size={20} />
+              <LogOut size={20} />
             </div>
-            {isOpen && <span className="button-label">{item.label}</span>}
+            {isOpen && <span className="button-label">Sign Out</span>}
           </button>
-        ))}
+        )}
       </div>
     </div>
   );
