@@ -5,6 +5,7 @@ import { SearchBar } from './components/SearchBar';
 import { CreateMission } from './components/CreateMission';
 import { MissionCard } from './components/MissionCard';
 import { Mission } from './types';
+import GuestHome from './Pages/GuestHome';
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -31,7 +32,7 @@ function App() {
   ]);
 
   return (
-    <div className={isDarkMode ? 'dark-mode' : ''}>
+      /*<div className={isDarkMode ? 'dark-mode' : ''}>
       <Sidebar isOpen={isSidebarOpen} toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} isDarkMode={isDarkMode} />
 
       <main style={{ 
@@ -86,7 +87,9 @@ function App() {
         )}
       </main>
     </div>
-  );
+  */
+ <GuestHome />
+ );
 }
 
 export default App;
