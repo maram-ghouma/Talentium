@@ -1,5 +1,5 @@
 import React, { ReactNode, useState } from 'react';
-import { Sun, Moon } from 'lucide-react';
+import { Sun, Moon, User } from 'lucide-react';
 import { Sidebar } from './Sidebar';
 import { SearchBar } from './SearchBar';
 import '../../Styles/layout.css';
@@ -12,6 +12,9 @@ interface MainLayoutProps {
   pageTitle?: string;
   hideSearchBar?: boolean;
   onSearch?: (query: string) => void;
+  usertype:  'admin' | 'client' | 'freelancer';
+  profileName;
+  profileRole 
 }
 
 export const MainLayout: React.FC<MainLayoutProps> = ({
@@ -21,8 +24,11 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
   isSidebarOpen,
   toggleSidebar,
   pageTitle,
+  profileName ,
+  profileRole ,
   hideSearchBar = false,
   onSearch = (query) => console.log(query),
+  usertype,
 }) => {
   return (
     <div className={isDarkMode ? 'dark-mode' : ''} style={{height:'100%', width:'100%'}}>
@@ -30,6 +36,9 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
         isOpen={isSidebarOpen} 
         toggleSidebar={toggleSidebar} 
         isDarkMode={isDarkMode} 
+        userType= {usertype}
+        profileName= {profileName}
+        profileRole={profileRole}
       />
 
       <main style={{ 
@@ -54,13 +63,20 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
             
             <div className="d-flex align-items-center">
               <div className="profile-container me-3">
-                <div className="profile-picture-wrapper">
-                  <img 
-                    src="/api/placeholder/32/32" 
-                    alt="Profile" 
-                    className="profile-picture" 
-                  />
-                </div>
+                {usertype === 'admin' ? (
+                    <div>
+                    </div>
+                  ) : (
+                    <div className="profile-picture-wrapper">
+
+                    <img 
+                      src="/api/placeholder/32/32" 
+                      alt="Profile" 
+                      className="profile-picture" 
+                    />
+                    </div>
+                  )}
+                 
               </div>
               
               <button
