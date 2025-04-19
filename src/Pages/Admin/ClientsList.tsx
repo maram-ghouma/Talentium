@@ -1,8 +1,7 @@
 
-import '../../Styles/admin.css';
+import '../../Styles/admin/admin.css';
 import { MainLayout } from '../../components/layout/MainLayout';
 import { useState } from 'react';
-import FreelancerTable from '../../components/admin/FreelancerTable';
 import ClientTable from '../../components/admin/ClientTable';
 interface Client {
     id: string;
