@@ -1,4 +1,4 @@
-import { Mission, User, ChatMessage, Conversation, NotificationType, WorkHistoryItem } from '../types/types';
+import { Mission, User, ChatMessage, Conversation, NotificationType, WorkHistoryItem } from '../types';
 
 export const currentUser: User = {
   id: 'user-1',
@@ -18,37 +18,41 @@ export const missions: Mission[] = [
     id: 'mission-1',
     title: 'Website Redesign',
     description: 'Need a complete redesign of our e-commerce website with modern UI/UX principles.',
-    status: 'not assigned',
-    deadline: '15/03/2024',
-    budget: 2500,
-    clientName: 'EcoShop Inc.'
+    status: 'not_assigned',
+    date: '15/03/2024',
+    price: 2500,
+    clientName: 'EcoShop Inc.',
+    clientId: "1"
   },
   {
     id: 'mission-2',
     title: 'Mobile App Development',
     description: 'Looking for a developer to create an iOS/Android app for our service.',
-    status: 'in progress',
-    deadline: '14/03/2024',
-    budget: 5000,
-    clientName: 'TechStart Solutions'
+    status: 'in_progress',
+    date: '14/03/2024',
+    price: 5000,
+    clientName: 'TechStart Solutions',
+    clientId: "2"
   },
   {
     id: 'mission-3',
     title: 'Brand Identity Design',
     description: 'Create a comprehensive brand identity including logo, color scheme, and typography.',
     status: 'completed',
-    deadline: '10/02/2024',
-    budget: 1800,
-    clientName: 'Green Earth Foods'
+    date: '10/02/2024',
+    price: 1800,
+    clientName: 'Green Earth Foods',
+    clientId: "1"
   },
   {
     id: 'mission-4',
     title: 'Marketing Campaign Creatives',
     description: 'Design social media creatives for our upcoming summer campaign.',
-    status: 'in progress',
-    deadline: '20/03/2024',
-    budget: 1200,
-    clientName: 'Sunshine Beverages'
+    status: 'in_progress',
+    date: '20/03/2024',
+    price: 1200,
+    clientName: 'Sunshine Beverages',
+    clientId:"2"
   }
 ];
 
