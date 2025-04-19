@@ -1,5 +1,5 @@
 
-import '../../Styles/admin.css';
+import '../../Styles/admin/admin.css';
 import Stats from '../../components/admin/stats';
 import Rankings from '../../components/admin/rankings';
 import { MainLayout } from '../../components/layout/MainLayout';
