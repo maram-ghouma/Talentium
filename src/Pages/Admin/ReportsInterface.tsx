@@ -76,11 +76,9 @@ const ReportsInterface = () => {
         pendingCount={pendingReports.length}
         resolvedCount={resolvedReports.length}
         totalCount={pendingReports.length + resolvedReports.length}
-        //isDarkMode={isDarkMode}
       />
-      <ReportsTabs activeTab={activeTab} setActiveTab={setActiveTab} /*sDarkMode={isDarkMode} *//>
+      <ReportsTabs activeTab={activeTab} setActiveTab={setActiveTab} />
       <ReportsList 
-        //isDarkMode={isDarkMode}
         reports={activeTab === 'pending' ? pendingReports : resolvedReports} 
       />
     </div>

@@ -11,9 +11,7 @@ const getStatusIcon = (status) => {
       return <AlertTriangle size={20} className="status-icon" />;
   }
 };
-interface CardProps {
-    isDarkMode: boolean;
-  }
+
 const ReportCard = ({ report }) => (
   <div className="report-card">
     <div className="report-header">
