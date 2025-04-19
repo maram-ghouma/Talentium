@@ -14,3 +14,21 @@ export interface Mission {
     read: boolean;
     date: string;
   }
+ export interface Client {
+      id: string;
+      name: string;
+      rating: number;
+      postedmissions: number;
+      joinedDate: string;
+      interaction: number;
+    }
+export interface Freelancer {
+        id: string;
+        name: string;
+        rating: number;
+        completedJobs: number;
+        field: string;
+        hourlyRate: number;
+        joinedDate: string;
+      }
+      
