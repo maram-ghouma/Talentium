@@ -15,6 +15,7 @@ import {
   Laptop,
   Handshake,
   Shield,
+  SwitchCamera,
 } from 'lucide-react';
 import '../../Styles/sidebar.css';
 import { report } from 'process';
@@ -173,12 +174,20 @@ const toggleUserDropdown = () => setUserDropdownOpen(prev => !prev);
 
         {/* Client specific footer items */}
         {(userType === 'client' || userType === 'freelancer') && (
+          <>
           <button key="sign-out" className="sidebar-button">
             <div className="icon-container">
-              <LogOut size={20} />
+              <SwitchCamera size={20} />
             </div>
-            {isOpen && <span className="button-label">Sign Out</span>}
+            {isOpen && <span className="button-label">Switch Profile</span>}
           </button>
+          <button key="sign-out" className="sidebar-button">
+          <div className="icon-container">
+            <LogOut size={20} />
+          </div>
+          {isOpen && <span className="button-label">Sign Out</span>}
+        </button>
+        </>
         )}
       </div>
     </div>
