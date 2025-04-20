@@ -2,31 +2,45 @@ import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
 // Layout component
-import Layout from './components/layout/Layout';
+import {MainLayout} from '../../components/layout/MainLayout';
 
-// Dashboard components
-import DashboardHome from './components/home/DashboardHome';
-import Profile from './components/profile/Profile';
-import MissionDetails from './components/mission/MissionDetails';
-import Chat from '../../components/Freelancer/chat'; // Fixed capitalization
-import History from '../../components/Freelancer/History'; // Assuming you have this component
+import Profile from '../../components/Freelancer/Profile';
+import MissionDetails from '../../components/Freelancer/mission';
+import Chat from '../../components/Freelancer/chat'; 
+import History from '../../components/Freelancer/History'; 
 
-function FreelancerHomepage() {
-  return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Layout />}>
-          <Route index element={<DashboardHome />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/mission/:id" element={<MissionDetails />} />
-          <Route path="/chat" element={<Chat />} />
-          <Route path="/history" element={<History />} /> {/* Using History component instead of Profile */}
-          <Route path="/schedule" element={<div className="p-6">Schedule page content</div>} />
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Route>
-      </Routes>
-    </BrowserRouter>
-  );
-}
+import { useState } from 'react';
 
-export default FreelancerHomepage;
+
+const FreelancerHomePage=()=>{
+    const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+      const [isDarkMode, setIsDarkMode] = useState(false);
+      
+      const handleSearch = (query: string) => {
+        console.log("Search query:", query);
+      };
+
+      return (
+        <MainLayout
+              isDarkMode={isDarkMode}
+              toggleDarkMode={() => setIsDarkMode(!isDarkMode)}
+              isSidebarOpen={isSidebarOpen}
+              toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
+              onSearch={handleSearch}
+              usertype='admin'
+              profileName = "Admin"
+              profileRole = ""
+            >
+              *
+            </MainLayout>
+           
+            
+        
+             
+          );
+        };
+export default FreelancerHomePage;
+
+
+
+    

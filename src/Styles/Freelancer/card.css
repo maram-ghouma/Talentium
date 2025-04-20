@@ -1,0 +1,64 @@
+.mission-card {
+    display: block;
+  }
+  
+  .card-content {
+    transition: transform 200ms;
+  }
+  
+  .card-content:hover {
+    transform: translateY(-2px);
+  }
+  
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.75rem;
+  }
+  
+  .mission-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+  }
+  
+  .mission-description {
+    color: #64748b;
+    margin-bottom: 1rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  
+  .dark .mission-description {
+    color: #94a3b8;
+  }
+  
+  .card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.875rem;
+    color: #64748b;
+  }
+  
+  .dark .card-footer {
+    color: #94a3b8;
+  }
+  
+  .deadline {
+    display: flex;
+    align-items: center;
+  }
+  
+  .budget {
+    display: flex;
+    align-items: center;
+    font-weight: 500;
+    color: #334155;
+  }
+  
+  .dark .budget {
+    color: #e2e8f0;
+  }

@@ -22,7 +22,8 @@ export const missions: Mission[] = [
     date: '15/03/2024',
     price: 2500,
     clientName: 'EcoShop Inc.',
-    clientId: "1"
+    clientId: 'client-1',
+
   },
   {
     id: 'mission-2',
@@ -32,7 +33,8 @@ export const missions: Mission[] = [
     date: '14/03/2024',
     price: 5000,
     clientName: 'TechStart Solutions',
-    clientId: "2"
+    clientId: 'client-1',
+
   },
   {
     id: 'mission-3',
@@ -42,7 +44,8 @@ export const missions: Mission[] = [
     date: '10/02/2024',
     price: 1800,
     clientName: 'Green Earth Foods',
-    clientId: "1"
+    clientId: 'client-1',
+
   },
   {
     id: 'mission-4',
@@ -52,7 +55,8 @@ export const missions: Mission[] = [
     date: '20/03/2024',
     price: 1200,
     clientName: 'Sunshine Beverages',
-    clientId:"2"
+    clientId: 'client-1',
+
   }
 ];
 
