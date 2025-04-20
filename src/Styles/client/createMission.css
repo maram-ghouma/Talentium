@@ -51,7 +51,7 @@
   transform: translate(-50%, -50%);
   background: white;
   border-radius: 12px;
-  padding: 1rem; /* Reduced padding */
+  padding: 0rem 0rem 0rem 0rem;
   width: 90%;
   max-width: 600px;
   height: 85%; /* Limit max height */
@@ -70,7 +70,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1rem; /* Reduced margin */
+  margin-bottom: 5px !important;/* Reduced margin */
+  /*background-color: var(--navy-secondary);*/
 }
 
 /* Smaller title */

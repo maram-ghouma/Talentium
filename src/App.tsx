@@ -3,6 +3,9 @@ import AdminDashboard from './Pages/Admin/AdminDashboard';
 import FreelancersList from './Pages/Admin/FreelancersList';
 import ClientHome from './Pages/Client/ClientHomePage';
 import ClientsList from './Pages/Admin/ClientsList';
+import ReportsInterface from './Pages/Admin/ReportsInterface';
+import ClientInterviewSchedule from './Pages/Client/ClientInterviews';
+import ClientProfilePage from './Pages/Client/ClientProfile';
 
 import Profile from './components/Freelancer/Profile';
 import MissionDetails from './components/Freelancer/mission';
@@ -28,9 +31,9 @@ function App() {
           <Route path="/history" element={<Profile />} />
 
   <Route path="/admin/reports" element={<ReportsInterface />} />
-  <Route path="/client" element={< ClientHomePage/>} />
-
-
+  <Route path="/client" element ={<ClientHome/>}/>
+  <Route path="/client/interviews" element ={<ClientInterviewSchedule/>}/>
+  <Route path="/client/profile" element ={<ClientProfilePage/>}/>
 
 
 </Routes>
