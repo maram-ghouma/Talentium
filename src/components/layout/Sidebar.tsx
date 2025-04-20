@@ -100,7 +100,7 @@ const toggleUserDropdown = () => setUserDropdownOpen(prev => !prev);
           
           {isOpen && (
             <div className="profile-info">
-              <h4 className="profile-name">{profileName}</h4>
+              <h6 className="profile-name">{profileName}</h6>
               <span className="role-text">{profileRole}</span>
             </div>
           )}
