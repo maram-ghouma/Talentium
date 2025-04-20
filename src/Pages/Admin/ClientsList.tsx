@@ -3,14 +3,7 @@ import '../../Styles/admin/admin.css';
 import { MainLayout } from '../../components/layout/MainLayout';
 import { useState } from 'react';
 import ClientTable from '../../components/admin/ClientTable';
-interface Client {
-    id: string;
-    name: string;
-    rating: number;
-    postedmissions: number;
-    joinedDate: string;
-    interaction: number;
-  }
+import {Client} from '../../types'
   
 const ClientsList = () => {
      const [isSidebarOpen, setIsSidebarOpen] = useState(true);
