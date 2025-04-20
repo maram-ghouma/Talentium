@@ -20,6 +20,7 @@ export const HomePage: React.FC<HomePageProps> = ({ isDarkMode, toggleDarkMode, 
       price: 2500,
       date: '2024-03-15',
       clientId: 'client1',
+      clientName: 'EcoShop Inc.',
     },
     {
       id: '2',
@@ -29,6 +30,7 @@ export const HomePage: React.FC<HomePageProps> = ({ isDarkMode, toggleDarkMode, 
       price: 5000,
       date: '2024-03-14',
       clientId: 'client1',
+      clientName: 'TechStart Solutions',
     },
   ]);
 

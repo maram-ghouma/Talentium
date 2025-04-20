@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Calendar, DollarSign, Clock, MessageSquare, CheckCircle, XCircle } from 'lucide-react';
-import { missions } from '../../data/mockData';
-import StatusBadge from '../shared/StatusBadge';
+import { missions } from '../../Data/mockData';
+import StatusBadge from './statusBadge';
+import '../../Styles/Freelancer/mission.css';
 
 const MissionDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -18,11 +19,11 @@ const MissionDetails: React.FC = () => {
   const milestones = [
     { id: 'm1', title: 'Initial consultation', completed: true, date: '10/01/2024' },
     { id: 'm2', title: 'Requirements gathering', completed: true, date: '15/01/2024' },
-    { id: 'm3', title: 'Design mockups', completed: mission.status !== 'not assigned', date: '25/01/2024' },
+    { id: 'm3', title: 'Design mockups', completed: mission.status !== 'not_assigned', date: '25/01/2024' },
     { id: 'm4', title: 'Finalize design', completed: false, date: '05/02/2024' },
     { id: 'm5', title: 'Implementation', completed: false, date: '20/02/2024' },
     { id: 'm6', title: 'Testing and feedback', completed: false, date: '01/03/2024' },
-    { id: 'm7', title: 'Final delivery', completed: false, date: mission.deadline }
+    { id: 'm7', title: 'Final delivery', completed: false, date: mission.date }
   ];
   
   return (
@@ -39,11 +40,11 @@ const MissionDetails: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
           <div className="flex items-center text-slate-700 dark:text-slate-300">
             <Calendar size={18} className="mr-2 text-slate-500" />
-            <span>Deadline: {mission.deadline}</span>
+            <span>Deadline: {mission.date}</span>
           </div>
           <div className="flex items-center text-slate-700 dark:text-slate-300">
             <DollarSign size={18} className="mr-2 text-slate-500" />
-            <span>Budget: ${mission.budget}</span>
+            <span>Budget: ${mission.price}</span>
           </div>
           <div className="flex items-center text-slate-700 dark:text-slate-300">
             <Clock size={18} className="mr-2 text-slate-500" />
@@ -99,12 +100,12 @@ const MissionDetails: React.FC = () => {
                 Contact Client
               </button>
               
-              {mission.status === 'not assigned' ? (
+              {mission.status === 'not_assigned' ? (
                 <button className="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-md transition-all duration-200 flex items-center">
                   <CheckCircle size={18} className="mr-2" />
                   Accept Mission
                 </button>
-              ) : mission.status === 'in progress' ? (
+              ) : mission.status === 'in_progress' ? (
                 <button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md transition-all duration-200 flex items-center">
                   <CheckCircle size={18} className="mr-2" />
                   Mark as Completed

@@ -1,0 +1,171 @@
+.mission-container {
+    max-width: 64rem;
+    margin: 0 auto;
+  }
+  
+  .mission-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+  }
+  
+  .mission-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+  }
+  
+  .client-name {
+    color: #64748b;
+  }
+  
+  .dark .client-name {
+    color: #94a3b8;
+  }
+  
+  .mission-info {
+    display: grid;
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  @media (min-width: 768px) {
+    .mission-info {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+  
+  .info-item {
+    display: flex;
+    align-items: center;
+    color: #334155;
+  }
+  
+  .dark .info-item {
+    color: #94a3b8;
+  }
+  
+  .tab-container {
+    border-bottom: 1px solid #e5e7eb;
+    margin-bottom: 1.5rem;
+  }
+  
+  .dark .tab-container {
+    border-color: #334155;
+  }
+  
+  .tab-list {
+    display: flex;
+    gap: 1.5rem;
+  }
+  
+  .tab-button {
+    padding-bottom: 0.75rem;
+    padding-left: 0.25rem;
+    padding-right: 0.25rem;
+    font-medium: 500;
+  }
+  
+  .tab-button.active {
+    border-bottom: 2px solid #3A4B6D;
+    color: #3A4B6D;
+  }
+  
+  .dark .tab-button.active {
+    color: white;
+  }
+  
+  .milestone-container {
+    display: flex;
+    align-items: flex-start;
+  }
+  
+  .milestone-indicator {
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 9999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 0.125rem;
+  }
+  
+  .milestone-indicator.completed {
+    background-color: #dcfce7;
+    color: #16a34a;
+  }
+  
+  .milestone-indicator.pending {
+    background-color: #f1f5f9;
+    color: #64748b;
+  }
+  
+  .milestone-content {
+    margin-left: 0.75rem;
+    padding-bottom: 1rem;
+    padding-left: 1.25rem;
+  }
+  
+  .milestone-content:not(:last-child) {
+    border-left: 2px solid #e5e7eb;
+  }
+  
+  .dark .milestone-content:not(:last-child) {
+    border-color: #334155;
+  }
+  
+  .attachment-grid {
+    display: grid;
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+    gap: 1rem;
+  }
+  
+  @media (min-width: 640px) {
+    .attachment-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  
+  @media (min-width: 1024px) {
+    .attachment-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+  
+  .attachment-item {
+    border: 1px solid #e5e7eb;
+    border-radius: 0.375rem;
+    padding: 0.75rem;
+    display: flex;
+    align-items: center;
+  }
+  
+  .dark .attachment-item {
+    border-color: #334155;
+  }
+  
+  .file-icon {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 0.375rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 0.75rem;
+  }
+  
+  .file-icon.pdf {
+    background-color: #dbeafe;
+    color: #2563eb;
+  }
+  
+  .file-icon.xls {
+    background-color: #dcfce7;
+    color: #16a34a;
+  }
+  
+  .file-icon.img {
+    background-color: #fef3c7;
+    color: #d97706;
+  }

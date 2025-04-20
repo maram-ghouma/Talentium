@@ -1,0 +1,152 @@
+.profile-container {
+    max-width: 64rem;
+    margin: 0 auto;
+  }
+  
+  .profile-header {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  @media (min-width: 768px) {
+    .profile-header {
+      flex-direction: row;
+    }
+  }
+  
+  .profile-sidebar {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 1.5rem;
+  }
+  
+  @media (min-width: 768px) {
+    .profile-sidebar {
+      width: 25%;
+      margin-bottom: 0;
+    }
+  }
+  
+  .profile-avatar {
+    width: 8rem;
+    height: 8rem;
+    border-radius: 9999px;
+    overflow: hidden;
+    margin-bottom: 1rem;
+  }
+  
+  .profile-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .rating-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+  }
+  
+  .rating-value {
+    font-weight: 600;
+  }
+  
+  .rating-count {
+    color: #64748b;
+    margin-left: 0.25rem;
+  }
+  
+  .dark .rating-count {
+    color: #94a3b8;
+  }
+  
+  .profile-main {
+    width: 100%;
+  }
+  
+  @media (min-width: 768px) {
+    .profile-main {
+      width: 75%;
+      padding-left: 2rem;
+    }
+  }
+  
+  .profile-name {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+  }
+  
+  .profile-role {
+    font-size: 1.125rem;
+    color: #64748b;
+    margin-bottom: 1rem;
+  }
+  
+  .dark .profile-role {
+    color: #94a3b8;
+  }
+  
+  .profile-bio {
+    margin-bottom: 1.5rem;
+    color: #334155;
+  }
+  
+  .dark .profile-bio {
+    color: #94a3b8;
+  }
+  
+  .contact-grid {
+    display: grid;
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  @media (min-width: 768px) {
+    .contact-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  
+  .contact-item {
+    display: flex;
+    align-items: center;
+    color: #334155;
+  }
+  
+  .dark .contact-item {
+    color: #94a3b8;
+  }
+  
+  .skills-container {
+    margin-top: 1.5rem;
+  }
+  
+  .skills-header {
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+  }
+  
+  .skills-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  
+  .skill-tag {
+    padding: 0.25rem 0.75rem;
+    background-color: #f1f5f9;
+    color: #334155;
+    border-radius: 9999px;
+    font-size: 0.875rem;
+  }
+  
+  .dark .skill-tag {
+    background-color: #334155;
+    color: #e2e8f0;
+  }
