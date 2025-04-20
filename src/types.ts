@@ -10,6 +10,7 @@ export interface Mission {
   deadline?: Date | string; 
   budget?: string;
   createdAt?: Date;
+  clientName: string;
 }
   export interface Notification {
     id: string;

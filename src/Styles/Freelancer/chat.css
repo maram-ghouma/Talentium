@@ -1,0 +1,170 @@
+.chat-container {
+    display: flex;
+    height: 100%;
+    margin-top: -1.5rem;
+    margin-bottom: -1.5rem;
+  }
+  
+  .conversation-list {
+    width: 20rem;
+    border-right: 1px solid #e5e7eb;
+  }
+  
+  .dark .conversation-list {
+    border-color: #334155;
+  }
+  
+  .search-container {
+    padding: 1rem;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  
+  .dark .search-container {
+    border-color: #334155;
+  }
+  
+  .search-input {
+    width: 100%;
+    padding: 0.5rem 0.75rem 0.5rem 2.5rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.375rem;
+    background-color: white;
+  }
+  
+  .dark .search-input {
+    background-color: #1e293b;
+    border-color: #475569;
+  }
+  
+  .search-input:focus {
+    outline: none;
+    ring: 1px;
+    ring-color: #3A4B6D;
+    border-color: #3A4B6D;
+  }
+  
+  .conversations-scroll {
+    height: calc(100% - 60px);
+    overflow-y: auto;
+  }
+  
+  .conversation-item {
+    padding: 0.75rem;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    align-items: flex-start;
+    cursor: pointer;
+  }
+  
+  .dark .conversation-item {
+    border-color: #334155;
+  }
+  
+  .conversation-item:hover {
+    background-color: #f8fafc;
+  }
+  
+  .dark .conversation-item:hover {
+    background-color: #1e293b;
+  }
+  
+  .conversation-item.active {
+    background-color: #f8fafc;
+  }
+  
+  .dark .conversation-item.active {
+    background-color: #1e293b;
+  }
+  
+  .avatar {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 9999px;
+    overflow: hidden;
+    margin-right: 0.75rem;
+    flex-shrink: 0;
+  }
+  
+  .avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .message-container {
+    display: flex;
+    margin-bottom: 1rem;
+  }
+  
+  .message-container.sent {
+    justify-content: flex-end;
+  }
+  
+  .message-bubble {
+    max-width: 20rem;
+    border-radius: 0.5rem;
+    padding: 0.75rem;
+  }
+  
+  @media (min-width: 1024px) {
+    .message-bubble {
+      max-width: 28rem;
+    }
+  }
+  
+  .message-bubble.sent {
+    background-color: #3A4B6D;
+    color: white;
+    border-top-right-radius: 0;
+  }
+  
+  .message-bubble.received {
+    background-color: #f1f5f9;
+    color: #334155;
+    border-top-left-radius: 0;
+  }
+  
+  .dark .message-bubble.received {
+    background-color: #334155;
+    color: white;
+  }
+  
+  .message-input-container {
+    border-top: 1px solid #e5e7eb;
+    padding: 0.75rem;
+  }
+  
+  .dark .message-input-container {
+    border-color: #334155;
+  }
+  
+  .message-input {
+    flex: 1;
+    border: 0;
+    background: transparent;
+    padding: 0 0.75rem;
+  }
+  
+  .message-input:focus {
+    outline: none;
+    ring: 0;
+  }
+  
+  .send-button {
+    padding: 0.5rem;
+    border-radius: 9999px;
+  }
+  
+  .send-button.active {
+    background-color: #3A4B6D;
+    color: white;
+  }
+  
+  .send-button.inactive {
+    background-color: #e2e8f0;
+    color: #64748b;
+  }
+  
+  .dark .send-button.inactive {
+    background-color: #334155;
+  }

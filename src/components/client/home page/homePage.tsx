@@ -25,7 +25,8 @@ export const HomePage: React.FC<HomePageProps> = ({ isDarkMode, toggleDarkMode, 
       requiredSkills: ['UI/UX', 'HTML', 'CSS', 'JavaScript'],
       deadline: new Date('2024-04-15'),
       budget: '$2,500',
-      createdAt: new Date('2024-03-15')
+      createdAt: new Date('2024-03-15'),
+      clientName: 'EcoShop Inc.',
     },
     {
       id: '2',
@@ -38,7 +39,8 @@ export const HomePage: React.FC<HomePageProps> = ({ isDarkMode, toggleDarkMode, 
       requiredSkills: ['React Native', 'iOS', 'Android', 'API Integration'],
       deadline: new Date('2024-05-01'),
       budget: '$5,000',
-      createdAt: new Date('2024-03-14')
+      createdAt: new Date('2024-03-14'),
+      clientName: 'TechStart Solutions',
     },
   ]);
 
