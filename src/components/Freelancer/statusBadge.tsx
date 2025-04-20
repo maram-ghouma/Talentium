@@ -1,4 +1,6 @@
 import React from 'react';
+import '../../Styles/Freelancer/status.css';
+
 
 interface StatusBadgeProps {
   status: string;

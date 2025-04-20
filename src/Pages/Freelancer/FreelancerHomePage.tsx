@@ -1,4 +1,6 @@
 import React from 'react';
+import '../../Styles/Freelancer.css';
+
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
 // Layout component
@@ -27,8 +29,8 @@ const FreelancerHomePage=()=>{
               isSidebarOpen={isSidebarOpen}
               toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
               onSearch={handleSearch}
-              usertype='admin'
-              profileName = "Admin"
+              usertype='freelancer'
+              profileName = "Freelancer"
               profileRole = ""
             >
               *

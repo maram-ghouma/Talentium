@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { Calendar, DollarSign, Clock, MessageSquare, CheckCircle, XCircle } from 'lucide-react';
 import { missions } from '../../Data/mockData';
 import StatusBadge from './statusBadge';
+import '../../Styles/Freelancer/mission.css';
 
 const MissionDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();

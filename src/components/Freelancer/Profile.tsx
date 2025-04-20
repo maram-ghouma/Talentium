@@ -2,6 +2,8 @@ import React from 'react';
 import { Star, MapPin, Mail, Phone, Award, DollarSign, Briefcase } from 'lucide-react';
 import { currentUser, workHistory } from '../../Data/mockData';
 import WorkHistoryItem from './History';
+import '../../Styles/Freelancer/profile.css';
+
 
 const Profile: React.FC = () => {
   return (

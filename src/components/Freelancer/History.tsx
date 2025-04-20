@@ -1,5 +1,7 @@
 import React from 'react';
 import { Star, ChevronDown, ChevronUp } from 'lucide-react';
+import '../../Styles/Freelancer/history.css';
+
 
 export type WorkHistoryItem = {
     id: string;

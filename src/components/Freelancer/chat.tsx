@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
 import { Search, Send, Paperclip, ChevronLeft, Phone, Video, MessageSquare } from 'lucide-react';
 import { conversations, chatMessages } from '../../Data/mockData';
-import './styles/Chat.css';
-
-
+import '../../Styles/Freelancer/chat.css';
 
 const Chat: React.FC = () => {
   const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
@@ -49,10 +47,10 @@ const Chat: React.FC = () => {
     : [];
     
   return (
-    <div className="flex h-full -mt-6 -mb-6">
+    <div className="chat-container">
       {/* Conversations List */}
-      <div className={`w-80 border-r dark:border-slate-700 ${selectedConversation ? 'hidden md:block' : 'block'}`}>
-        <div className="p-4 border-b dark:border-slate-700">
+      <div className={`conversation-list ${selectedConversation ? 'hidden md:block' : 'block'}`}>
+        <div className="search-container">
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <Search size={16} className="text-slate-400" />
@@ -60,23 +58,22 @@ const Chat: React.FC = () => {
             <input
               type="text"
               placeholder="Search conversations..."
-              className="block w-full pl-10 pr-3 py-2 border border-slate-300 rounded-md bg-white focus:outline-none focus:ring-1 focus:ring-[#3A4B6D] focus:border-[#3A4B6D] text-sm dark:bg-slate-800 dark:border-slate-600"
+              className="search-input"
             />
           </div>
         </div>
         
-        <div className="overflow-y-auto h-[calc(100%-60px)]">
+        <div className="conversations-scroll">
           {conversations.map(conv => (
             <div 
               key={conv.id}
-              className={`p-3 border-b flex items-start cursor-pointer hover:bg-slate-50 dark:border-slate-700 dark:hover:bg-slate-800 ${selectedConversation === conv.id ? 'bg-slate-50 dark:bg-slate-800' : ''}`}
+              className={`conversation-item ${selectedConversation === conv.id ? 'active' : ''}`}
               onClick={() => setSelectedConversation(conv.id)}
             >
-              <div className="w-10 h-10 rounded-full overflow-hidden mr-3 flex-shrink-0">
+              <div className="avatar">
                 <img 
                   src={conv.participants.find(p => p.id !== 'user-1')?.avatar || 'https://via.placeholder.com/40'} 
                   alt={conv.participants.find(p => p.id !== 'user-1')?.name} 
-                  className="w-full h-full object-cover"
                 />
               </div>
               
@@ -120,11 +117,10 @@ const Chat: React.FC = () => {
                   <ChevronLeft size={20} />
                 </button>
                 
-                <div className="w-10 h-10 rounded-full overflow-hidden mr-3">
+                <div className="avatar">
                   <img 
                     src={conversation?.participants.find(p => p.id !== 'user-1')?.avatar || 'https://via.placeholder.com/40'} 
                     alt={conversation?.participants.find(p => p.id !== 'user-1')?.name} 
-                    className="w-full h-full object-cover"
                   />
                 </div>
                 
@@ -150,22 +146,17 @@ const Chat: React.FC = () => {
             
             <div className="flex-1 overflow-y-auto p-4">
               {conversationMessages.map(msg => (
-                <div key={msg.id} className={`flex mb-4 ${msg.senderId === 'user-1' ? 'justify-end' : 'justify-start'}`}>
+                <div key={msg.id} className={`message-container ${msg.senderId === 'user-1' ? 'sent' : ''}`}>
                   {msg.senderId !== 'user-1' && (
-                    <div className="w-8 h-8 rounded-full overflow-hidden mr-2 flex-shrink-0 mt-1">
+                    <div className="avatar" style={{width: '2rem', height: '2rem', marginTop: '0.25rem'}}>
                       <img 
                         src={msg.senderAvatar || 'https://via.placeholder.com/32'} 
                         alt={msg.senderName} 
-                        className="w-full h-full object-cover"
                       />
                     </div>
                   )}
                   
-                  <div className={`max-w-xs lg:max-w-md rounded-lg p-3 ${
-                    msg.senderId === 'user-1' 
-                      ? 'bg-[#3A4B6D] text-white rounded-tr-none' 
-                      : 'bg-slate-100 text-slate-700 rounded-tl-none dark:bg-slate-700 dark:text-white'
-                  }`}>
+                  <div className={`message-bubble ${msg.senderId === 'user-1' ? 'sent' : 'received'}`}>
                     <div>{msg.content}</div>
                     <div className={`text-xs mt-1 ${msg.senderId === 'user-1' ? 'text-slate-300' : 'text-slate-500 dark:text-slate-400'}`}>
                       {formatTime(msg.timestamp)}
@@ -175,7 +166,7 @@ const Chat: React.FC = () => {
               ))}
             </div>
             
-            <div className="border-t p-3 dark:border-slate-700">
+            <div className="message-input-container">
               <form onSubmit={handleSendMessage} className="flex items-center">
                 <button type="button" className="p-2 rounded-full hover:bg-slate-100 text-slate-500 dark:hover:bg-slate-700">
                   <Paperclip size={20} />
@@ -183,13 +174,13 @@ const Chat: React.FC = () => {
                 <input
                   type="text"
                   placeholder="Type a message..."
-                  className="flex-1 border-0 bg-transparent focus:outline-none focus:ring-0 px-3"
+                  className="message-input"
                   value={newMessage}
                   onChange={(e) => setNewMessage(e.target.value)}
                 />
                 <button 
                   type="submit" 
-                  className={`p-2 rounded-full ${newMessage.trim() ? 'bg-[#3A4B6D] text-white' : 'bg-slate-200 text-slate-500 dark:bg-slate-700'}`}
+                  className={`send-button ${newMessage.trim() ? 'active' : 'inactive'}`}
                 >
                   <Send size={18} />
                 </button>

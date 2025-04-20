@@ -3,6 +3,8 @@ import { Calendar, DollarSign } from 'lucide-react';
 import { Mission } from '../../types';
 import StatusBadge from './statusBadge';
 import { Link } from 'react-router-dom';
+import '../../Styles/Freelancer/card.css';
+
 
 interface MissionCardProps {
   mission: Mission;
