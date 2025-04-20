@@ -4,7 +4,8 @@ import FreelancersList from './Pages/Admin/FreelancersList';
 import ClientHome from './Pages/Client/ClientHomePage';
 import ClientsList from './Pages/Admin/ClientsList';
 import ReportsInterface from './Pages/Admin/ReportsInterface';
-
+import ClientInterviewSchedule from './Pages/Client/ClientInterviews';
+import ClientProfilePage from './Pages/Client/ClientProfile';
 function App() {
  
   return (
@@ -13,7 +14,9 @@ function App() {
   <Route path="/admin" element={<AdminDashboard />} />
   <Route path="/admin/freelancers" element={<FreelancersList />} />
   <Route path="/admin/reports" element={<ReportsInterface />} />
-
+  <Route path="/client" element ={<ClientHome/>}/>
+  <Route path="/client/interviews" element ={<ClientInterviewSchedule/>}/>
+  <Route path="/client/profile" element ={<ClientProfilePage/>}/>
 
 </Routes>
   );

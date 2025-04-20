@@ -27,7 +27,7 @@ const [formData, setFormData] = useState({
       
       {/* Modal content - completely separate from the blurred overlay */}
       <div className={`modal-container ${isDarkMode ? 'dark-mode' : ''}`}>
-        <div className="modal-header">
+        <div className="modal-header" style={{ backgroundColor: isDarkMode ? 'var(--navy-secondary)' : '' ,margin:'0px 0px 0px 0px', paddingBottom:'20px',paddingTop:'20px',paddingLeft:'20px',paddingRight:'20px'}}>
           <h2 className="modal-title">Create New Mission</h2>
           <button onClick={onClose} className="close-button">
             <X size={24} />
@@ -44,6 +44,7 @@ const [formData, setFormData] = useState({
               date: new Date().toISOString(),
             });
           }}
+          style={{margin:'0px 0px 0px 0px', paddingBottom:'10px',paddingTop:'20px',paddingLeft:'20px',paddingRight:'20px'}}
         >
           <div className="form-group">
   <label className="form-label">Title</label>
