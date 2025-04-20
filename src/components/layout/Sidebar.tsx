@@ -8,17 +8,17 @@ import {
   MessageSquare,
   ChevronLeft,
   ChevronRight,
-  LogIn,
   LogOut,
-  Repeat,
   Briefcase,
   CalendarCheck,
   ChevronDown,
   Laptop,
-  Building,
   Handshake,
+  Shield,
+  SwitchCamera,
 } from 'lucide-react';
 import '../../Styles/sidebar.css';
+import { report } from 'process';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -43,12 +43,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { icon: CalendarCheck, label: 'Schedule', path: "" },
     { icon: MessageSquare, label: 'Chat', badge: 2 , path: ""},
     { icon: History, label: 'History',path: "" },
+
   ];
 
   // Client menu items
   const AdminMenuItems = [
     { icon: Briefcase, label: 'Dashboard' ,path: "/admin"}, 
     { icon: Bell, label: 'Notifications', badge: 3,path: "" },
+    { icon: Shield, label: 'Reports',path: "/admin/reports" },
+
   ];
   const FreelancerMenuItems = [
     { icon: Bell, label: 'Notifications', badge: 3 ,path: ""},
@@ -171,12 +174,20 @@ const toggleUserDropdown = () => setUserDropdownOpen(prev => !prev);
 
         {/* Client specific footer items */}
         {(userType === 'client' || userType === 'freelancer') && (
+          <>
           <button key="sign-out" className="sidebar-button">
             <div className="icon-container">
-              <LogOut size={20} />
+              <SwitchCamera size={20} />
             </div>
-            {isOpen && <span className="button-label">Sign Out</span>}
+            {isOpen && <span className="button-label">Switch Profile</span>}
           </button>
+          <button key="sign-out" className="sidebar-button">
+          <div className="icon-container">
+            <LogOut size={20} />
+          </div>
+          {isOpen && <span className="button-label">Sign Out</span>}
+        </button>
+        </>
         )}
       </div>
     </div>
