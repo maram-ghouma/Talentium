@@ -2,17 +2,34 @@
       id: string;
       title: string;
       description: string;
-      status: 'not_assigned' | 'in_progress' | 'assigned' | 'completed';
+      status: 'not_assigned' | 'in_progress' | 'assigned' | 'completed';//assigned a eliminer
+      /* case 'completed':
+        
+      case 'in_progress':
+        
+      case 'not_assigned':*/
       price: number;
       date: string;
       clientId: string;
+      client: string;
+      clientLogo?: string;
       requiredSkills?: string[];
       deadline?: Date | string; 
       budget?: string;
       createdAt?: Date;
       clientName: string;
+      paymentStatus: 'Paid' | 'Unpaid' | 'Partial';
+      priority: 'Low' | 'Medium' | 'High';
+      progress: number;
+      tasks: {
+        total: number;
+        completed: number;
+      };
   
     }
+    export type MissionStatus = 'not_assigned' | 'in_progress' | 'assigned' | 'completed';
+    
+   
   
     export interface Notification {
       id: string;
@@ -51,25 +68,32 @@
       completedMissions?: number;
       rating?: number;
     };
+    
   
-    export type ChatMessage = {
+    export interface Message {
       id: string;
       senderId: string;
-      senderName: string;
-      senderAvatar?: string;
+      receiverId: string;
       content: string;
       timestamp: string;
       read: boolean;
-    };
+      attachments?: {
+        name: string;
+        url: string;
+        type: string;
+      }[];
+    }
+    
+
   
-    export type Conversation = {
+    export interface ChatConversation {
       id: string;
-      participants: { id: string; name: string; avatar?: string }[];
-      missionId?: string;
-      missionTitle?: string;
-      lastMessage?: ChatMessage;
+      participantId: string;
+      participantName: string;
+      participantAvatar: string;
+      lastMessage: Message;
       unreadCount: number;
-    };
+    }
   
     export type NotificationType = {
       id: string;
@@ -85,12 +109,42 @@
       id: string;
       title: string;
       client: string;
-      date: string;
+      date: string;//date
+      clientLogo?: string;
       description: string;
       skills: string[];
+      endDate: string | null;
+/*
       feedback?: string;
       rating?: number;
+      */
+      testimonial?: {
+        text: string;
+        author: string;
+        rating: number;
+      };
     };
+    export interface Profile {
+      id: string;
+      name: string;
+      title: string;
+      avatar: string;
+      location: string;
+      email: string;
+      phone: string;
+      bio: string;
+      skills: string[];
+      hourlyRate: number;
+      availability: string;
+      joinedDate: string;
+      socialLinks: {
+        linkedin?: string;
+        github?: string;
+        portfolio?: string;
+        twitter?: string;
+      };
+    }
+    
     export interface Interview {
       id: string;
       candidateName: string;
@@ -98,3 +152,10 @@
       scheduledDateTime: string;
       remindMe: boolean;
     };
+    
+    
+ 
+   
+    
+   
+ 

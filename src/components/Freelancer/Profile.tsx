@@ -1,93 +1,176 @@
-import React from 'react';
-import { Star, MapPin, Mail, Phone, Award, DollarSign, Briefcase } from 'lucide-react';
-import { currentUser, workHistory } from '../../Data/mockData';
-import WorkHistoryItem from './History';
-import '../../Styles/Freelancer/profile.css';
+import React, { useState } from 'react';
+import { MapPin, Mail, Phone, Calendar, DollarSign, Clock, Edit, Linkedin, Github, Globe, Twitter } from 'lucide-react';
+import { Profile as ProfileType } from '../../types';
+import '../../Styles/Freelancer/Profile.css';
+import { MainLayout } from '../layout/MainLayout';
 
+interface ProfileProps {
+  profile: ProfileType;
+  onEdit?: () => void;
+}
 
-const Profile: React.FC = () => {
+const Profile: React.FC<ProfileProps> = ({ profile, onEdit }) => {
+  const {
+    name,
+    title,
+    avatar,
+    location,
+    email,
+    phone,
+    bio,
+    skills,
+    hourlyRate,
+    availability,
+    joinedDate,
+    socialLinks
+  } = profile;
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { 
+      month: 'long', 
+      year: 'numeric'
+    });
+  };
+ const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isDarkMode, setIsDarkMode] = useState(false);
+
+  const handleSearch = (query: string) => {
+    console.log('Search query:', query);
+  };
+
   return (
-    <div className="max-w-5xl mx-auto">
-      <div className="card mb-8">
-        <div className="flex flex-col md:flex-row">
-          <div className="md:w-1/4 flex flex-col items-center mb-6 md:mb-0">
-            <div className="w-32 h-32 rounded-full overflow-hidden mb-4">
-              <img 
-                src={currentUser.avatar || 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1'}
-                alt={currentUser.name}
-                className="w-full h-full object-cover"
-              />
+    <MainLayout
+      isDarkMode={isDarkMode}
+      toggleDarkMode={() => setIsDarkMode(!isDarkMode)}
+      isSidebarOpen={isSidebarOpen}
+      toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
+      onSearch={handleSearch}
+      usertype="freelancer"
+      profileName="Freelancer"
+      profileRole=""
+    >
+    <div className="profile-container">
+      <div className="profile-header">
+        <img src={avatar} alt={name} className="profile-avatar" />
+        
+        <div className="profile-header-info">
+          <h1 className="profile-name">{name}</h1>
+          <h2 className="profile-title">{title}</h2>
+          
+          <div className="profile-meta">
+            <div className="profile-meta-item">
+              <MapPin size={16} />
+              <span>{location}</span>
             </div>
             
-            <div className="flex items-center mb-2">
-              <Star size={18} className="text-yellow-500 mr-1" />
-              <span className="font-semibold">{currentUser.rating}</span>
-              <span className="text-slate-500 ml-1 dark:text-slate-400">({currentUser.completedMissions} reviews)</span>
+            <div className="profile-meta-item">
+              <Mail size={16} />
+              <span>{email}</span>
             </div>
             
-            <button className="btn-primary w-full mt-2">Edit Profile</button>
+            <div className="profile-meta-item">
+              <Phone size={16} />
+              <span>{phone}</span>
+            </div>
           </div>
           
-          <div className="md:w-3/4 md:pl-8">
-            <h2 className="text-2xl font-bold mb-2">{currentUser.name}</h2>
-            <h3 className="text-lg text-slate-600 dark:text-slate-300 mb-4">{currentUser.role}</h3>
+          <div className="profile-social">
+            {socialLinks.linkedin && (
+              <a 
+                href={socialLinks.linkedin} 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="profile-social-link"
+                aria-label="LinkedIn profile"
+              >
+                <Linkedin size={18} />
+              </a>
+            )}
             
-            <p className="mb-6 text-slate-700 dark:text-slate-300">
-              {currentUser.bio}
-            </p>
+            {socialLinks.github && (
+              <a 
+                href={socialLinks.github} 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="profile-social-link"
+                aria-label="GitHub profile"
+              >
+                <Github size={18} />
+              </a>
+            )}
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-              <div className="flex items-center text-slate-700 dark:text-slate-300">
-                <Mail size={18} className="mr-2 text-slate-500" />
-                <span>{currentUser.email}</span>
-              </div>
-              <div className="flex items-center text-slate-700 dark:text-slate-300">
-                <Phone size={18} className="mr-2 text-slate-500" />
-                <span>+1 (555) 123-4567</span>
-              </div>
-              <div className="flex items-center text-slate-700 dark:text-slate-300">
-                <MapPin size={18} className="mr-2 text-slate-500" />
-                <span>New York, USA</span>
-              </div>
-              <div className="flex items-center text-slate-700 dark:text-slate-300">
-                <DollarSign size={18} className="mr-2 text-slate-500" />
-                <span>${currentUser.hourlyRate}/hr</span>
-              </div>
-            </div>
+            {socialLinks.portfolio && (
+              <a 
+                href={socialLinks.portfolio} 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="profile-social-link"
+                aria-label="Portfolio website"
+              >
+                <Globe size={18} />
+              </a>
+            )}
             
-            <div>
-              <h4 className="font-semibold mb-3 flex items-center">
-                <Award size={18} className="mr-2" />
-                Skills
-              </h4>
-              <div className="flex flex-wrap gap-2">
-                {currentUser.skills?.map((skill, index) => (
-                  <span 
-                    key={index}
-                    className="px-3 py-1 bg-slate-100 text-slate-700 rounded-full text-sm dark:bg-slate-700 dark:text-slate-200"
-                  >
-                    {skill}
-                  </span>
-                ))}
-              </div>
-            </div>
+            {socialLinks.twitter && (
+              <a 
+                href={socialLinks.twitter} 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="profile-social-link"
+                aria-label="Twitter profile"
+              >
+                <Twitter size={18} />
+              </a>
+            )}
           </div>
         </div>
       </div>
       
-      <div className="mb-6">
-        <h3 className="text-xl font-semibold mb-4 flex items-center">
-          <Briefcase size={20} className="mr-2" />
-          Work History
-        </h3>
+      <section className="profile-section">
+        <h3 className="profile-section-title">About</h3>
+        <p className="profile-bio">{bio}</p>
         
-        <div className="space-y-6">
-          {workHistory.map(item => (
-            <WorkHistoryItem key={item.id} historyItem={item} />
+        <div className="profile-info-grid">
+          <div className="profile-info-item">
+            <div className="profile-info-label">
+              <Calendar size={14} /> Member Since
+            </div>
+            <div className="profile-info-value">{formatDate(joinedDate)}</div>
+          </div>
+          
+          <div className="profile-info-item">
+            <div className="profile-info-label">
+              <DollarSign size={14} /> Hourly Rate
+            </div>
+            <div className="profile-info-value">${hourlyRate.toFixed(2)}/hr</div>
+          </div>
+          
+          <div className="profile-info-item">
+            <div className="profile-info-label">
+              <Clock size={14} /> Availability
+            </div>
+            <div className="profile-info-value">{availability}</div>
+          </div>
+        </div>
+        
+        <h3 className="profile-section-title">Skills</h3>
+        <div className="profile-skills">
+          {skills.map((skill, index) => (
+            <span key={index} className="profile-skill">{skill}</span>
           ))}
         </div>
-      </div>
+        
+        {onEdit && (
+          <div className="profile-actions">
+            <button className="edit-profile-btn" onClick={onEdit}>
+              <Edit size={16} /> Edit Profile
+            </button>
+          </div>
+        )}
+      </section>
     </div>
+    </MainLayout>
   );
 };
 

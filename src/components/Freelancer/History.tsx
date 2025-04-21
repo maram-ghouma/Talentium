@@ -1,94 +1,100 @@
-import React from 'react';
-import { Star, ChevronDown, ChevronUp } from 'lucide-react';
+import React, { JSX, useState } from 'react';
+import { Star, Calendar } from 'lucide-react';
+import { WorkHistoryItem } from '../../types';
 import '../../Styles/Freelancer/history.css';
+import { MainLayout } from '../layout/MainLayout';
 
-
-export type WorkHistoryItem = {
-    id: string;
-    title: string;
-    client: string;
-    date: string;
-    description: string;
-    skills: string[];
-    feedback?: string;
-    rating?: number;
-  };
-interface WorkHistoryItemProps {
-  historyItem: WorkHistoryItem;
+interface HistoryProps {
+  historyItems: WorkHistoryItem[];
 }
 
-const WorkHistoryItem: React.FC<WorkHistoryItemProps> = ({ historyItem }) => {
-  const [isExpanded, setIsExpanded] = React.useState(false);
+const History: React.FC<HistoryProps> = ({ historyItems }) => {
+  const formatDate = (dateString: string | null) => {
+    if (!dateString) return 'Present';
+    
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { 
+      month: 'short', 
+      year: 'numeric' 
+    });
+  };
+
+  const getDateRange = (startDate: string, endDate: string | null) => {
+    return `${formatDate(startDate)} - ${formatDate(endDate)}`;
+  };
+
+  const renderStars = (rating: number) => {
+    const stars: JSX.Element[] = [];
+    for (let i = 1; i <= 5; i++) {
+      stars.push(
+        <Star 
+          key={i}
+          size={14}
+          className={i <= rating ? 'star-filled' : 'star-empty'}
+        />
+      );
+    }
+    return stars;
+  };
   
-  return (
-    <div className="card">
-      <div className="flex justify-between">
-        <div>
-          <h4 className="font-semibold text-lg">{historyItem.title}</h4>
-          <p className="text-slate-600 dark:text-slate-300">
-            {historyItem.client} • {historyItem.date}
-          </p>
-        </div>
-        
-        {historyItem.rating && (
-          <div className="flex items-center">
-            <div className="flex">
-              {[...Array(5)].map((_, i) => (
-                <Star 
-                  key={i}
-                  size={16} 
-                  className={i < Math.floor(historyItem.rating || 0) ? "text-yellow-500" : "text-slate-300"}
-                  fill={i < Math.floor(historyItem.rating || 0) ? "currentColor" : "none"}
-                />
-              ))}
+   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+    const [isDarkMode, setIsDarkMode] = useState(false);
+  
+    const handleSearch = (query: string) => {
+      console.log('Search query:', query);
+    };
+  
+    return (
+      <MainLayout
+        isDarkMode={isDarkMode}
+        toggleDarkMode={() => setIsDarkMode(!isDarkMode)}
+        isSidebarOpen={isSidebarOpen}
+        toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
+        onSearch={handleSearch}
+        usertype="freelancer"
+        profileName="Freelancer"
+        profileRole=""
+      >
+    <div className="history-container">
+      <div className="timeline">
+        {historyItems.map((item) => (
+          <div key={item.id} className="timeline-item">
+            <div className="timeline-marker"></div>
+            <div className="timeline-date">
+              <Calendar size={14} /> {getDateRange(item.date, item.endDate)}
             </div>
-            <span className="ml-1 font-medium">{historyItem.rating}</span>
+            <div className="timeline-content">
+              <h3 className="timeline-title">{item.title}</h3>
+              
+              <div className="timeline-client">
+                {item.clientLogo && <img src={item.clientLogo} alt={item.client} className="client-logo" />}
+                <span className="client-name">{item.client}</span>
+              </div>
+              
+              <p className="timeline-description">{item.description}</p>
+              
+              <div className="timeline-skills">
+                {item.skills.map((skill, index) => (
+                  <span key={index} className="timeline-skill">{skill}</span>
+                ))}
+              </div>
+              
+              {item.testimonial && (
+                <div className="timeline-testimonial">
+                  <p className="testimonial-text">{item.testimonial.text}</p>
+                  <div className="testimonial-author">- {item.testimonial.author}</div>
+                  <div className="testimonial-rating">
+                    {renderStars(item.testimonial.rating)}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
-        )}
-      </div>
-      
-      <div className={`mt-4 ${!isExpanded && 'line-clamp-2'}`}>
-        <p className="text-slate-600 dark:text-slate-300">
-          {historyItem.description}
-        </p>
-      </div>
-      
-      <div className="mt-4 flex flex-wrap gap-2">
-        {historyItem.skills.map((skill, index) => (
-          <span 
-            key={index}
-            className="px-2 py-1 bg-slate-100 text-slate-700 rounded-full text-xs dark:bg-slate-700 dark:text-slate-200"
-          >
-            {skill}
-          </span>
         ))}
       </div>
-      
-      {historyItem.feedback && (
-        <div className={`mt-4 ${!isExpanded && 'hidden'}`}>
-          <h5 className="font-medium mb-1">Client Feedback:</h5>
-          <p className="text-slate-600 italic dark:text-slate-300">"{historyItem.feedback}"</p>
-        </div>
-      )}
-      
-      <button 
-        className="mt-4 text-[#3A4B6D] flex items-center text-sm font-medium"
-        onClick={() => setIsExpanded(!isExpanded)}
-      >
-        {isExpanded ? (
-          <>
-            <ChevronUp size={16} className="mr-1" />
-            Show less
-          </>
-        ) : (
-          <>
-            <ChevronDown size={16} className="mr-1" />
-            Show more
-          </>
-        )}
-      </button>
     </div>
+  </MainLayout>
   );
 };
 
-export default WorkHistoryItem;
+export default History;

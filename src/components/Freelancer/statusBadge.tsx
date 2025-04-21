@@ -1,31 +1,45 @@
 import React from 'react';
+import { CheckCircle, Clock, AlertCircle } from 'lucide-react';
+import { MissionStatus } from '../../types';
 import '../../Styles/Freelancer/status.css';
 
-
 interface StatusBadgeProps {
-  status: string;
+  status: MissionStatus;
+  count?: number;
+  variant?: 'badge' | 'pill';
 }
 
-const StatusBadge: React.FC<StatusBadgeProps> = ({ status }) => {
-  let statusClass = '';
-  
-  switch (status) {
-    case 'not assigned':
-      statusClass = 'status-not-assigned';
-      break;
-    case 'in progress':
-      statusClass = 'status-in-progress';
-      break;
-    case 'completed':
-      statusClass = 'status-completed';
-      break;
-    default:
-      statusClass = 'bg-gray-100 text-gray-800';
-  }
-  
+const StatusBadge: React.FC<StatusBadgeProps> = ({ 
+  status, 
+  count,
+  variant = 'badge' 
+}) => {
+        
+
+  const getStatusIcon = () => {
+    switch (status) {
+      case 'completed':
+        return <CheckCircle size={16} />;
+      case 'in_progress':
+        return <Clock size={16} />;
+      case 'not_assigned':
+        return <AlertCircle size={16} />;
+      default:
+        return null;
+    }
+  };
+
+  const statusClass = status.toLowerCase().replace(' ', '-');
+  const variantClass = variant === 'pill' ? 'status-pill' : 'status-badge';
+  const className = `${variantClass} ${statusClass}`;
+
   return (
-    <span className={`status-badge ${statusClass}`}>
+    <span className={className}>
+      {variant === 'badge' && getStatusIcon()}
       {status}
+      {count !== undefined && variant === 'badge' && (
+        <span className="status-count">{count}</span>
+      )}
     </span>
   );
 };

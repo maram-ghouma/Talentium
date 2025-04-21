@@ -1,205 +1,309 @@
-import React, { useState } from 'react';
-import { Search, Send, Paperclip, ChevronLeft, Phone, Video, MessageSquare } from 'lucide-react';
-import { conversations, chatMessages } from '../../Data/mockData';
+import React, { useState, useRef, useEffect } from 'react';
+import { Search, Send, Paperclip, Image, Smile, MoreVertical, Phone, Video } from 'lucide-react';
+import { Message, ChatConversation } from '../../types';
 import '../../Styles/Freelancer/chat.css';
+import { chatConversations, messages } from '../../Data/mockData';
+import { MainLayout } from '../layout/MainLayout';
 
 const Chat: React.FC = () => {
-  const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
-  const [newMessage, setNewMessage] = useState('');
-  const [messages, setMessages] = useState(chatMessages);
+  const [inputValue, setInputValue] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
+  const [currentMessages, setCurrentMessages] = useState<Message[]>(messages);
+  const [selectedConversationId, setSelectedConversationId] = useState<string | null>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
   
-  const conversation = conversations.find(c => c.id === selectedConversation);
-  
-  const handleSendMessage = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newMessage.trim() || !selectedConversation) return;
-    
-    const newMsg = {
-      id: `msg-${Date.now()}`,
-      senderId: 'user-1',
-      senderName: 'Alex Morgan',
-      senderAvatar: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-      content: newMessage,
-      timestamp: new Date().toISOString(),
-      read: true
-    };
-    
-    setMessages([...messages, newMsg]);
-    setNewMessage('');
-  };
-  
-  const formatTime = (timestamp: string) => {
+  const currentUserId = "user-1"; // This should come from auth context in a real app
+
+  const selectedConversation = chatConversations.find(
+    conv => conv.id === selectedConversationId
+  );
+
+  // Filter conversations based on search query
+  const filteredConversations = chatConversations.filter(conv => 
+    conv.participantName.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  // Format timestamp to readable time
+  const formatMessageTime = (timestamp: string) => {
     const date = new Date(timestamp);
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
-  
-  const formatDate = (timestamp: string) => {
+
+  // Format date for message dividers
+  const formatMessageDate = (timestamp: string) => {
     const date = new Date(timestamp);
-    return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
-  };
-  
-  // Filter messages for the selected conversation
-  const conversationMessages = selectedConversation 
-    ? messages.filter(msg => 
-        (msg.senderId === 'user-1' && conversation?.participants.some(p => p.id !== 'user-1')) || 
-        conversation?.participants.some(p => p.id === msg.senderId)
-      )
-    : [];
+    const today = new Date();
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
     
+    if (date.toDateString() === today.toDateString()) {
+      return 'Today';
+    } else if (date.toDateString() === yesterday.toDateString()) {
+      return 'Yesterday';
+    } else {
+      return date.toLocaleDateString([], {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric'
+      });
+    }
+  };
+
+  // Group messages by date
+  const groupMessagesByDate = () => {
+    const groups: { [key: string]: Message[] } = {};
+    
+    currentMessages.forEach(message => {
+      const date = new Date(message.timestamp).toDateString();
+      if (!groups[date]) {
+        groups[date] = [];
+      }
+      groups[date].push(message);
+    });
+    
+    return groups;
+  };
+
+  // Handle sending a message
+  const handleSendMessage = () => {
+    if (inputValue.trim() && selectedConversationId) {
+      const newMessage: Message = {
+        id: `msg-${Date.now()}`,
+        senderId: currentUserId,
+        receiverId: selectedConversation?.participantId || '',
+        content: inputValue,
+        timestamp: new Date().toISOString(),
+        read: false
+      };
+      
+      setCurrentMessages([...currentMessages, newMessage]);
+      setInputValue('');
+    }
+  };
+
+  // Handle key press (Enter to send)
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage();
+    }
+  };
+
+  // Auto-scroll to bottom when messages change
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [currentMessages]);
+
+  // Simulate typing indicator
+  useEffect(() => {
+    if (selectedConversationId && currentMessages.length > 0) {
+      const lastMessage = currentMessages[currentMessages.length - 1];
+      if (lastMessage.senderId !== currentUserId) {
+        setIsTyping(true);
+        const timeout = setTimeout(() => {
+          setIsTyping(false);
+        }, 3000);
+        return () => clearTimeout(timeout);
+      }
+    }
+  }, [currentMessages, currentUserId, selectedConversationId]);
+
+  const handleSelectConversation = (conversationId: string) => {
+    setSelectedConversationId(conversationId);
+    // Mark messages as read when conversation is selected
+    setCurrentMessages(msgs => 
+      msgs.map(msg => 
+        msg.senderId !== currentUserId && !msg.read 
+          ? {...msg, read: true} 
+          : msg
+      )
+    );
+  };
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isDarkMode, setIsDarkMode] = useState(false);
+
+  const handleSearch = (query: string) => {
+    console.log('Search query:', query);
+  };
+
   return (
+    <MainLayout
+      isDarkMode={isDarkMode}
+      toggleDarkMode={() => setIsDarkMode(!isDarkMode)}
+      isSidebarOpen={isSidebarOpen}
+      toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
+      onSearch={handleSearch}
+      usertype="freelancer"
+      profileName="Freelancer"
+      profileRole=""
+    >
     <div className="chat-container">
-      {/* Conversations List */}
-      <div className={`conversation-list ${selectedConversation ? 'hidden md:block' : 'block'}`}>
-        <div className="search-container">
-          <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <Search size={16} className="text-slate-400" />
-            </div>
-            <input
-              type="text"
-              placeholder="Search conversations..."
-              className="search-input"
+      <div className="chat-sidebar">
+        <div className="chat-sidebar-header">
+          <div className="chat-search">
+            <Search size={16} />
+            <input 
+              type="text" 
+              placeholder="Search conversations..." 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
         </div>
         
-        <div className="conversations-scroll">
-          {conversations.map(conv => (
-            <div 
-              key={conv.id}
-              className={`conversation-item ${selectedConversation === conv.id ? 'active' : ''}`}
-              onClick={() => setSelectedConversation(conv.id)}
-            >
-              <div className="avatar">
+        <div className="chat-conversations">
+          {filteredConversations.length > 0 ? (
+            filteredConversations.map(conversation => (
+              <div 
+                key={conversation.id}
+                className={`conversation-item ${conversation.id === selectedConversationId ? 'active' : ''}`}
+                onClick={() => handleSelectConversation(conversation.id)}
+              >
                 <img 
-                  src={conv.participants.find(p => p.id !== 'user-1')?.avatar || 'https://via.placeholder.com/40'} 
-                  alt={conv.participants.find(p => p.id !== 'user-1')?.name} 
+                  src={conversation.participantAvatar} 
+                  alt={conversation.participantName} 
+                  className="conversation-avatar" 
                 />
-              </div>
-              
-              <div className="flex-1 min-w-0">
-                <div className="flex justify-between">
-                  <div className="font-medium truncate">
-                    {conv.participants.find(p => p.id !== 'user-1')?.name}
+                
+                <div className="conversation-info">
+                  <div className="conversation-header">
+                    <span className="conversation-name">{conversation.participantName}</span>
+                    <span className="conversation-time">
+                      {formatMessageTime(conversation.lastMessage.timestamp)}
+                    </span>
                   </div>
-                  <div className="text-xs text-slate-500 flex-shrink-0">
-                    {conv.lastMessage ? formatDate(conv.lastMessage.timestamp) : ''}
+                  
+                  <div className="conversation-preview">
+                    {conversation.lastMessage.content}
                   </div>
                 </div>
                 
-                <div className="flex justify-between items-center mt-1">
-                  <div className="text-sm truncate text-slate-500">
-                    {conv.missionTitle}
-                  </div>
-                  
-                  {conv.unreadCount > 0 && (
-                    <div className="ml-auto bg-[#C99E9E] text-white rounded-full w-5 h-5 flex items-center justify-center text-xs flex-shrink-0">
-                      {conv.unreadCount}
-                    </div>
-                  )}
-                </div>
+                {conversation.unreadCount > 0 && (
+                  <div className="conversation-badge">{conversation.unreadCount}</div>
+                )}
               </div>
+            ))
+          ) : (
+            <div className="chat-empty-state">
+              <div className="chat-empty-icon">🔍</div>
+              <div className="chat-empty-text">No conversations found</div>
+              <div className="chat-empty-subtext">Try a different search term</div>
             </div>
-          ))}
+          )}
         </div>
       </div>
       
-      {/* Chat Area */}
-      <div className={`flex-1 flex flex-col ${!selectedConversation ? 'hidden md:flex' : 'flex'}`}>
+      <div className="chat-main">
         {selectedConversation ? (
           <>
-            <div className="p-3 border-b flex items-center justify-between dark:border-slate-700">
-              <div className="flex items-center">
-                <button 
-                  className="md:hidden mr-2 p-1 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700"
-                  onClick={() => setSelectedConversation(null)}
-                >
-                  <ChevronLeft size={20} />
-                </button>
-                
-                <div className="avatar">
-                  <img 
-                    src={conversation?.participants.find(p => p.id !== 'user-1')?.avatar || 'https://via.placeholder.com/40'} 
-                    alt={conversation?.participants.find(p => p.id !== 'user-1')?.name} 
-                  />
-                </div>
-                
-                <div>
-                  <div className="font-medium">
-                    {conversation?.participants.find(p => p.id !== 'user-1')?.name}
-                  </div>
-                  <div className="text-xs text-slate-500">
-                    {conversation?.missionTitle}
-                  </div>
-                </div>
+            <div className="chat-header">
+              <img 
+                src={selectedConversation.participantAvatar} 
+                alt={selectedConversation.participantName} 
+                className="chat-header-avatar" 
+              />
+              
+              <div className="chat-header-info">
+                <div className="chat-header-name">{selectedConversation.participantName}</div>
+                <div className="chat-header-status online">Online</div>
               </div>
               
-              <div className="flex space-x-2">
-                <button className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700">
-                  <Phone size={18} />
+              <div className="chat-header-actions">
+                <button className="chat-header-btn" aria-label="Phone call">
+                  <Phone size={16} />
                 </button>
-                <button className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700">
-                  <Video size={18} />
+                <button className="chat-header-btn" aria-label="Video call">
+                  <Video size={16} />
+                </button>
+                <button className="chat-header-btn" aria-label="More options">
+                  <MoreVertical size={16} />
                 </button>
               </div>
             </div>
             
-            <div className="flex-1 overflow-y-auto p-4">
-              {conversationMessages.map(msg => (
-                <div key={msg.id} className={`message-container ${msg.senderId === 'user-1' ? 'sent' : ''}`}>
-                  {msg.senderId !== 'user-1' && (
-                    <div className="avatar" style={{width: '2rem', height: '2rem', marginTop: '0.25rem'}}>
-                      <img 
-                        src={msg.senderAvatar || 'https://via.placeholder.com/32'} 
-                        alt={msg.senderName} 
-                      />
-                    </div>
-                  )}
-                  
-                  <div className={`message-bubble ${msg.senderId === 'user-1' ? 'sent' : 'received'}`}>
-                    <div>{msg.content}</div>
-                    <div className={`text-xs mt-1 ${msg.senderId === 'user-1' ? 'text-slate-300' : 'text-slate-500 dark:text-slate-400'}`}>
-                      {formatTime(msg.timestamp)}
-                    </div>
+            <div className="chat-messages">
+              {Object.entries(groupMessagesByDate()).map(([date, dateMessages]) => (
+                <React.Fragment key={date}>
+                  <div className="message-date-divider">
+                    <span className="message-date-label">
+                      {formatMessageDate(dateMessages[0].timestamp)}
+                    </span>
                   </div>
-                </div>
+                  
+                  {dateMessages.map(message => (
+                    <div 
+                      key={message.id}
+                      className={`message ${message.senderId === currentUserId ? 'outgoing' : 'incoming'}`}
+                    >
+                      <div className="message-content">
+                        {message.content}
+                      </div>
+                      <div className="message-time">
+                        {formatMessageTime(message.timestamp)}
+                      </div>
+                    </div>
+                  ))}
+                </React.Fragment>
               ))}
+              
+              {isTyping && (
+                <div className="typing-indicator">
+                  <div className="typing-dots">
+                    <span className="typing-dot"></span>
+                    <span className="typing-dot"></span>
+                    <span className="typing-dot"></span>
+                  </div>
+                  <span>typing...</span>
+                </div>
+              )}
+              
+              <div ref={messagesEndRef} />
             </div>
             
-            <div className="message-input-container">
-              <form onSubmit={handleSendMessage} className="flex items-center">
-                <button type="button" className="p-2 rounded-full hover:bg-slate-100 text-slate-500 dark:hover:bg-slate-700">
-                  <Paperclip size={20} />
-                </button>
-                <input
-                  type="text"
+            <div className="chat-input-container">
+              <div className="chat-input-wrapper">
+                <div className="chat-input-actions">
+                  <button className="chat-input-action-btn" aria-label="Attach file">
+                    <Paperclip size={20} />
+                  </button>
+                  <button className="chat-input-action-btn" aria-label="Attach image">
+                    <Image size={20} />
+                  </button>
+                  <button className="chat-input-action-btn" aria-label="Add emoji">
+                    <Smile size={20} />
+                  </button>
+                </div>
+                
+                <textarea
+                  className="chat-input"
                   placeholder="Type a message..."
-                  className="message-input"
-                  value={newMessage}
-                  onChange={(e) => setNewMessage(e.target.value)}
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  onKeyDown={handleKeyPress}
+                  rows={1}
                 />
+                
                 <button 
-                  type="submit" 
-                  className={`send-button ${newMessage.trim() ? 'active' : 'inactive'}`}
+                  className="chat-send-btn" 
+                  onClick={handleSendMessage}
+                  aria-label="Send message"
                 >
                   <Send size={18} />
                 </button>
-              </form>
+              </div>
             </div>
           </>
         ) : (
-          <div className="flex items-center justify-center h-full flex-col p-6 text-center">
-            <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mb-4 dark:bg-slate-800">
-              <MessageSquare size={32} className="text-slate-400" />
-            </div>
-            <h3 className="text-xl font-semibold mb-2">Your Messages</h3>
-            <p className="text-slate-500 mb-6 max-w-md">
-              Select a conversation from the list to view messages or start a new conversation.
-            </p>
+          <div className="chat-empty-state">
+            <div className="chat-empty-icon">💬</div>
+            <div className="chat-empty-text">Select a conversation to start chatting</div>
+            <div className="chat-empty-subtext">Your messages will appear here</div>
           </div>
         )}
       </div>
     </div>
+    </MainLayout>
   );
 };
 
