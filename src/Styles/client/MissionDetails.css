@@ -23,13 +23,13 @@
     border-bottom: 1px solid rgba(150, 165, 179, 0.1);
     background-color: white;
     color: var(--navy-secondary);
+    margin-bottom: 0rem !important;
   }
-  
+
   .dark-mode .modal-header {
     border-bottom-color: rgba(150, 165, 179, 0.15);
     background-color: var(--navy-secondary);
     color: var(--powder);
-    margin-bottom: 0px;
   }
   
   .dark-mode .modal-content {

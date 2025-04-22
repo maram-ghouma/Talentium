@@ -36,7 +36,7 @@
     right: 7px;
     background: white;
     border: none;
-    width: 25px;
+    width: 25px !important;
     height: 25px;
     border-radius: 50%;
     display: flex;
@@ -46,6 +46,7 @@
     color: var(--navy-primary);
     transition: all 0.3s ease;
     z-index: 10;
+    margin-top: 0rem !important;
   }
   
   .toggle-button:hover {
@@ -145,12 +146,13 @@
   
   .profile-info {
     margin-left: 0.75rem;
+    padding-right: 0.1rem;
     flex: 1;
+    min-width: 0;
   }
-  
   .profile-name {
-    margin: 0;
-    font-size: 0.95rem;
+    margin-bottom: 0 !important;
+    font-size: 1rem !important;
     font-weight: 600;
     color: var(--navy-primary);
     white-space: nowrap;
@@ -159,6 +161,7 @@
   }
   
   .role-text {
+    margin-top: 0rem;
     font-size: 0.75rem;
     color: var(--slate);
   }
