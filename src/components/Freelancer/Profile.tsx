@@ -40,16 +40,7 @@ const Profile: React.FC<ProfileProps> = ({ profile, onEdit }) => {
   };
 
   return (
-    <MainLayout
-      isDarkMode={isDarkMode}
-      toggleDarkMode={() => setIsDarkMode(!isDarkMode)}
-      isSidebarOpen={isSidebarOpen}
-      toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
-      onSearch={handleSearch}
-      usertype="freelancer"
-      profileName="Freelancer"
-      profileRole=""
-    >
+   
     <div className="profile-container">
       <div className="profile-header">
         <img src={avatar} alt={name} className="profile-avatar" />
@@ -170,7 +161,7 @@ const Profile: React.FC<ProfileProps> = ({ profile, onEdit }) => {
         )}
       </section>
     </div>
-    </MainLayout>
+    
   );
 };
 

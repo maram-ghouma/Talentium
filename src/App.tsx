@@ -17,6 +17,9 @@ import { MainLayout } from './components/layout/MainLayout';
 import { useEffect } from 'react';
 import FreelancerHomePage from './Pages/Freelancer/FreelancerHomePage';
 import FreelancerDashboard from './Pages/Freelancer/FreelancerDashboard';
+import FreelancerProfile from './Pages/Freelancer/FreelancerProfile';
+import FreelancerHistory from './Pages/Freelancer/FreelancerHistory';
+import FreelancerChat from './Pages/Freelancer/FreelancerChat';
 
 
 
@@ -28,10 +31,10 @@ function App() {
   <Route path="/admin" element={<AdminDashboard />} />
   <Route path="/admin/freelancers" element={<FreelancersList />} />
 
-  <Route path="/Freelancer/profile" element={<Profile profile={profile} />} />
+  <Route path="/Freelancer/profile" element={<FreelancerProfile profile={profile} />} />
   <Route path="/Freelancer/mission/:id" element={<MissionDetails mission={missions[0]} />} />
-  <Route path="/Freelancer/chat" element={<Chat />} />
-  <Route path="/Freelancer/history" element={<History historyItems={workHistory} />} />
+  <Route path="/Freelancer/chat" element={<FreelancerChat />} />
+  <Route path="/Freelancer/history" element={<FreelancerHistory historyItems={workHistory} />} />
   <Route path="/Freelancer" element={<FreelancerDashboard />} />
           
 

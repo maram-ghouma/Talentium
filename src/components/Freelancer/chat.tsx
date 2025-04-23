@@ -128,16 +128,7 @@ const Chat: React.FC = () => {
   };
 
   return (
-    <MainLayout
-      isDarkMode={isDarkMode}
-      toggleDarkMode={() => setIsDarkMode(!isDarkMode)}
-      isSidebarOpen={isSidebarOpen}
-      toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
-      onSearch={handleSearch}
-      usertype="freelancer"
-      profileName="Freelancer"
-      profileRole=""
-    >
+   
     <div className="chat-container">
       <div className="chat-sidebar">
         <div className="chat-sidebar-header">
@@ -303,7 +294,7 @@ const Chat: React.FC = () => {
         )}
       </div>
     </div>
-    </MainLayout>
+    
   );
 };
 

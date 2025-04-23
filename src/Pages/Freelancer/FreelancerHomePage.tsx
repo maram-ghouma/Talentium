@@ -3,7 +3,7 @@ import { DollarSign, Calendar, Users, Clock, ChevronRight, ArrowRight } from 'lu
 import Mission from '../../components/Freelancer/mission';
 import StatusBadge from '../../components/Freelancer/statusBadge';
 import { Mission as MissionType, MissionStatus } from '../../types';
-import '../../Styles/Freelancer/home.css';
+
 
 interface FreelancerHomePageProps {
   freelancerName: string;

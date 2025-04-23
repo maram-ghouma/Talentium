@@ -45,16 +45,7 @@ const History: React.FC<HistoryProps> = ({ historyItems }) => {
     };
   
     return (
-      <MainLayout
-        isDarkMode={isDarkMode}
-        toggleDarkMode={() => setIsDarkMode(!isDarkMode)}
-        isSidebarOpen={isSidebarOpen}
-        toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
-        onSearch={handleSearch}
-        usertype="freelancer"
-        profileName="Freelancer"
-        profileRole=""
-      >
+     
     <div className="history-container">
       <div className="timeline">
         {historyItems.map((item) => (
@@ -93,7 +84,7 @@ const History: React.FC<HistoryProps> = ({ historyItems }) => {
         ))}
       </div>
     </div>
-  </MainLayout>
+  
   );
 };
 
