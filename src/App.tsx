@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Sun, Moon } from 'lucide-react';
 import { Sidebar } from './components/Sidebar';
@@ -41,34 +42,41 @@ function App() {
     },
   ]);
 
+import { Route, Routes } from 'react-router-dom';
+import AdminDashboard from './Pages/Admin/AdminDashboard';
+import FreelancersList from './Pages/Admin/FreelancersList';
+import ClientHome from './Pages/Client/ClientHomePage';
+import ClientsList from './Pages/Admin/ClientsList';
+import ReportsInterface from './Pages/Admin/ReportsInterface';
+import ClientInterviewSchedule from './Pages/Client/ClientInterviews';
+import ClientProfilePage from './Pages/Client/ClientProfile';
+
+import Profile from './components/Freelancer/Profile';
+import MissionDetails from './components/Freelancer/mission';
+import Chat from './components/Freelancer/chat';
+import History from './components/Freelancer/History';
+import { MainLayout } from './components/layout/MainLayout';
+import { useEffect } from 'react';
+
+
+
+function App() {
+ 
   return (
-    <div className={isDarkMode ? 'dark-mode' : ''}>
-      <Sidebar isOpen={isSidebarOpen} toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} isDarkMode={isDarkMode} />
+    <Routes>
+  <Route path="/admin/clients" element={<ClientsList />} />
+  <Route path="/admin" element={<AdminDashboard />} />
+  <Route path="/admin/freelancers" element={<FreelancersList />} />
 
-      <main style={{ 
-        marginLeft: isSidebarOpen ? '260px' : '80px',
-        padding: '2rem',
-        transition: 'margin-left 0.3s ease',
-        filter: showCreateMission ? 'blur(4px)' : 'none'
-      }}>
-        <div className="d-flex justify-content-between align-items-center mb-4">
-          <SearchBar onSearch={(query) => console.log(query)} isDarkMode={isDarkMode} />
-          <button
-            onClick={() => setIsDarkMode(!isDarkMode)}
-            className="search-button ms-3"
-          >
-            {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
-          </button>
-        </div>
+  <Route path="/profile" element={<Profile />} />
+          <Route path="/mission/:id" element={<MissionDetails />} />
+          <Route path="/chat" element={<Chat />} />
+          <Route path="/history" element={<Profile />} />
 
-        <div className="mb-4">
-          <button
-            onClick={() => setShowCreateMission(true)}
-            className="search-button w-100"
-          >
-            + Create New Mission
-          </button>
-        </div>
+  <Route path="/admin/reports" element={<ReportsInterface />} />
+  <Route path="/client" element ={<ClientHome/>}/>
+  <Route path="/client/interviews" element ={<ClientInterviewSchedule/>}/>
+  <Route path="/client/profile" element ={<ClientProfilePage/>}/>
 
         <div className="row g-4">
           {missions.map((mission) => (
@@ -83,25 +91,7 @@ function App() {
   <Route path="/notifications" element={<NotificationsPage />} />
 
 
-        {showCreateMission && (
-          <CreateMission
-            onClose={() => setShowCreateMission(false)}
-            onSubmit={(newMission) => {
-              setMissions([
-                ...missions,
-                {
-                  ...newMission,
-                  id: String(missions.length + 1),
-                  clientId: 'client1',
-                } as Mission,
-              ]);
-              setShowCreateMission(false);
-            }}
-            isDarkMode={isDarkMode}
-          />
-        )}
-      </main>
-    </div>
+</Routes>
   );
 }
 

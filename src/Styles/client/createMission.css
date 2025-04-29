@@ -1,0 +1,148 @@
+/* Blurred background overlay */
+.backdrop-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(8px);
+    z-index: 1000;
+  }
+  
+  /* Modal container - completely separate from the blurred background */
+
+  .close-button {
+    background: none;
+    border: none;
+    color: var(--slate);
+    cursor: pointer;
+    padding: 0.5rem;
+    transition: color 0.3s ease;
+  }
+  
+  .close-button:hover {
+    color: var(--rose);
+  }
+  
+ 
+  
+  .form-label {
+    display: block;
+    margin-bottom: 0.25rem;
+    font-weight: 0.875rem;
+    color: var(--navy-primary);
+  }
+  
+
+  .form-control:focus {
+    outline: none;
+    border-color: var(--rose);
+    box-shadow: 0 0 0 2px rgba(201, 158, 158, 0.2);
+  }
+  
+ 
+  
+/* Modal container - reduced height */
+.modal-container {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  border-radius: 12px;
+  padding: 0rem 0rem 0rem 0rem;
+  width: 90%;
+  max-width: 600px;
+  height: 85%; /* Limit max height */
+  overflow-y: auto; /* Add scrolling if needed */
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  z-index: 1001;
+  overflow-x: hidden;
+  
+  /* Custom scrollbar styling */
+  scrollbar-width: thin; /* Firefox */
+  scrollbar-color: var(--slate) transparent; 
+}
+
+/* More compact header */
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 5px !important;/* Reduced margin */
+  /*background-color: var(--navy-secondary);*/
+}
+
+/* Smaller title */
+.modal-title {
+  font-size: 1.5rem; /* Reduced size */
+  font-weight: 600;
+  color: var(--navy-primary);
+  margin: 0;
+}
+
+/* Tighter form groups */
+.form-group {
+  margin-bottom: 0.75rem; /* Further reduced margin */
+}
+
+/* Smaller text areas */
+textarea.form-control {
+  min-height: 80px; /* Reduced height */
+  resize: none;
+}
+
+/* Form control with reduced padding */
+.form-control {
+  width: 100%;
+  padding: 0.5rem 0.75rem; /* Reduced padding */
+  border: 1px solid rgba(150, 165, 179, 0.3);
+  border-radius: 8px;
+  background: rgba(197, 216, 229, 0.1);
+  transition: all 0.3s ease;
+}
+
+/* Smaller submit button */
+.submit-button {
+  width: 100%;
+  padding: 0.75rem; /* Reduced padding */
+  margin-top: 1rem; /* Add small top margin */
+  background: var(--rose);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+  
+  .submit-button:hover {
+    background: rgba(201, 158, 158, 0.9);
+    transform: translateY(-1px);
+  }
+  
+  /* Dark mode styles */
+  .dark-mode.modal-container {
+    background: var(--navy-primary);
+  }
+  
+  .dark-mode .modal-title {
+    color: var(--powder);
+  }
+  
+  .dark-mode .form-label {
+    color: var(--powder);
+  }
+  
+  .dark-mode .form-control {
+    background: var(--navy-secondary);
+    border-color: rgba(197, 216, 229, 0.1);
+    color: var(--powder);
+  }
+  
+  /* For Safari compatibility */
+  @supports (-webkit-backdrop-filter: none) {
+    .backdrop-overlay {
+      -webkit-backdrop-filter: blur(8px);
+    }
+  }

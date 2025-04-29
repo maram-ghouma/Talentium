@@ -1,0 +1,286 @@
+.admin-container {
+    padding: 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+    background-color: #f8f9fa;
+    border-radius: 16px;
+
+
+  }
+  .dark-mode .admin-container{
+    background-color: var(--navy-primary);
+
+  }
+  
+  .admin-title {
+    font-size: 2.5rem;
+    color: var(--navy-primary);
+    margin-bottom: 2rem;
+    font-weight: 700;
+  }
+  .dark-mode .admin-title{
+    color: white;
+  }
+  
+  .stats-grid {
+    
+    flex-direction: row;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+    display: grid;
+    gap: 1rem;
+  }
+  
+  .stat-card {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    display:flex;
+    align-items: flex-start;
+    gap: 1rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    
+  }
+  .dark-mode .stat-card{
+    background: var(--navy-secondary);
+  }
+  
+  .stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+  }
+  
+  .stat-icon {
+    background-color: var(--powder);
+    padding: 1rem;
+    border-radius: 12px;
+    color: var(--navy-primary);
+  }
+  .dark-mode .stat-icon{
+    background-color: white;
+
+  }
+  
+  .stat-content {
+    flex: 1;
+  }
+  
+  .stat-content h3 {
+    font-size: 0.9rem;
+    color: var(--slate);
+    margin: 0 0 0.5rem 0;
+  }
+ 
+  
+  .stat-number {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--navy-primary);
+    margin: 0;
+  }
+  .dark-mode .stat-number{
+    color: white;
+  }
+  .stat-change {
+    font-size: 0.85rem;
+    display: block;
+    margin-top: 0.5rem;
+  }
+  
+  .stat-change.positive {
+    color: var(--rose);
+  }
+  
+  .rankings-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-top: 3rem;
+  }
+  
+  .ranking-section {
+    background: white;
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  }
+  .dark-mode .ranking-section{
+    background: var(--navy-primary);
+  }
+  
+  .section-title {
+    font-size: 2rem;
+    color: var(--navy-primary);
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .dark-mode .section-title{
+    color: white;
+
+  }
+  
+  .section-icon {
+    color: var(--rose);
+  }
+  
+  .ranking-cards {
+    display: grid;
+    gap: 1rem;
+  }
+  
+  .ranking-card {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 1.25rem;
+    transition: transform 0.3s ease;
+  }
+  .dark-mode .ranking-card{
+    background: var(--navy-secondary);
+
+  }
+  
+  .ranking-card:hover {
+    transform: translateX(5px);
+  }
+  
+  .ranking-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+  }
+  
+  .ranking-number {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--slate);
+  }
+  .dark-mode .ranking-number{
+    color: var(--rose);
+
+  }
+  
+  .rating {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    color: var(--rose);
+    font-weight: 600;
+  }
+  
+  .star-icon {
+    color: var(--rose);
+  }
+  
+  .ranking-card h3 {
+    font-size: 1.1rem;
+    color: var(--navy-primary);
+    margin: 0 0 0.5rem 0;
+  }
+  .dark-mode .ranking-card h3{
+    color: white;
+
+  }
+  
+  .field, .completed-jobs, .projects-posted {
+    font-size: 0.9rem;
+    color: var(--slate);
+    margin: 0.25rem 0;
+  }
+  
+  @media (max-width: 768px) {
+    .admin-container {
+      padding: 1rem;
+    }
+  
+    .admin-title {
+      font-size: 2rem;
+    }
+  
+    .stats-grid {
+      grid-template-columns: 1fr;
+    }
+  
+    .rankings-container {
+      grid-template-columns: 1fr;
+    }
+  }
+  
+  .freelancer-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: var(--card-background);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  }
+  
+  .freelancer-table th,
+  .freelancer-table td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--powder);
+    text-align: center;
+  }
+  
+  .freelancer-table th {
+    background: var(--powder);
+    color: var(--navy-primary);
+    font-weight: 600;
+    
+  }
+  
+  .freelancer-table tr:last-child td {
+    border-bottom: none;
+  }
+  
+  .status-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+  
+  .status-badge.available {
+    background-color: #4CAF50;
+    color: white;
+  }
+  
+  .status-badge.busy {
+    background-color: #FFA726;
+    color: white;
+  }
+  
+  .status-badge.offline {
+    background-color: var(--slate);
+    color: white;
+  }
+  
+  .view-profile-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background-color: var(--powder);
+    color: var(--navy-primary);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .view-profile-btn:hover {
+    background-color: var(--navy-primary);
+    color: white;
+  }
+  
+  .overflow-x-auto {
+    overflow-x: auto;
+    margin: 1rem 0;
+    border-radius: 16px;
+  }
