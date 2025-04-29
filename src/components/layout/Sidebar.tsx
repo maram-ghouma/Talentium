@@ -54,8 +54,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   ];
   const FreelancerMenuItems = [
-    { icon: Bell, label: 'Notifications', badge: 3 ,path: ""},
-    { icon: MessageSquare, label: 'Chat', badge: 2 ,path: ""},
+    { icon: User, label: 'Profile', path: "/Freelancer/profile" },
+    { icon: Bell, label: 'Notifications', badge: 3, path: "/Freelancer" },
+    { icon: MessageSquare, label: 'Chat', badge: 2, path: "/Freelancer/chat" },
+    { icon: History, label: 'Work History', path: "/Freelancer/history" },
+    { icon: Briefcase, label: 'Missions', path: "/Freelancer" },
   ];
   const [userDropdownOpen, setUserDropdownOpen] = React.useState(false);
 const toggleUserDropdown = () => setUserDropdownOpen(prev => !prev);
@@ -189,6 +192,8 @@ const toggleUserDropdown = () => setUserDropdownOpen(prev => !prev);
         </button>
         </>
         )}
+       
+
       </div>
     </div>
   );

@@ -1,0 +1,94 @@
+:root {
+    --navy-primary: #2C3850;
+    --navy-secondary: #3A4B6D;
+    --slate: #96A5B3;
+    --powder: #C5D8E5;
+    --rose: #C99E9E;
+    
+    /* Extended color palette */
+    --navy-lighter: #4A5A7D;
+    --navy-darker: #1E2A3C;
+    --slate-lighter: #B1BDC8;
+    --slate-darker: #7B8A98;
+    --powder-lighter: #D9E6F0;
+    --powder-darker: #A4BFD2;
+    --rose-lighter: #D9B4B4;
+    --rose-darker: #B58585;
+  
+    /* Status colors */
+    --status-completed: #10B981;
+    --status-in-progress: #3B82F6;
+    --status-pending: #F59E0B;
+    
+    /* Neutral colors */
+    --white: #FFFFFF;
+    --off-white: #F9FAFB;
+    --light-gray: #E5E7EB;
+    --gray: #9CA3AF;
+    --dark-gray: #4B5563;
+    --black: #1F2937;
+    
+    /* Spacing */
+    --space-xs: 4px;
+    --space-sm: 8px;
+    --space-md: 16px;
+    --space-lg: 24px;
+    --space-xl: 32px;
+    --space-2xl: 48px;
+    
+    /* Typography */
+    --font-size-xs: 0.75rem;
+    --font-size-sm: 0.875rem;
+    --font-size-md: 1rem;
+    --font-size-lg: 1.125rem;
+    --font-size-xl: 1.25rem;
+    --font-size-2xl: 1.5rem;
+    --font-size-3xl: 1.875rem;
+    --font-size-4xl: 2.25rem;
+    
+    /* Border radius */
+    --radius-sm: 4px;
+    --radius-md: 6px;
+    --radius-lg: 8px;
+    --radius-xl: 12px;
+    --radius-full: 9999px;
+    
+    /* Shadows */
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    
+    /* Animation */
+    --transition-fast: 150ms ease;
+    --transition-normal: 250ms ease;
+    --transition-slow: 350ms ease;
+  }
+  
+  .dark-mode {
+    --navy-primary: #3A4B6D;
+    --navy-secondary: #2C3850;
+    --slate: #7B8A98;
+    --powder: #A4BFD2;
+    --rose: #B58585;
+    
+    --navy-lighter: #4A5A7D;
+    --navy-darker: #1E2A3C;
+    --slate-lighter: #96A5B3;
+    --slate-darker: #5F6E7D;
+    --powder-lighter: #B9D0DE;
+    --powder-darker: #8AAABF;
+    --rose-lighter: #C99E9E;
+    --rose-darker: #9E7575;
+    
+    --white: #1F2937;
+    --off-white: #111827;
+    --light-gray: #374151;
+    --gray: #6B7280;
+    --dark-gray: #9CA3AF;
+    --black: #F9FAFB;
+    
+    /* Status colors for dark mode */
+    --status-completed: #059669;
+    --status-in-progress: #2563EB;
+    --status-pending: #D97706;
+  }

@@ -1,0 +1,167 @@
+@import './variables.css';
+@import 'bootstrap/dist/css/bootstrap.min.css';
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  line-height: 1.5;
+  color: var(--black);
+  background-color: var(--off-white);
+  transition: background-color var(--transition-normal), color var(--transition-normal);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  line-height: 1.2;
+  font-weight: 600;
+  margin-bottom: var(--space-md);
+  color: var(--navy-primary);
+}
+
+p {
+  margin-bottom: var(--space-md);
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-family: inherit;
+}
+
+a {
+  color: var(--navy-primary);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+a:hover {
+  color: var(--navy-lighter);
+}
+
+.card {
+  background-color: var(--white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+  border: none;
+  overflow: hidden;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-md);
+  font-weight: 500;
+  transition: background-color var(--transition-fast), color var(--transition-fast);
+}
+
+.btn-primary {
+  background-color: var(--navy-primary);
+  color: var(--white);
+}
+
+.btn-primary:hover {
+  background-color: var(--navy-lighter);
+}
+
+.btn-secondary {
+  background-color: var(--slate);
+  color: var(--white);
+}
+
+.btn-secondary:hover {
+  background-color: var(--slate-lighter);
+}
+
+.btn-accent {
+  background-color: var(--rose);
+  color: var(--white);
+}
+
+.btn-accent:hover {
+  background-color: var(--rose-lighter);
+}
+
+.section {
+  margin-bottom: var(--space-2xl);
+}
+
+.container {
+  padding: var(--space-lg);
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: var(--space-md);
+  }
+}
+
+.page-title {
+  font-size: var(--font-size-3xl);
+  color: var(--navy-primary);
+  margin-bottom: var(--space-xl);
+}
+
+.text-muted {
+  color: var(--gray);
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+}
+
+.dark-mode {
+  color: var(--off-white);
+}
+
+.dark-mode h1, .dark-mode h2, .dark-mode h3, .dark-mode h4, .dark-mode h5, .dark-mode h6 {
+  color: var(--powder-lighter);
+}
+
+.dark-mode .card {
+  background-color: var(--navy-darker);
+}
+
+.dark-mode a {
+  color: var(--powder);
+}
+
+.dark-mode a:hover {
+  color: var(--powder-lighter);
+}
+
+/* Subtle animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(10px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.animate-fade-in {
+  animation: fadeIn var(--transition-normal);
+}
+
+.animate-slide-up {
+  animation: slideUp var(--transition-normal);
+}

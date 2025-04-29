@@ -1,183 +1,164 @@
-import React, { useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { Calendar, DollarSign, Clock, MessageSquare, CheckCircle, XCircle } from 'lucide-react';
-import { missions } from '../../Data/mockData';
+import React from 'react';
+import { Calendar, DollarSign, Clock, MoreVertical, ExternalLink, Edit, Trash2 } from 'lucide-react';
+import { Mission as MissionType } from '../../types';
 import StatusBadge from './statusBadge';
 import '../../Styles/Freelancer/mission.css';
 
-const MissionDetails: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
-  const [activeTab, setActiveTab] = useState('details');
+interface MissionProps {
+  mission: MissionType;
+  onEdit?: (id: string) => void;
+  onDelete?: (id: string) => void;
+  onView?: (id: string) => void;
+}
+
+const Mission: React.FC<MissionProps> = ({
+  mission,
+  onEdit,
+  onDelete,
+  onView
+}) => {
+  const { 
+    id, 
+    title, 
+    client, 
+    clientLogo, 
+    description, 
+    date, 
+    deadline, 
+    status, 
+    price, 
+    paymentStatus, 
+    priority, 
+    progress,
+    tasks
+  } = mission;
+
+  const formatDate = (dateInput: string | Date) => {
+    const date = typeof dateInput === 'string' ? new Date(dateInput) : dateInput;
+    return date.toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric'
+    });
+  };
   
-  // Find the mission or redirect/show not found
-  const mission = missions.find(m => m.id === id);
-  
-  if (!mission) {
-    return <div className="text-center py-10">Mission not found</div>;
-  }
-  
-  const milestones = [
-    { id: 'm1', title: 'Initial consultation', completed: true, date: '10/01/2024' },
-    { id: 'm2', title: 'Requirements gathering', completed: true, date: '15/01/2024' },
-    { id: 'm3', title: 'Design mockups', completed: mission.status !== 'not_assigned', date: '25/01/2024' },
-    { id: 'm4', title: 'Finalize design', completed: false, date: '05/02/2024' },
-    { id: 'm5', title: 'Implementation', completed: false, date: '20/02/2024' },
-    { id: 'm6', title: 'Testing and feedback', completed: false, date: '01/03/2024' },
-    { id: 'm7', title: 'Final delivery', completed: false, date: mission.date }
-  ];
-  
+
+  const getPriorityClass = () => {
+    switch (priority) {
+      case 'High':
+        return 'priority-high';
+      case 'Medium':
+        return 'priority-medium';
+      case 'Low':
+        return 'priority-low';
+      default:
+        return '';
+    }
+  };
+
+  const statusClass = status.toLowerCase().replace(' ', '-');
+
   return (
-    <div className="max-w-5xl mx-auto">
-      <div className="card mb-6">
-        <div className="flex justify-between items-start mb-4">
-          <div>
-            <h2 className="text-2xl font-bold">{mission.title}</h2>
-            <p className="text-slate-600 dark:text-slate-300">Client: {mission.clientName}</p>
-          </div>
-          <StatusBadge status={mission.status} />
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <div className="flex items-center text-slate-700 dark:text-slate-300">
-            <Calendar size={18} className="mr-2 text-slate-500" />
-            <span>Deadline: {mission.date}</span>
-          </div>
-          <div className="flex items-center text-slate-700 dark:text-slate-300">
-            <DollarSign size={18} className="mr-2 text-slate-500" />
-            <span>Budget: ${mission.price}</span>
-          </div>
-          <div className="flex items-center text-slate-700 dark:text-slate-300">
-            <Clock size={18} className="mr-2 text-slate-500" />
-            <span>Est. Duration: 4 weeks</span>
+    <div className={`mission-card ${statusClass}`}>
+      <div className="mission-header">
+        <div>
+          <h3 className="mission-title">{title}</h3>
+          <div className="mission-client">
+            {clientLogo && <img src={clientLogo} alt={client} />}
+            <span>{client}</span>
           </div>
         </div>
-        
-        <div className="border-b mb-6 dark:border-slate-700">
-          <div className="flex space-x-6">
-            <button 
-              className={`pb-3 px-1 font-medium ${activeTab === 'details' ? 'border-b-2 border-[#3A4B6D] text-[#3A4B6D] dark:text-white' : 'text-slate-500'}`}
-              onClick={() => setActiveTab('details')}
-            >
-              Details
-            </button>
-            <button 
-              className={`pb-3 px-1 font-medium ${activeTab === 'milestones' ? 'border-b-2 border-[#3A4B6D] text-[#3A4B6D] dark:text-white' : 'text-slate-500'}`}
-              onClick={() => setActiveTab('milestones')}
-            >
-              Milestones
-            </button>
-            <button 
-              className={`pb-3 px-1 font-medium ${activeTab === 'attachments' ? 'border-b-2 border-[#3A4B6D] text-[#3A4B6D] dark:text-white' : 'text-slate-500'}`}
-              onClick={() => setActiveTab('attachments')}
-            >
-              Attachments
-            </button>
-          </div>
+        <StatusBadge status={status} />
+      </div>
+      
+      <p className="mission-description">{description}</p>
+      
+      <div className="mission-meta">
+        <div className="mission-meta-item">
+          <span className="mission-meta-label">
+            <Calendar size={12} /> Start Date
+          </span>
+          <span className="mission-meta-value">{formatDate(date)}</span>
         </div>
         
-        {activeTab === 'details' && (
-          <div>
-            <h3 className="font-semibold mb-3">Description</h3>
-            <p className="text-slate-700 mb-6 dark:text-slate-300">
-              {mission.description}
-              <br /><br />
-              Additional details about this mission would be displayed here. Information like project scope, 
-              deliverables, specific requirements, and any additional context that would help the freelancer 
-              understand the project better.
-            </p>
-            
-            <h3 className="font-semibold mb-3">Requirements</h3>
-            <ul className="list-disc pl-5 text-slate-700 mb-6 dark:text-slate-300">
-              <li>Requirement 1 for this mission</li>
-              <li>Requirement 2 for this mission</li>
-              <li>Requirement 3 for this mission</li>
-              <li>Requirement 4 for this mission</li>
-            </ul>
-            
-            <div className="flex space-x-4 mt-6">
-              <button className="btn-primary">
-                <MessageSquare size={18} className="mr-2" />
-                Contact Client
-              </button>
-              
-              {mission.status === 'not_assigned' ? (
-                <button className="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-md transition-all duration-200 flex items-center">
-                  <CheckCircle size={18} className="mr-2" />
-                  Accept Mission
-                </button>
-              ) : mission.status === 'in_progress' ? (
-                <button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md transition-all duration-200 flex items-center">
-                  <CheckCircle size={18} className="mr-2" />
-                  Mark as Completed
-                </button>
-              ) : (
-                <button className="bg-slate-600 hover:bg-slate-700 text-white font-semibold py-2 px-4 rounded-md transition-all duration-200 flex items-center" disabled>
-                  <CheckCircle size={18} className="mr-2" />
-                  Completed
-                </button>
-              )}
-            </div>
-          </div>
-        )}
+        <div className="mission-meta-item">
+          <span className="mission-meta-label">
+            <Clock size={12} /> Due Date
+          </span>
+          <span className="mission-meta-value">{deadline ? formatDate(deadline) : 'N/A'}</span>
+        </div>
         
-        {activeTab === 'milestones' && (
-          <div className="space-y-4">
-            {milestones.map((milestone, index) => (
-              <div key={milestone.id} className="flex items-start">
-                <div className={`w-6 h-6 rounded-full flex items-center justify-center mt-0.5 ${milestone.completed ? 'bg-green-100 text-green-600' : 'bg-slate-100 text-slate-400'}`}>
-                  {milestone.completed ? (
-                    <CheckCircle size={16} />
-                  ) : (
-                    <span className="text-xs font-medium">{index + 1}</span>
-                  )}
-                </div>
-                <div className={`ml-3 pb-4 ${index < milestones.length - 1 ? 'border-l-2 border-slate-200 dark:border-slate-700 pl-5' : 'pl-5'}`}>
-                  <div className="font-medium">{milestone.title}</div>
-                  <div className="text-sm text-slate-500 dark:text-slate-400">Due: {milestone.date}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+        <div className="mission-meta-item">
+          <span className="mission-meta-label">
+            <DollarSign size={12} /> Payment
+          </span>
+          <span className="mission-meta-value">
+            ${price.toLocaleString()} • {paymentStatus}
+          </span>
+        </div>
         
-        {activeTab === 'attachments' && (
-          <div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              <div className="border rounded-md p-3 flex items-center dark:border-slate-700">
-                <div className="w-10 h-10 rounded bg-blue-100 flex items-center justify-center text-blue-500 mr-3">
-                  <span className="font-medium">PDF</span>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="font-medium truncate">project_brief.pdf</div>
-                  <div className="text-sm text-slate-500">548 KB</div>
-                </div>
-              </div>
-              
-              <div className="border rounded-md p-3 flex items-center dark:border-slate-700">
-                <div className="w-10 h-10 rounded bg-green-100 flex items-center justify-center text-green-500 mr-3">
-                  <span className="font-medium">XLS</span>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="font-medium truncate">budget_breakdown.xlsx</div>
-                  <div className="text-sm text-slate-500">235 KB</div>
-                </div>
-              </div>
-              
-              <div className="border rounded-md p-3 flex items-center dark:border-slate-700">
-                <div className="w-10 h-10 rounded bg-amber-100 flex items-center justify-center text-amber-500 mr-3">
-                  <span className="font-medium">IMG</span>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="font-medium truncate">reference_design.jpg</div>
-                  <div className="text-sm text-slate-500">1.2 MB</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
+        <div className="mission-meta-item">
+          <span className="mission-meta-label">
+            <Clock size={12} /> Tasks
+          </span>
+          <span className="mission-meta-value">
+            {tasks.completed} of {tasks.total} completed
+          </span>
+        </div>
+      </div>
+      
+      <div className="mission-progress">
+        <div className="progress-label">
+          <span className="progress-text">Progress</span>
+          <span className="progress-percentage">{progress}%</span>
+        </div>
+        <div className="progress-bar-container">
+          <div 
+            className="progress-bar-fill" 
+            style={{ width: `${progress}%` }}
+          ></div>
+        </div>
+      </div>
+      
+      <div className="mission-footer">
+        <div className={`mission-priority ${getPriorityClass()}`}>
+          {priority} Priority
+        </div>
+        
+        <div className="mission-actions">
+          {onView && (
+            <button 
+              className="mission-action-btn" 
+              onClick={() => onView(id)}
+              aria-label="View mission details"
+            >
+              <ExternalLink size={16} />
+            </button>
+          )}
+          
+          {onEdit && (
+            <button 
+              className="mission-action-btn" 
+              onClick={() => onEdit(id)}
+              aria-label="Edit mission"
+            >
+              <Edit size={16} />
+            </button>
+          )}
+          
+          {onDelete && (
+            <button 
+              className="mission-action-btn" 
+              onClick={() => onDelete(id)}
+              aria-label="Delete mission"
+            >
+              <Trash2 size={16} />
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );
 };
 
-export default MissionDetails;
+export default Mission;
