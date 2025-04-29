@@ -1,0 +1,125 @@
+.payment-page {
+    display: flex;
+    height: 100vh;
+    width: 100%;
+    background-color: var(--navy-primary);
+  }
+  
+  .freelancer-section {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    padding: 40px;
+    color: white;
+  }
+  
+  .freelancer-content {
+    display: flex;
+    align-items: center;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  
+  .profile-image {
+    min-width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background-color: var(--powder);
+    margin-right: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 3px solid white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .profile-image:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+  }
+  
+  .freelancer-info h2 {
+    font-size: 24px;
+    font-weight: bold;
+    margin: 0 0 8px 0;
+    color: white;
+  }
+  
+  .freelancer-info p {
+    margin: 0;
+    color: var(--powder);
+    line-height: 1.5;
+  }
+  
+  .payment-section {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+  }
+  
+  .payment-form-card {
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    padding: 40px 30px;
+    width: 100%;
+    max-width: 420px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .payment-form-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+  }
+  
+  .payment-header {
+    text-align: center;
+    margin-bottom: 32px;
+  }
+  
+  .payment-header h1 {
+    color: var(--navy-primary);
+    font-size: 32px;
+    font-weight: bold;
+    margin-bottom: 16px;
+    letter-spacing: -0.5px;
+  }
+  
+  .form-group {
+    margin-bottom: 24px;
+  }
+  
+  .form-row {
+    display: flex;
+    gap: 16px;
+  }
+  
+  .form-row .form-group {
+    flex: 1;
+  }
+  
+  .form-action {
+    margin-top: 32px;
+  }
+  
+  @media (max-width: 768px) {
+    .payment-page {
+      flex-direction: column;
+    }
+    
+    .freelancer-section,
+    .payment-section {
+      padding: 20px;
+    }
+    
+    .payment-form-card {
+      padding: 30px 20px;
+    }
+    
+    .payment-header h1 {
+      font-size: 28px;
+    }
+  }

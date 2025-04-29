@@ -5,6 +5,17 @@ import { SearchBar } from './components/SearchBar';
 import { CreateMission } from './components/CreateMission';
 import { MissionCard } from './components/MissionCard';
 import { Mission } from './types';
+import { Route, Routes } from 'react-router-dom';
+
+import { useEffect } from 'react';
+
+import SignUpPage from './Pages/SignUpPage/SignUpPage';
+import SignInPage from './Pages/SignInPage/SignInPage';
+import PaymentPage from './Pages/PaymentPage/PaymentPage';
+import NotificationsPage from './Pages/NotificationsPage/NotificationsPage';
+
+
+
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -66,6 +77,11 @@ function App() {
             </div>
           ))}
         </div>
+  <Route path="/signup" element={<SignUpPage />} />
+  <Route path="/signin" element={<SignInPage />} />
+  <Route path="/payment" element={<PaymentPage />} />
+  <Route path="/notifications" element={<NotificationsPage />} />
+
 
         {showCreateMission && (
           <CreateMission
