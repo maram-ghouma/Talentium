@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { MapPin, Mail, Phone, Calendar, DollarSign, Clock, Edit, Linkedin, Github, Globe, Twitter } from 'lucide-react';
 import { Profile as ProfileType } from '../../types';
-import '../../Styles/Freelancer/Profile.css';
+import '../../Styles/Freelancer/profile.css';
 import { MainLayout } from '../layout/MainLayout';
 
 interface ProfileProps {
