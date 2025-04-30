@@ -1,23 +1,132 @@
+@import '../variables.css';
+
 .status-badge {
-    display: inline-flex;
-    align-items: center;
-    padding: 0.25rem 0.625rem;
-    border-radius: 9999px;
-    font-size: 0.75rem;
-    font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+  transition: all var(--transition-normal);
+}
+
+.status-badge svg {
+  margin-right: var(--space-xs);
+  width: 14px;
+  height: 14px;
+}
+
+.status-badge.completed {
+  background-color: rgba(16, 185, 129, 0.1);
+  color: var(--status-completed);
+}
+
+.status-badge.in-progress {
+  background-color: rgba(59, 130, 246, 0.1);
+  color: var(--status-in-progress);
+}
+
+.status-badge.pending {
+  background-color: rgba(245, 158, 11, 0.1);
+  color: var(--status-pending);
+}
+
+.status-badge.completed svg {
+  color: var(--status-completed);
+}
+
+.status-badge.in-progress svg {
+  color: var(--status-in-progress);
+}
+
+.status-badge.pending svg {
+  color: var(--status-pending);
+}
+
+.status-badge:hover {
+  transform: translateY(-1px);
+}
+
+.status-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  background-color: var(--white);
+  color: var(--status-completed);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  margin-left: var(--space-xs);
+}
+
+.status-badge.in-progress .status-count {
+  color: var(--status-in-progress);
+}
+
+.status-badge.pending .status-count {
+  color: var(--status-pending);
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+  background-color: var(--light-gray);
+  color: var(--navy-primary);
+}
+
+.status-pill.completed {
+  background-color: var(--status-completed);
+  color: white;
+}
+
+.status-pill.in-progress {
+  background-color: var(--status-in-progress);
+  color: white;
+}
+
+.status-pill.pending {
+  background-color: var(--status-pending);
+  color: white;
+}
+
+/* Dark mode styles */
+.dark-mode .status-badge.completed {
+  background-color: rgba(16, 185, 129, 0.2);
+}
+
+.dark-mode .status-badge.in-progress {
+  background-color: rgba(59, 130, 246, 0.2);
+}
+
+.dark-mode .status-badge.pending {
+  background-color: rgba(245, 158, 11, 0.2);
+}
+
+.dark-mode .status-count {
+  background-color: var(--navy-lighter);
+}
+
+.dark-mode .status-pill {
+  background-color: var(--navy-lighter);
+  color: var(--powder);
+}
+
+/* Animations */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
   }
-  
-  .status-not-assigned {
-    background-color: #fef3c7;
-    color: #92400e;
+  50% {
+    opacity: 0.6;
   }
-  
-  .status-in-progress {
-    background-color: #dbeafe;
-    color: #1e40af;
-  }
-  
-  .status-completed {
-    background-color: #dcfce7;
-    color: #166534;
-  }
+}
+
+.status-badge.in-progress svg {
+  animation: pulse 2s infinite;
+}
