@@ -1,0 +1,56 @@
+.notification-item {
+    background-color: white;
+    padding: 20px;
+    margin-bottom: 16px;
+    border-radius: 8px;
+    position: relative;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border: 1px solid var(--powder);
+  }
+  
+  .notification-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+  
+  .notification-item:last-child {
+    margin-bottom: 0;
+  }
+  
+  .notification-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 8px;
+  }
+  
+  .notification-title {
+    color: var(--navy-primary);
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0;
+  }
+  
+  .notification-description {
+    color: var(--slate);
+    font-size: 14px;
+    line-height: 1.5;
+    margin: 0;
+  }
+  
+  .dismiss-button {
+    background: none;
+    border: none;
+    padding: 4px;
+    cursor: pointer;
+    color: var(--slate);
+    transition: color 0.2s ease, transform 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .dismiss-button:hover {
+    color: var(--navy-primary);
+    transform: scale(1.1);
+  }

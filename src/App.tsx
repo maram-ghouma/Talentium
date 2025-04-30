@@ -1,4 +1,16 @@
+import React, { useState, useEffect } from 'react';
+import { Sun, Moon } from 'lucide-react';
+import { Mission } from './types';
 import { Route, Routes } from 'react-router-dom';
+
+
+import SignUpPage from './Pages/SignUpPage/SignUpPage';
+import SignInPage from './Pages/SignInPage/SignInPage';
+import PaymentPage from './Pages/PaymentPage/PaymentPage';
+import NotificationsPage from './Pages/NotificationsPage/NotificationsPage';
+
+
+
 import AdminDashboard from './Pages/Admin/AdminDashboard';
 import FreelancersList from './Pages/Admin/FreelancersList';
 import ClientHome from './Pages/Client/ClientHomePage';
@@ -12,9 +24,7 @@ import {chatConversations, messages, missions, profile, workHistory} from './Dat
 import MissionDetails from './components/Freelancer/mission';
 import Chat from './components/Freelancer/chat';
 import History from './components/Freelancer/History';
-import { useState } from 'react';
 import { MainLayout } from './components/layout/MainLayout';
-import { useEffect } from 'react';
 import FreelancerHomePage from './Pages/Freelancer/FreelancerHomePage';
 import FreelancerDashboard from './Pages/Freelancer/FreelancerDashboard';
 import FreelancerProfile from './Pages/Freelancer/FreelancerProfile';
@@ -24,7 +34,7 @@ import FreelancerChat from './Pages/Freelancer/FreelancerChat';
 
 
 function App() {
- 
+
   return (
     <Routes>
   <Route path="/admin/clients" element={<ClientsList />} />
@@ -42,6 +52,11 @@ function App() {
   <Route path="/client" element ={<ClientHome/>}/>
   <Route path="/client/interviews" element ={<ClientInterviewSchedule/>}/>
   <Route path="/client/profile" element ={<ClientProfilePage/>}/>
+
+  <Route path="/signup" element={<SignUpPage />} />
+  <Route path="/signin" element={<SignInPage />} />
+  <Route path="/payment" element={<PaymentPage />} />
+  <Route path="/notifications" element={<NotificationsPage />} />
 
 
 </Routes>
