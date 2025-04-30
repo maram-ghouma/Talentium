@@ -1,9 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Sun, Moon } from 'lucide-react';
-import { Sidebar } from './components/Sidebar';
-import { SearchBar } from './components/SearchBar';
-import { CreateMission } from './components/CreateMission';
-import { MissionCard } from './components/MissionCard';
 import { Mission } from './types';
 import { Route, Routes } from 'react-router-dom';
 
@@ -38,29 +34,6 @@ import FreelancerChat from './Pages/Freelancer/FreelancerChat';
 
 
 function App() {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [isDarkMode, setIsDarkMode] = useState(false);
-  const [showCreateMission, setShowCreateMission] = useState(false);
-  const [missions, setMissions] = useState<Mission[]>([
-    {
-      id: '1',
-      title: 'Website Redesign',
-      description: 'Need a complete redesign of our e-commerce website with modern UI/UX principles.',
-      status: 'not_assigned',
-      price: 2500,
-      date: '2024-03-15',
-      clientId: 'client1',
-    },
-    {
-      id: '2',
-      title: 'Mobile App Development',
-      description: 'Looking for a developer to create an iOS/Android app for our service.',
-      status: 'in_progress',
-      price: 5000,
-      date: '2024-03-14',
-      clientId: 'client1',
-    },
-  ]);
 
   return (
     <Routes>
@@ -80,13 +53,6 @@ function App() {
   <Route path="/client/interviews" element ={<ClientInterviewSchedule/>}/>
   <Route path="/client/profile" element ={<ClientProfilePage/>}/>
 
-        <div className="row g-4">
-          {missions.map((mission) => (
-            <div key={mission.id} className="col-12 col-md-6 col-lg-4">
-              <MissionCard mission={mission} isDarkMode={isDarkMode} />
-            </div>
-          ))}
-        </div>
   <Route path="/signup" element={<SignUpPage />} />
   <Route path="/signin" element={<SignInPage />} />
   <Route path="/payment" element={<PaymentPage />} />
