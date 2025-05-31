@@ -3,7 +3,8 @@ import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn } from 'ty
 export enum UserRole {
   CLIENT = 'client',
   FREELANCER = 'freelancer',
-}
+  ADMIN = 'admin',
+} 
 
 @Entity()
 export class User {
@@ -19,9 +20,9 @@ export class User {
   @Column()
   password: string;
 
-  @Column({ default: false })
-  isAdmin: boolean;
+   @Column({ nullable: true })
+  imageUrl: string;
 
-  @Column({ type: 'enum', enum: UserRole, default: UserRole.CLIENT })
+  @Column({ type: 'enum', enum: UserRole, default: UserRole.FREELANCER })
   currentRole: UserRole;
 }

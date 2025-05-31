@@ -3,20 +3,59 @@ import { UserPlus } from 'lucide-react';
 import Input from '../SignIn/UI/Input';
 import Button from '../SignIn/UI/Button';
 import './SignUpForm.css';
+import { registerUser } from '../../services/authService';
+import { useNavigate } from 'react-router-dom';
 
 const SignUpForm: React.FC = () => {
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
+    const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-
-  const handleSubmit = (e: React.FormEvent) => {
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [country, setCountry] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+const navigate = useNavigate();
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle sign up logic here
-    console.log('Sign up attempt with:', { firstName, lastName, email, password, confirmPassword });
-  };
+    setError(null);
 
+    if (password !== confirmPassword) {
+      setError("Passwords don't match");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const data = {
+        username,
+        email,
+        password,
+        phoneNumber,
+        country,
+      };
+
+      await registerUser(data);
+      navigate('/signin'); 
+      setSuccess(true);
+      setUsername('');
+      setEmail('');
+      setPassword('');
+      setConfirmPassword('');
+      setPhoneNumber('');
+      setCountry('');
+    } catch (err: any) {
+      if (err.response?.data?.message) {
+        setError(err.response.data.message);
+      } else {
+        setError('Registration failed, please try again.');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
     <div className="sign-up-form-card">
       <div className="sign-up-header">
@@ -30,21 +69,10 @@ const SignUpForm: React.FC = () => {
         <div className="form-group">
           <Input
             type="text"
-            label="First Name"
-            value={firstName}
-            onChange={(e) => setFirstName(e.target.value)}
+            label="userName"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
             placeholder="Enter your first name"
-            required
-          />
-        </div>
-
-        <div className="form-group">
-          <Input
-            type="text"
-            label="Last Name"
-            value={lastName}
-            onChange={(e) => setLastName(e.target.value)}
-            placeholder="Enter your last name"
             required
           />
         </div>
@@ -56,6 +84,26 @@ const SignUpForm: React.FC = () => {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="Enter your email"
+            required
+          />
+        </div>
+         <div className="form-group">
+          <Input
+            type="text"
+            label="Phone Number"
+            value={phoneNumber}
+            onChange={(e) => setPhoneNumber(e.target.value)}
+            placeholder="Enter your phone number"
+            required
+          />
+        </div>
+          <div className="form-group">
+          <Input
+            type="text"
+            label="Country"
+            value={country}
+            onChange={(e) => setCountry(e.target.value)}
+            placeholder="Enter your country"
             required
           />
         </div>
@@ -88,7 +136,7 @@ const SignUpForm: React.FC = () => {
 
         <div className="sign-in-prompt">
           <p>
-            Already have an account? <a href="#">Sign In</a>
+            Already have an account? <a href="signUp">Sign In</a>
           </p>
         </div>
       </form>
