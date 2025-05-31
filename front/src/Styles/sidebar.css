@@ -56,22 +56,22 @@
   
   /* Logo and Brand Section */
   .logo-section {
-    display: flex;
-    align-items: center;
-    padding: 1rem 1rem 1rem;
-    margin-top: 1rem;
+    display: flex !important;
+    align-items: center !important;
+    padding: 1rem 1rem 1rem !important;
+    margin-top: 1rem !important;
   }
   
-  .logo-container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 40px;
-    height: 40px;
-    background: linear-gradient(135deg, var(--rose) 0%, var(--navy-primary) 100%);
-    border-radius: 10px;
-    margin-right: 0.75rem;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  .logo-container1 {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 40px !important;
+    height: 40px !important;
+    background: linear-gradient(135deg, var(--rose) 0%, var(--navy-primary) 100%) !important;
+    border-radius: 10px !important;
+    margin-right: 0.75rem !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
   }
   
   .logo-icon {
