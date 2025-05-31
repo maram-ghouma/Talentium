@@ -30,6 +30,7 @@ import FreelancerDashboard from './Pages/Freelancer/FreelancerDashboard';
 import FreelancerProfile from './Pages/Freelancer/FreelancerProfile';
 import FreelancerHistory from './Pages/Freelancer/FreelancerHistory';
 import FreelancerChat from './Pages/Freelancer/FreelancerChat';
+import GuestHome from './Pages/GuestHome';
 
 
 
@@ -57,7 +58,7 @@ function App() {
   <Route path="/signin" element={<SignInPage />} />
   <Route path="/payment" element={<PaymentPage />} />
   <Route path="/notifications" element={<NotificationsPage />} />
-
+    <Route path="/" element={<GuestHome />} />
 
 </Routes>
   );
