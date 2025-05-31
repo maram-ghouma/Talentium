@@ -89,7 +89,7 @@ const toggleUserDropdown = () => setUserDropdownOpen(prev => !prev);
           </div>
           {isOpen && (
             <div className="brand-name">
-              <span className="brand-text">Talent</span>
+              <span className="brand-text1">Talent</span>
               <span className="brand-highlight">ium</span>
             </div>
           )}
