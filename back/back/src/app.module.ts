@@ -6,9 +6,17 @@ import { FreelancerProfileModule } from './freelancer-profile/freelancer-profile
 import { ClientProfileModule } from './client-profile/client-profile.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-
+import { MissionModule } from './mission/mission.module';
+import { GraphQLModule } from '@nestjs/graphql';
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
+import * as path from 'path';
+import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/dist/esm/plugin/landingPage/default';
 @Module({
   imports: [UserModule, FreelancerProfileModule, ClientProfileModule,
+    ConfigModule.forRoot({
+      isGlobal: true,          // Makes ConfigService available app-wide
+      envFilePath: '.env',     // Explicit path to your .env file
+    }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -27,7 +35,12 @@ import { TypeOrmModule } from '@nestjs/typeorm';
         };
       },
     }),
-  ],
+    MissionModule,
+   GraphQLModule.forRoot<ApolloDriverConfig>({
+      driver: ApolloDriver,
+      autoSchemaFile: path.join(process.cwd(), 'src/schema.gql'),
+      installSubscriptionHandlers: true,
+    }),],
   controllers: [AppController],
   providers: [AppService],
 })
