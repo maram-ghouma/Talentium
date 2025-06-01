@@ -17,9 +17,9 @@ export class MissionService {
   ) {}
 
   async create(createMissionInput: CreateMissionInput): Promise<Mission> {
-    const { clientId, ...rest } = createMissionInput;
+    const { /*clientId,*/ ...rest } = createMissionInput;
 
-    const client = await this.userRepository.findOne({ where: { id: clientId } });
+    const client = await this.userRepository.findOne({ where: { id: 1 } });
     if (!client) throw new Error('Client not found');
 
     const mission = this.missionRepository.create({ ...rest, client });

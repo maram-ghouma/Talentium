@@ -28,8 +28,9 @@ export class MissionResolver {
     return this.missionService.update(updateMissionInput.id, updateMissionInput);
   }
 
-  @Mutation(() => Mission)
-  removeMission(@Args('id', { type: () => Int }) id: number) {
-    return this.missionService.remove(id);
-  }
+@Mutation(() => Boolean)
+removeMission(@Args('id', { type: () => Int }) id: number): Promise<boolean> {
+  return this.missionService.remove(id);
+}
+
 }

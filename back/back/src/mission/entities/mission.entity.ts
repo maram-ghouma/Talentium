@@ -8,8 +8,9 @@ import {
   JoinTable,
 } from 'typeorm';
 import { User } from 'src/user/entities/user.entity';
-import { ObjectType, Field, Int } from '@nestjs/graphql';
+import { ObjectType, Field, Int, GraphQLISODateTime } from '@nestjs/graphql';
 import { FreelancerProfile } from 'src/freelancer-profile/entities/freelancer-profile.entity';
+import { GraphQLDate } from 'graphql-scalars';
 
 @ObjectType()
 @Entity()
@@ -34,7 +35,7 @@ export class Mission {
   @Column('int')
   price: number;
 
-  @Field()
+  @Field(() => GraphQLDate)
   @Column({ type: 'date' })
   date: string;
 
@@ -46,7 +47,7 @@ export class Mission {
   @Column('simple-array')
   requiredSkills: string[];
 
-  @Field()
+@Field(() => GraphQLDate)
   @Column({ type: 'date' })
   deadline: Date;
 
@@ -54,12 +55,12 @@ export class Mission {
   @Column()
   budget: string;
 
-  @Field()
+ @Field(() => GraphQLDate)
   @CreateDateColumn()
   createdAt: Date;
 
   @Field()
-  @Column()
+  @Column({  default: "john Client" })
   clientName: string;
 
   @Field(() => Int)

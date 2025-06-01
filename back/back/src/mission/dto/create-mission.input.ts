@@ -26,8 +26,8 @@ export class CreateMissionInput {
   @Field()
   date: string; // formatted like 'YYYY-MM-DD'
 
-  @Field(() => Int)
-  clientId: number;
+  //@Field(() => Int)
+  //clientId: number;
 
   @Field(() => [String])
   requiredSkills: string[];
@@ -38,8 +38,8 @@ export class CreateMissionInput {
   @Field()
   budget: string;
 
-  @Field()
-  clientName: string;
+  //@Field()
+  //clientName: string;
 
   @Field(() => Int, { defaultValue: 0 })
   progress: number;
