@@ -17,9 +17,15 @@ export class FreelancerProfile {
   skills: string[];
 
   @Column()
-  hourlyRate: number;
+  phoneNumber: string;
 
   @Column()
+  country : string;
+
+  @Column({ nullable: true })
+  hourlyRate: number;
+
+  @Column({ nullable: true })
   bio: string;
 
   @OneToMany(() => Mission, (mission) => mission.selectedFreelancer)

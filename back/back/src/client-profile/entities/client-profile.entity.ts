@@ -13,6 +13,12 @@ export class ClientProfile {
   user: User;
   @Field()
   @Column()
+  phoneNumber: string;
+
+  @Column()
+  country : string;
+
+  @Column()
   companyName: string;
   @Field()
   @Column()

@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Briefcase, Menu, X, Search, Bell, User } from 'lucide-react';
+import { Briefcase, Menu, X, Search, Bell, User, Link } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const HeroComponent: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
+const navigate = useNavigate();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -45,14 +47,39 @@ const HeroComponent: React.FC = () => {
             </button>
             <div className="collapse navbar-collapse" id="navbarNav">
                 <ul className="navbar-nav ms-auto">
-                   <li className="nav-item"><button className="btn" style={{
-      backgroundColor: 'var(--powder)',
-      color: 'var(--navy-primary)',
-      marginRight: '10px'}}>Log In</button></li>
-                   <li className="nav-item"><button className="btn"   style={{
-      backgroundColor: 'var(--rose)',
-      color: 'white'
-    }}>Sign Up</button></li>
+                      <li className="nav-item" style={{ marginRight: '20px' }}>
+          <button
+            className="btn"
+            style={{
+              backgroundColor: 'var(--powder)',
+              color: 'var(--navy-primary)',
+              padding: '8px 16px',
+              borderRadius: '4px',
+              border: 'none',
+              cursor: 'pointer',
+            }}
+            onClick={() => navigate('/signin')}
+          >
+            Login
+          </button>
+        </li>
+         <li className="nav-item">
+          <button
+            className="btn"
+            style={{
+              backgroundColor: 'var(--rose)',
+              color: 'var(-powder)',
+              padding: '8px 16px',
+              borderRadius: '4px',
+              border: 'none',
+              cursor: 'pointer',
+            }}
+            onClick={() => navigate('/signup')}
+          >
+            Sign Up
+          </button>
+        </li>
+      
                    </ul>
                    </div>
                 </div>

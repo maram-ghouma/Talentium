@@ -10,7 +10,8 @@ import { MissionModule } from './mission/mission.module';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import * as path from 'path';
-import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/dist/esm/plugin/landingPage/default';
+import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/dist/esm/plugin/landingPage/default';import { AuthModule } from './auth/auth.module';
+
 @Module({
   imports: [UserModule, FreelancerProfileModule, ClientProfileModule,
     ConfigModule.forRoot({

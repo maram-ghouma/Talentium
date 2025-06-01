@@ -4,7 +4,8 @@ import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn } from 'ty
 export enum UserRole {
   CLIENT = 'client',
   FREELANCER = 'freelancer',
-}
+  ADMIN = 'admin',
+} 
 @ObjectType()
 @Entity()
 export class User {

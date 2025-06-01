@@ -1,6 +1,8 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
+import { UserService } from './user/user.service';
+import { seedAdmin } from './SeedAdmin';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
