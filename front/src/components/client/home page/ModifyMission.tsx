@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { X } from 'lucide-react';
 import { Mission } from '../../../types';
 import '../../../Styles/client/createMission.css';
@@ -21,21 +21,57 @@ export const ModifyMission: React.FC<ModifyMissionProps> = ({ onClose, onSubmit,
     ? new Date(mission.deadline).toISOString().split('T')[0] 
     : today;
   
-  const [formData, setFormData] = useState({
+
+const [formData, setFormData] = useState({
+  title: '',
+  description: '',
+  price: '',
+  skills: '',
+  deadline: today,
+});
+
+useEffect(() => {
+  const initialDeadline = mission.deadline
+    ? new Date(mission.deadline).toISOString().split('T')[0]
+    : today;
+
+  setFormData({
     title: mission.title,
     description: mission.description,
     price: mission.price.toString(),
     skills: mission.requiredSkills?.join(', ') || '',
     deadline: initialDeadline,
   });
+}, [mission]);
+
+
 
   return (
     <>
-      {/* Separate blurred background overlay */}
-      <div className="backdrop-overlay1" onClick={onClose}></div>
-      
-      {/* Modal content - completely separate from the blurred overlay */}
-      <div className={`modal-container1 ${isDarkMode ? 'dark-mode' : ''}`}>
+      <div
+  
+  style={{
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: 9998,
+  }}
+  onClick={onClose}
+/>
+
+<div
+  className="backdrop-overlay1"
+  style={{
+    pointerEvents: 'none', // keep blur but disable interaction
+  }}
+/>
+<div
+  className={`modal-container1 ${isDarkMode ? 'dark-mode' : ''}`}
+  style={{ zIndex: 10000 }}
+>
+
         <div className="modal-header" style={{ backgroundColor: isDarkMode ? 'var(--navy-secondary)' : '', margin: '0px 0px 0px 0px', paddingBottom: '20px', paddingTop: '20px', paddingLeft: '20px', paddingRight: '20px' }}>
           <h2 className="modal-title">Modify Mission</h2>
           <button onClick={onClose} className="close-button">
