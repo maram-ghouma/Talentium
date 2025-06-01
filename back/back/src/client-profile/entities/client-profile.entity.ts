@@ -11,6 +11,12 @@ export class ClientProfile {
   user: User;
 
   @Column()
+  phoneNumber: string;
+
+  @Column()
+  country : string;
+
+  @Column()
   companyName: string;
 
   @Column()

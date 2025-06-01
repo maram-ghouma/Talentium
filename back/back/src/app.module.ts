@@ -6,9 +6,11 @@ import { FreelancerProfileModule } from './freelancer-profile/freelancer-profile
 import { ClientProfileModule } from './client-profile/client-profile.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
-  imports: [UserModule, FreelancerProfileModule, ClientProfileModule,
+  imports: [UserModule, FreelancerProfileModule, ClientProfileModule,AuthModule,
+    ConfigModule.forRoot({ isGlobal: true }), 
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
