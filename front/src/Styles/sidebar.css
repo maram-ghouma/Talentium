@@ -87,7 +87,7 @@
     letter-spacing: 0.5px;
   }
   
-  .brand-text {
+  .brand-text1 {
     color: var(--navy-primary);
   }
   
@@ -248,7 +248,7 @@
     background: linear-gradient(135deg, var(--rose) 0%, var(--powder) 100%);
   }
   
-  .sidebar.dark-mode .brand-text {
+  .sidebar.dark-mode .brand-text1 {
     color: var(--powder);
   }
   

@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import { X } from 'lucide-react';
 import { Mission } from '../../../types';
 import '../../../Styles/client/createMission.css';
+import { useMutation } from '@apollo/client';
+import { CREATE_MISSION } from '../../../graphql/mission';
+
 interface CreateMissionProps {
   onClose: () => void;
   onSubmit: (mission: Partial<Mission>) => void;
@@ -9,6 +12,7 @@ interface CreateMissionProps {
 }
 
 export const CreateMission: React.FC<CreateMissionProps> = ({ onClose, onSubmit, isDarkMode }) => {
+  const [createMission] = useMutation(CREATE_MISSION);
 const today = new Date().toISOString().split('T')[0];
 const [formData, setFormData] = useState({
   title: '',
@@ -37,12 +41,26 @@ const [formData, setFormData] = useState({
         <form
           onSubmit={(e) => {
             e.preventDefault();
-            onSubmit({
-              ...formData,
-              price: Number(formData.price),
-              status: 'not_assigned',
-              date: new Date().toISOString(),
-            });
+            createMission({
+            variables: {
+              createMissionInput: {
+                title: formData.title,
+                description: formData.description,
+                deadline: formData.deadline,
+                price: Number(formData.price),
+                budget:formData.price,
+                status: 'not_assigned',
+                date: new Date().toISOString().split('T')[0],
+                requiredSkills : formData.skills
+              ? formData.skills.split(',').map(skill => skill.trim())
+              : []
+              },
+            },
+            refetchQueries: ['GetMissions'],
+          }).then(() => {
+            onClose(); // optionally close modal
+          });
+
           }}
           style={{margin:'0px 0px 0px 0px', paddingBottom:'10px',paddingTop:'20px',paddingLeft:'20px',paddingRight:'20px'}}
         >

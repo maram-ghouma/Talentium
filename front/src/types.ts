@@ -11,16 +11,16 @@
       price: number;
       date: string;
       clientId: string;
-      client: string;
+      client?: string;
       clientLogo?: string;
       requiredSkills?: string[];
       deadline?: Date | string; 
       budget?: string;
       createdAt?: Date;
       clientName: string;
-      paymentStatus: 'Paid' | 'Unpaid' | 'Partial';
-      priority: 'Low' | 'Medium' | 'High';
-      progress: number;
+      paymentStatus?: 'Paid' | 'Unpaid' | 'Partial';
+      priority?: 'Low' | 'Medium' | 'High';
+      progress?: number;
       tasks: {
         total: number;
         completed: number;

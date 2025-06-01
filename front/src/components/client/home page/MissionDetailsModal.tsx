@@ -3,6 +3,11 @@ import { Modal, ListGroup, Card, Button, Badge, Row, Col } from 'react-bootstrap
 import { X, Star, User } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import '../../../Styles/client/MissionDetails.css';
+import { useMutation } from '@apollo/client';
+import { REMOVE_MISSION } from '../../../graphql/mission';
+import { useNavigate } from 'react-router-dom';
+import { Mission } from '../../../types';
+import { ModifyMission } from './ModifyMission';
 
 interface Applicant {
   id: string;
@@ -21,19 +26,15 @@ interface Developer {
   completedProjects: number;
   profilePictureUrl:string;
 }
-
+interface ModifyButtonProps {
+  mission: Mission;
+  onMissionModified?: () => void; 
+}
 interface MissionDetailsModalProps {
   show: boolean;
   onHide: () => void;
-  mission: {
-    title: string;
-    description: string;
-    requiredSkills: string[];
-    deadline: Date;
-    budget: string;
-    status: 'not_assigned' | 'assigned' | 'completed';
-    createdAt: Date;
-  };
+  onMissionModified?: () => void;
+  mission: Mission
   darkMode?: boolean;
 }
 
@@ -54,11 +55,13 @@ const assignedDeveloper: Developer = {
 };
 
 const MissionDetailsModal: React.FC<MissionDetailsModalProps> = ({
+  onMissionModified,
   show,
   onHide,
   mission,
   darkMode = false,
 }) => {
+  const navigate = useNavigate();
   const getStatusBadgeVariant = (status: string) => {
     switch (status) {
       case 'not_assigned':
@@ -71,9 +74,62 @@ const MissionDetailsModal: React.FC<MissionDetailsModalProps> = ({
         return 'secondary';
     }
   };
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleMissionModified = () => {
+    setIsModalOpen(false);
+    if (onMissionModified) {
+      onMissionModified();
+    }
+  };
+  const [removeMission] = useMutation(REMOVE_MISSION);
+
+const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
+const handleDelete = () => {
+  removeMission({
+    variables: { id: mission.id },
+    refetchQueries: ['GetMissions'],
+    onCompleted: () => {
+      setShowDeleteConfirm(false); 
+      onHide(); 
+      console.log('here');
+      navigate('/client');
+    },
+    onError: (error) => console.error('Error deleting mission:', error)
+  });
+};
 
   return (
       <>
+      {showDeleteConfirm && (
+        <div className="confirm-overlay" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+          <div className="confirm-box" style={{ backgroundColor: !darkMode? 'var(--white)':'var(--navy-secondary)' }}>
+            <p>Are you sure you want to delete this mission?</p>
+            <div className="confirm-buttons">
+              <button 
+                onClick={() => setShowDeleteConfirm(false)}
+                style={{ backgroundColor: 'var(--slate)' }}
+              >
+                No
+              </button>
+              <button 
+                onClick={() => {
+                  setShowDeleteConfirm(false);
+                  handleDelete(); 
+                }}
+                style={{ backgroundColor: 'var(--rose)' }}
+              >
+                Yes
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
         {show && <div className="backdrop-overlay" onClick={onHide}></div>}
         <Modal
           show={show}
@@ -117,7 +173,7 @@ const MissionDetailsModal: React.FC<MissionDetailsModalProps> = ({
                     <h6 className="text-muted mb-2">Required Skills</h6>
                     <div>
                     <p>
-                      {mission.requiredSkills.join(', ')}
+                      {mission.requiredSkills?.join(', ')}
                     </p>
                   </div>
 
@@ -140,7 +196,7 @@ const MissionDetailsModal: React.FC<MissionDetailsModalProps> = ({
                   
                   <div className="mb-3">
                     <h6 className="text-muted mb-1">Deadline</h6>
-                    <p className="mb-0">{mission.deadline.toLocaleDateString()}</p>
+                    <p className="mb-0">{mission.deadline?.toLocaleString()}</p>
                   </div>
                   
                   <div className="mb-3">
@@ -151,7 +207,7 @@ const MissionDetailsModal: React.FC<MissionDetailsModalProps> = ({
                   <div>
                     <h6 className="text-muted mb-1">Created</h6>
                     <p className="mb-0">
-                      {formatDistanceToNow(mission.createdAt, { addSuffix: true })}
+                      {formatDistanceToNow(mission.createdAt? mission.createdAt:'', { addSuffix: true })}
                     </p>
                   </div>
                 </Card.Body>
@@ -275,7 +331,36 @@ const MissionDetailsModal: React.FC<MissionDetailsModalProps> = ({
             </>
           )}
         </Modal.Body>
+        <Modal.Footer className="border-top-0 d-flex justify-content-end" style={{ backgroundColor: darkMode ? 'var(--navy-secondary)' : '' }}>
+          <Button 
+            className="me-2"
+            onClick={() => setShowDeleteConfirm(true)}
+            style={{ 
+              backgroundColor: 'var(--rose)' ,
+              borderColor: 'var(--rose)' 
+            }}
+          >
+            Delete
+          </Button>
+          <Button 
+          onClick={() => setIsModalOpen(true)}
+            style={{ 
+              backgroundColor: darkMode ? 'var(--slate)' : 'var(--navy-primary)',
+              borderColor: darkMode ? 'var(--slate)' : 'var(--navy-primary)'
+            }}
+          >
+            Modify
+          </Button>
+        </Modal.Footer>
       </Modal>
+      {isModalOpen && (
+        <ModifyMission
+          onClose={handleModalClose}
+          onSubmit={handleMissionModified}
+          isDarkMode={darkMode}
+          mission={mission}
+        />
+      )}
     </>
   );
 };
