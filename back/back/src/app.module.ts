@@ -11,6 +11,13 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import * as path from 'path';
 import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/dist/esm/plugin/landingPage/default';import { AuthModule } from './auth/auth.module';
+import { ConversationModule } from './conversation/conversation.module';
+import { ChatController } from './chat/chat.controller';
+import { ChatService } from './chat/chat.service';
+import { ChatGateway } from './chat/chat.gateway';
+import { ProjectModule } from './project/project.module';
+import { ProjectModule } from './project/project.module';
+import { ConversationModule } from './conversation/conversation.module';
 
 @Module({
   imports: [UserModule, FreelancerProfileModule, ClientProfileModule,
@@ -41,8 +48,10 @@ import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/dist/e
       driver: ApolloDriver,
       autoSchemaFile: path.join(process.cwd(), 'src/schema.gql'),
       installSubscriptionHandlers: true,
-    }),],
-  controllers: [AppController],
-  providers: [AppService],
+    }),
+   ConversationModule,
+   ProjectModule,],
+  controllers: [AppController, ChatController],
+  providers: [AppService, ChatGateway, ChatService],
 })
 export class AppModule {}
