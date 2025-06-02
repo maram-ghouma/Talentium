@@ -11,14 +11,20 @@ export class FreelancerProfile {
   @JoinColumn()
   user: User;
 
-  @Column("simple-array")
-  skills: string[];
+  @Column('simple-array', { nullable: true })
+skills: string[];
 
   @Column()
   phoneNumber: string;
 
   @Column()
   country : string;
+
+   @Column({ nullable: true })
+  linkedIn: string;
+
+   @Column({ nullable: true })
+  github: string;
 
   @Column({ nullable: true })
   hourlyRate: number;

@@ -1,28 +1,21 @@
 import React, { useState } from 'react';
 import { useRef } from 'react';
-import { Mission } from '../../../types';
+import { Mission ,ClientProfileType} from '../../../types';
 import { Container, Card, Button, Badge, Row, Col, Form } from 'react-bootstrap';
 import { Star, Building, Globe, MapPin, Users, Briefcase, Award, Clock, Mail, Linkedin, Phone, Edit, Save, X, Circle } from 'lucide-react';
 import MissionDetailsModal from '../home page/MissionDetailsModal';
 import '../../../Styles/client/profile.css';
 import { CreateMission } from '../home page/CreateMission';
+import { updateClientProfile } from '../../../services/userService';
 
 interface ClientProfileProps {
   darkMode?: boolean;
+  profile: ClientProfileType
 }
 
 
 const clientData = {
-  name: "Sarah Anderson",
-  tagline: "Trusted Client",
-  avatar: "https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg",
-  company: "TechVision Solutions",
-  country: "United States",
-  website: "www.techvision.com",
-  industry: "Software Development",
-  email: "sarah.anderson@techvision.com",
-  phone: "+1 (555) 123-4567",
-  linkedin: "linkedin.com/in/sarahanderson",
+  
   stats: {
     totalMissions: 24,
     activeMissions: 5,
@@ -47,21 +40,22 @@ const clientData = {
   ]
 };
 
-const ClientProfile: React.FC<ClientProfileProps> = ({ darkMode = false }) => {
+const ClientProfile: React.FC<ClientProfileProps> = ({ darkMode = false , profile}) => {
   const [selectedMission, setSelectedMission] = useState<Mission | null>(null);
   const [showCreateMission, setShowCreateMission] = useState(false);
   const [isEditingPersonal, setIsEditingPersonal] = useState(false);
   const [isEditingInfo, setIsEditingInfo] = useState(false);
   const [formData, setFormData] = useState({
-    name: clientData.name,
-    tagline: clientData.tagline,
-    company: clientData.company,
-    country: clientData.country,
-    website: clientData.website,
-    industry: clientData.industry,
-    email: clientData.email,
-    phone: clientData.phone,
-    linkedin: clientData.linkedin
+  name: profile.user?.username || '',
+  tagline: profile?.bio || '',
+  company: profile.companyName || '',
+  country: profile.country || '',
+  industry: profile.industry || '',
+  email: profile.user?.email || '',
+  phone: profile.phoneNumber || '',
+  linkedin: profile.linkedIn || '',
+  avatar: profile.user?.imageUrl || '',
+
   });
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [missions, setMissions] = useState<Mission[]>([
@@ -121,15 +115,44 @@ const ClientProfile: React.FC<ClientProfileProps> = ({ darkMode = false }) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
+  const [file, setFile] = useState<File | null>(null);
 
-  const handleSavePersonal = () => {
-    // Here you would typically send data to your backend
-    console.log("Saving personal data:", {
-      name: formData.name,
-      tagline: formData.tagline
-    });
+const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const file = e.target.files?.[0];
+  if (file) {
+    setFile(file);
+    console.log('Selected file:', file);
+  }
+};
+
+  const fileToBase64 = (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = error => reject(error);
+  });
+};
+
+const handleSavePersonal = async () => {
+  try {
+    const formPayload = new FormData();
+
+    formPayload.append('username', formData.name); 
+    formPayload.append('bio', formData.tagline);
+
+    if (file) {
+      formPayload.append('imageUrl', file); 
+    }
+
+    const result = await updateClientProfile(formPayload); // This should be a function that POSTs/PUTs with multipart/form-data
+    console.log('Personal data updated', result);
     setIsEditingPersonal(false);
-  };
+  } catch (error) {
+    console.error('Error updating personal data:', error);
+  }
+};
+
   const handleOpenDetails = (mission: Mission) => {
       setSelectedMission(mission);
   };
@@ -137,19 +160,24 @@ const ClientProfile: React.FC<ClientProfileProps> = ({ darkMode = false }) => {
     setSelectedMission(null);
   };
 
-  const handleSaveInfo = () => {
-    // Here you would typically send data to your backend
-    console.log("Saving info data:", {
-      company: formData.company,
+  const handleSaveInfo = async () => {
+  try {
+    const updatedInfoData = {
+      companyName: formData.company,
       country: formData.country,
-      website: formData.website,
       industry: formData.industry,
       email: formData.email,
-      phone: formData.phone,
-      linkedin: formData.linkedin
-    });
+      phoneNumber: formData.phone,
+      linkedIn: formData.linkedin,
+    };
+
+    const result = await updateClientProfile(updatedInfoData);
+    console.log('Info data updated', result);
     setIsEditingInfo(false);
-  };
+  } catch (error) {
+    console.error('Error updating info data:', error);
+  }
+};
 
   return (
     <>
@@ -172,8 +200,8 @@ const ClientProfile: React.FC<ClientProfileProps> = ({ darkMode = false }) => {
                 
                 <div className="position-relative mb-3 mx-auto" style={{ width: '80px', height: '80px' }}>
                 <img
-                  src={clientData.avatar}
-                  alt={clientData.name}
+                  src={formData.avatar}
+                  alt={formData.name}
                   className="rounded-circle"
                   style={{ width: '80px', height: '80px', objectFit: 'cover' }}
                 />
@@ -195,13 +223,7 @@ const ClientProfile: React.FC<ClientProfileProps> = ({ darkMode = false }) => {
                     accept="image/*"
                     ref={fileInputRef}
                     style={{ display: 'none' }}
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) {
-                        console.log('Selected file:', file);
-                        // Optional: preview or upload
-                      }
-                    }}
+                    onChange={handleFileChange}
                   />
                 </div>
 
@@ -242,8 +264,8 @@ const ClientProfile: React.FC<ClientProfileProps> = ({ darkMode = false }) => {
                   </div>
                 </div>
                 <img
-                  src={clientData.avatar}
-                  alt={clientData.name}
+                  src={formData.avatar}
+                  alt={formData.name}
                   className="rounded-circle mb-3"
                   style={{ width: '100px', height: '100px', objectFit: 'cover' }}
                 />
@@ -306,20 +328,7 @@ const ClientProfile: React.FC<ClientProfileProps> = ({ darkMode = false }) => {
                       />
                     </Form.Group>
                   </Col>
-                  <Col md={6} className="mb-3">
-                    <Form.Group>
-                      <Form.Label className="d-flex align-items-center info-label">
-                        <Globe size={18} className="me-2" />
-                        <span>Website</span>
-                      </Form.Label>
-                      <Form.Control
-                        type="text"
-                        name="website"
-                        value={formData.website}
-                        onChange={handleInputChange}
-                      />
-                    </Form.Group>
-                  </Col>
+                 
                   <Col md={6} className="mb-3">
                     <Form.Group>
                       <Form.Label className="d-flex align-items-center info-label">
@@ -394,13 +403,7 @@ const ClientProfile: React.FC<ClientProfileProps> = ({ darkMode = false }) => {
                   </div>
                   <p className="info-value">{formData.country}</p>
                 </Col>
-                <Col md={6} className="mb-3">
-                  <div className="d-flex align-items-center mb-1">
-                    <Globe size={18} className="text-info me-2" />
-                    <span className="info-label">Website</span>
-                  </div>
-                  <p className="info-value">{formData.website}</p>
-                </Col>
+              
                 <Col md={6} className="mb-3">
                   <div className="d-flex align-items-center mb-1">
                     <Briefcase size={18} className="text-success me-2" />
