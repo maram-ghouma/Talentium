@@ -147,6 +147,7 @@ const handleSavePersonal = async () => {
 
     const result = await updateClientProfile(formPayload); // This should be a function that POSTs/PUTs with multipart/form-data
     console.log('Personal data updated', result);
+    window.location.reload(); 
     setIsEditingPersonal(false);
   } catch (error) {
     console.error('Error updating personal data:', error);

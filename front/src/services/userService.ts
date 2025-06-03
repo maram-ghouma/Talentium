@@ -6,7 +6,7 @@ export const getClientProfile = async () => {
 };
 
 export const getUser = async () => {
-  const response = await api.get('/user/me');
+  const response = await api.get('/auth/getUser');
   return response.data;
 };
 

@@ -4,6 +4,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
 import { AuthGuard } from '@nestjs/passport';
+import { User } from './entities/user.entity';
 
 @Controller('user')
 export class UserController {
@@ -34,23 +35,5 @@ export class UserController {
     return this.userService.remove(+id);
   }
 
-  @UseGuards(AuthGuard('jwt'))
-    @Get('me')
-    async getUser(@CurrentUser() user: any) {
-console.log('user from @CurrentUser:', user);
-console.log('user.userId:', user?.userId);
-
-if (!user?.userId || isNaN(Number(user.userId))) {
-  throw new BadRequestException('Invalid userId in JWT payload');
-}
-      const person = await this.userService.findById(user.userId);
-      const baseUrl = 'http://localhost:4000'; 
-      if (!person) {
-        throw new NotFoundException('User not found');
-      }
-      person.imageUrl = person.imageUrl ? `${baseUrl}${person.imageUrl}` : '';
-
-      return person;
-    }
-
+  
 }
