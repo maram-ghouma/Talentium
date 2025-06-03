@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { CreateMission } from './CreateMission';
 import { MissionCard } from './MissionCard';
 import MissionDetailsModal from './MissionDetailsModal';
 import { Mission } from '../../../types';
 import '../../../Styles/client/Interviews.css';
+import { useQuery } from '@apollo/client';
+import { GET_MISSIONS } from '../../../graphql/mission';
 interface HomePageProps {
   isDarkMode: boolean;
   toggleDarkMode: () => void;
@@ -13,46 +15,17 @@ interface HomePageProps {
 export const HomePage: React.FC<HomePageProps> = ({ isDarkMode, toggleDarkMode, isSidebarOpen }) => {
   const [showCreateMission, setShowCreateMission] = useState(false);
   const [selectedMission, setSelectedMission] = useState<Mission | null>(null);
-  const [missions, setMissions] = useState<Mission[]>([
-    {
-      id: '1',
-      title: 'Website Redesign',
-      description: 'Need a complete redesign of our e-commerce website with modern UI/UX principles.',
-      status: 'not_assigned',
-      price: 2500,
-      date: '2024-03-15',
-      clientId: 'client1',
-      requiredSkills: ['UI/UX', 'HTML', 'CSS', 'JavaScript'],
-      deadline: new Date('2024-04-15'),
-      budget: '$2,500',
-      createdAt: new Date('2024-03-15'),
-      clientName: 'EcoShop Inc.',
-    client:'EcoShop Inc.',
-    paymentStatus: 'Unpaid',
-    priority: 'High',
-    progress: 0,
-    tasks: { total: 0, completed: 0 },
-    },
-    {
-      id: '2',
-      title: 'Mobile App Development',
-      description: 'Looking for a developer to create an iOS/Android app for our service.',
-      status: 'in_progress',
-      price: 5000,
-      date: '2024-03-14',
-      clientId: 'client1',
-      requiredSkills: ['React Native', 'iOS', 'Android', 'API Integration'],
-      deadline: new Date('2024-05-01'),
-      budget: '$5,000',
-      createdAt: new Date('2024-03-14'),
-      clientName: 'TechStart Solutions',
-      client:'Ecorefk Inc.',
-      paymentStatus: 'Unpaid',
-      priority: 'High',
-      progress: 0,
-      tasks: { total: 0, completed: 0 },
-    },
-  ]);
+   const { data, loading, error } = useQuery(GET_MISSIONS);
+  const [missions, setMissions] = useState<Mission[]>([]);
+
+  useEffect(() => {
+    if (data && data.missions) {
+      setMissions(data.missions);
+    }
+  }, [data]);
+
+  if (loading) return <p>Loading...</p>;
+  if (error){console.error('GraphQL error stack:', error);  return<p>Error loading missions</p>;}
 
   const handleOpenDetails = (mission: Mission) => {
     setSelectedMission(mission);
@@ -113,6 +86,15 @@ export const HomePage: React.FC<HomePageProps> = ({ isDarkMode, toggleDarkMode, 
         show={!!selectedMission}
         onHide={handleCloseDetails}
         mission={{
+          id: selectedMission.id,
+          price:selectedMission.price,
+          clientId: '1',
+          clientName:'john Client',
+          tasks: {
+        total: 2,
+        completed: 0
+      },
+          date: selectedMission.date,
           title: selectedMission.title,
           description: selectedMission.description,
           requiredSkills: selectedMission.requiredSkills || [],

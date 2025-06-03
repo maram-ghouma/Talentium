@@ -84,12 +84,12 @@ const toggleUserDropdown = () => setUserDropdownOpen(prev => !prev);
         
         {/* Logo and Brand Section */}
         <div className="logo-section">
-          <div className="logo-container">
+          <div className="logo-container1">
             <Briefcase className="logo-icon" size={20} />
           </div>
           {isOpen && (
             <div className="brand-name">
-              <span className="brand-text">Talent</span>
+              <span className="brand-text1">Talent</span>
               <span className="brand-highlight">ium</span>
             </div>
           )}

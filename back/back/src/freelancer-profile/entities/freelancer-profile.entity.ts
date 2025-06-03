@@ -1,7 +1,9 @@
 // freelancer-profile/freelancer-profile.entity.ts
+import { ObjectType } from '@nestjs/graphql';
+import { Mission } from 'src/mission/entities/mission.entity';
 import { User } from 'src/user/entities/user.entity';
-import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn } from 'typeorm';
-
+import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn, OneToMany } from 'typeorm';
+@ObjectType()
 @Entity()
 export class FreelancerProfile {
   @PrimaryGeneratedColumn()
@@ -31,4 +33,7 @@ skills: string[];
 
   @Column({ nullable: true })
   bio: string;
+
+  @OneToMany(() => Mission, (mission) => mission.selectedFreelancer)
+selectedMissions: Mission[];
 }

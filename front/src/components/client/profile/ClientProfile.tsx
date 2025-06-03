@@ -556,7 +556,17 @@ const handleSavePersonal = async () => {
         show={!!selectedMission}
         onHide={handleCloseDetails}
         mission={{
+          id: selectedMission.id,
+          date:selectedMission.date,
           title: selectedMission.title,
+          price:selectedMission.price,
+          clientId: '1',
+          clientName:'john Client',
+          tasks: {
+        total: 2,
+        completed: 0
+      },
+
           description: selectedMission.description,
           requiredSkills: selectedMission.requiredSkills || [],
           deadline: typeof selectedMission.deadline === 'string' 
