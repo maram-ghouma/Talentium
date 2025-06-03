@@ -10,12 +10,16 @@ import { CreateUserDto } from '../user/dto/create-user.dto';
 import { UserService } from '../user/user.service';
 import { UserRole } from '../user/entities/user.entity';
 import { JwtAuthResponse } from './dto/jwt-auth-response.dto';
+import { ClientProfileService } from 'src/client-profile/client-profile.service';
+import { FreelancerProfileService } from 'src/freelancer-profile/freelancer-profile.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
+     private readonly clientProfilesService: ClientProfileService,
+    private readonly freelancerProfilesService: FreelancerProfileService,
   ) {}
 
   async validateUser(loginDto: LoginDto) {
@@ -73,6 +77,15 @@ export class AuthService {
       ...registerDto,
       password: hashedPassword,
     });
+    await this.clientProfilesService.createProfileForUser(newUser, {
+  phoneNumber: registerDto.phoneNumber,
+  country: registerDto.country,
+});
+
+    await this.freelancerProfilesService.createProfileForUser(newUser, {
+  phoneNumber: registerDto.phoneNumber,
+  country: registerDto.country,
+});
 
     const { password, ...result } = newUser;
     return result;

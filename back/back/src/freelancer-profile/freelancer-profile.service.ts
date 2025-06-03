@@ -1,26 +1,30 @@
+
 import { Injectable } from '@nestjs/common';
-import { CreateFreelancerProfileDto } from './dto/create-freelancer-profile.dto';
-import { UpdateFreelancerProfileDto } from './dto/update-freelancer-profile.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { User } from 'src/user/entities/user.entity';
+import { FreelancerProfile } from './entities/freelancer-profile.entity';
 
 @Injectable()
 export class FreelancerProfileService {
-  create(createFreelancerProfileDto: CreateFreelancerProfileDto) {
-    return 'This action adds a new freelancerProfile';
-  }
+  constructor(
+    @InjectRepository(FreelancerProfile)
+    private readonly freelancerProfileRepository: Repository<FreelancerProfile>,
+  ) {}
 
-  findAll() {
-    return `This action returns all freelancerProfile`;
-  }
+  async findByUserId(userId: number) {
+  return this.freelancerProfileRepository.findOne({
+    where: { user: { id: userId } },
+    relations: ['user'],
+  });
+}
+async createProfileForUser(user: User,clientData: { phoneNumber?: string; country?: string }) {
+  const profile = this.freelancerProfileRepository.create({
+    user: user,
+    phoneNumber: clientData.phoneNumber ?? undefined,
+    country: clientData.country ?? undefined,
+  });
 
-  findOne(id: number) {
-    return `This action returns a #${id} freelancerProfile`;
-  }
-
-  update(id: number, updateFreelancerProfileDto: UpdateFreelancerProfileDto) {
-    return `This action updates a #${id} freelancerProfile`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} freelancerProfile`;
-  }
+  return this.freelancerProfileRepository.save(profile);
+}
 }

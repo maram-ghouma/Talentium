@@ -9,7 +9,6 @@ export async function seedAdmin(userService: UserService) {
     if (!adminEmail || !adminPassword) {
       throw new Error('ADMIN_EMAIL and ADMIN_PASSWORD must be set in the environment');
     }
-  
     const existingAdmin = await userService.findByEmail(adminEmail);
     if (!existingAdmin) {
       const hashedPassword = await bcrypt.hash(adminPassword, 10);

@@ -1,8 +1,9 @@
-import React, { ReactNode, useState } from 'react';
+import React, { ReactNode, useEffect, useState } from 'react';
 import { Sun, Moon, User } from 'lucide-react';
 import { Sidebar } from './Sidebar';
 import { SearchBar } from './SearchBar';
 import '../../Styles/layout.css';
+import { getUser } from '../../services/userService';
 interface MainLayoutProps {
   children: ReactNode;
   isDarkMode: boolean;
@@ -30,6 +31,27 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
   onSearch = (query) => console.log(query),
   usertype,
 }) => {
+  const [user, setUser] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const data = await getUser();
+        setUser(data);
+      } catch (err) {
+        setError('Failed to load profile');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProfile();
+    console.log("User data:", user);
+
+  }, []);
   return (
     <div className={isDarkMode ? 'dark-mode' : ''} style={{height:'100%', width:'100%'}}>
       <Sidebar 
@@ -70,7 +92,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
                     <div className="profile-picture-wrapper">
 
                     <img 
-                      src="/api/placeholder/32/32" 
+                      src={user?.imageUrl}
                       alt="Profile" 
                       className="profile-picture" 
                     />
