@@ -1,3 +1,4 @@
+import { Field, ID, ObjectType } from '@nestjs/graphql';
 import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn } from 'typeorm';
 
 export enum UserRole {
@@ -5,24 +6,25 @@ export enum UserRole {
   FREELANCER = 'freelancer',
   ADMIN = 'admin',
 } 
-
+@ObjectType()
 @Entity()
 export class User {
+  @Field(() => ID)
   @PrimaryGeneratedColumn()
   id: number;
-
+  @Field()
   @Column()
   username: string;
-
+  @Field()
   @Column()
   email: string;
-
+  @Field()
   @Column()
   password: string;
-
-   @Column({ nullable: true })
-  imageUrl: string;
-
-  @Column({ type: 'enum', enum: UserRole, default: UserRole.FREELANCER })
+  @Field()
+  @Column({ default: false })
+  isAdmin: boolean;
+  @Field()
+  @Column({ type: 'enum', enum: UserRole, default: UserRole.CLIENT })
   currentRole: UserRole;
 }
