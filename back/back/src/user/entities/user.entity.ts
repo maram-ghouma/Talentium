@@ -24,6 +24,11 @@ export class User {
   @Field()
   @Column({ default: false })
   isAdmin: boolean;
+  
+  @Field()
+  @Column({ nullable: true })
+  imageUrl: string;
+
   @Field()
   @Column({ type: 'enum', enum: UserRole, default: UserRole.CLIENT })
   currentRole: UserRole;

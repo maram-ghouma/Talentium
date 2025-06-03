@@ -11,6 +11,7 @@ import { updateClientProfile } from '../../../services/userService';
 interface ClientProfileProps {
   darkMode?: boolean;
   profile: ClientProfileType
+  isEditable?: boolean; 
 }
 
 
@@ -40,7 +41,7 @@ const clientData = {
   ]
 };
 
-const ClientProfile: React.FC<ClientProfileProps> = ({ darkMode = false , profile}) => {
+const ClientProfile: React.FC<ClientProfileProps> = ({ darkMode = false , profile,isEditable }) => {
   const [selectedMission, setSelectedMission] = useState<Mission | null>(null);
   const [showCreateMission, setShowCreateMission] = useState(false);
   const [isEditingPersonal, setIsEditingPersonal] = useState(false);
@@ -183,260 +184,267 @@ const handleSavePersonal = async () => {
   return (
     <>
       <Container className="py-4">
-        {/* Profile Overview */}
-        <Card className="mb-4 card profile-card">
-          <Card.Body>
-            {isEditingPersonal ? (
-              <div className="text-center">
-                <div className="d-flex justify-content-end">
-                  <div className="action-icon-group">
-                    <div className="action-icon cancel-icon" onClick={() => setIsEditingPersonal(false)}>
-                      <X size={20} />
-                    </div>
-                    <div className="action-icon save-icon" onClick={handleSavePersonal}>
-                      <Save size={20} />
-                    </div>
-                  </div>
+  {/* Profile Overview */}
+  <Card className="mb-4 card profile-card">
+    <Card.Body>
+      {isEditingPersonal ? (
+        <div className="text-center">
+          {isEditable && (
+            <div className="d-flex justify-content-end">
+              <div className="action-icon-group">
+                <div className="action-icon cancel-icon" onClick={() => setIsEditingPersonal(false)}>
+                  <X size={20} />
                 </div>
-                
-                <div className="position-relative mb-3 mx-auto" style={{ width: '80px', height: '80px' }}>
-                <img
-                  src={formData.avatar}
-                  alt={formData.name}
-                  className="rounded-circle"
-                  style={{ width: '80px', height: '80px', objectFit: 'cover' }}
-                />
-                <div className="position-relative">
-
-                  {/* Edit icon button */}
-                  <button
-                    type="button"
-                    className="position-absolute bottom-0 end-0 bg-primary rounded-circle p-1 border-0"
-                    onClick={() => fileInputRef.current?.click()}
-                    style={{backgroundColor:'var(--navy-secondary)'}}
-                  >
-                    <Edit size={16} color="white" /*style={{backgroundColor:'var(--navy-secondary)'}}*/ />
-                  </button>
-
-                  {/* Hidden file input */}
-                  <input
-                    type="file"
-                    accept="image/*"
-                    ref={fileInputRef}
-                    style={{ display: 'none' }}
-                    onChange={handleFileChange}
-                  />
+                <div className="action-icon save-icon" onClick={handleSavePersonal}>
+                  <Save size={20} />
                 </div>
-
               </div>
-                <Form className="profile-form">
-                  <Form.Group className="mb-3">
-                  <Form.Label className="d-flex align-items-center info-label">
-                        <span>Profile Name</span>
-                  </Form.Label>
-                    <Form.Control
-                      type="text"
-                      name="name"
-                      value={formData.name}
-                      onChange={handleInputChange}
-                      className="text-center"
-                    />
-                  </Form.Group>
-                  
-                  <Form.Group className="mb-3">
-                    <Form.Label className="d-flex align-items-center info-label">
-                          <span>Bio</span>
-                    </Form.Label>
-                    <Form.Control
-                      type="text"
-                      name="tagline"
-                      value={formData.tagline}
-                      onChange={handleInputChange}
-                      className="text-center"
-                    />
-                  </Form.Group>
-                </Form>
-              </div>
-            ) : (
-              <div className="text-center">
-                <div className="d-flex justify-content-end">
-                  <div className="edit-icon" onClick={() => setIsEditingPersonal(true)}>
-                    <Edit size={20} />
-                  </div>
-                </div>
-                <img
-                  src={formData.avatar}
-                  alt={formData.name}
-                  className="rounded-circle mb-3"
-                  style={{ width: '100px', height: '100px', objectFit: 'cover' }}
+            </div>
+          )}
+
+          <div className="position-relative mb-3 mx-auto" style={{ width: '80px', height: '80px' }}>
+            <img
+              src={formData.avatar}
+              alt={formData.name}
+              className="rounded-circle"
+              style={{ width: '80px', height: '80px', objectFit: 'cover' }}
+            />
+            {isEditable && (
+              <div className="position-relative">
+                {/* Edit icon button */}
+                <button
+                  type="button"
+                  className="position-absolute bottom-0 end-0 bg-primary rounded-circle p-1 border-0"
+                  onClick={() => fileInputRef.current?.click()}
+                  style={{ backgroundColor: 'var(--navy-secondary)' }}
+                >
+                  <Edit size={16} color="white" />
+                </button>
+
+                {/* Hidden file input */}
+                <input
+                  type="file"
+                  accept="image/*"
+                  ref={fileInputRef}
+                  style={{ display: 'none' }}
+                  onChange={handleFileChange}
                 />
-                <h4 className="mb-1">{formData.name}</h4>
-                <p className="text-muted mb-0">{formData.tagline}</p>
               </div>
             )}
-          </Card.Body>
-        </Card>
+          </div>
+
+          <Form className="profile-form">
+            <Form.Group className="mb-3">
+              <Form.Label className="d-flex align-items-center info-label">
+                <span>Profile Name</span>
+              </Form.Label>
+              <Form.Control
+                type="text"
+                name="name"
+                value={formData.name}
+                onChange={handleInputChange}
+                className="text-center"
+              />
+            </Form.Group>
+
+            <Form.Group className="mb-3">
+              <Form.Label className="d-flex align-items-center info-label">
+                <span>Bio</span>
+              </Form.Label>
+              <Form.Control
+                type="text"
+                name="tagline"
+                value={formData.tagline}
+                onChange={handleInputChange}
+                className="text-center"
+              />
+            </Form.Group>
+          </Form>
+        </div>
+      ) : (
+        <div className="text-center">
+          {isEditable && (
+            <div className="d-flex justify-content-end">
+              <div className="edit-icon" onClick={() => setIsEditingPersonal(true)}>
+                <Edit size={20} />
+              </div>
+            </div>
+          )}
+          <img
+            src={formData.avatar}
+            alt={formData.name}
+            className="rounded-circle mb-3"
+            style={{ width: '100px', height: '100px', objectFit: 'cover' }}
+          />
+          <h4 className="mb-1">{formData.name}</h4>
+          <p className="text-muted mb-0">{formData.tagline}</p>
+        </div>
+      )}
+    </Card.Body>
+  </Card>
+
 
         {/* Public Info */}
-        <Card className="mb-4 card">
-          <Card.Body>
-            <div className="profile-header">
-              <h5 className="mb-0">Public Information</h5>
-              {!isEditingInfo ? (
-                <div className="edit-icon" onClick={() => setIsEditingInfo(true)}>
-                  <Edit size={20} />
-                </div>
-              ) : (
-                <div className="action-icon-group">
-                  <div className="action-icon cancel-icon" onClick={() => setIsEditingInfo(false)}>
-                    <X size={20} />
-                  </div>
-                  <div className="action-icon save-icon" onClick={handleSaveInfo}>
-                    <Save size={20} />
-                  </div>
-                </div>
-              )}
+<Card className="mb-4 card">
+  <Card.Body>
+    <div className="profile-header">
+      <h5 className="mb-0">Public Information</h5>
+      {isEditable && (
+        !isEditingInfo ? (
+          <div className="edit-icon" onClick={() => setIsEditingInfo(true)}>
+            <Edit size={20} />
+          </div>
+        ) : (
+          <div className="action-icon-group">
+            <div className="action-icon cancel-icon" onClick={() => setIsEditingInfo(false)}>
+              <X size={20} />
             </div>
-            
-            {isEditingInfo ? (
-              <Form className="profile-form">
-                <Row>
-                  <Col md={6} className="mb-3">
-                    <Form.Group>
-                      <Form.Label className="d-flex align-items-center info-label">
-                        <Building size={18} className="me-2" />
-                        <span>Company</span>
-                      </Form.Label>
-                      <Form.Control
-                        type="text"
-                        name="company"
-                        value={formData.company}
-                        onChange={handleInputChange}
-                      />
-                    </Form.Group>
-                  </Col>
-                  <Col md={6} className="mb-3">
-                    <Form.Group>
-                      <Form.Label className="d-flex align-items-center info-label">
-                        <MapPin size={18} className="me-2" />
-                        <span>Country</span>
-                      </Form.Label>
-                      <Form.Control
-                        type="text"
-                        name="country"
-                        value={formData.country}
-                        onChange={handleInputChange}
-                      />
-                    </Form.Group>
-                  </Col>
-                 
-                  <Col md={6} className="mb-3">
-                    <Form.Group>
-                      <Form.Label className="d-flex align-items-center info-label">
-                        <Briefcase size={18} className="me-2" />
-                        <span>Industry</span>
-                      </Form.Label>
-                      <Form.Control
-                        type="text"
-                        name="industry"
-                        value={formData.industry}
-                        onChange={handleInputChange}
-                      />
-                    </Form.Group>
-                  </Col>
-                  <Col md={6} className="mb-3">
-                    <Form.Group>
-                      <Form.Label className="d-flex align-items-center info-label">
-                        <Mail size={18} className="me-2" />
-                        <span>Email</span>
-                      </Form.Label>
-                      <Form.Control
-                        type="email"
-                        name="email"
-                        value={formData.email}
-                        onChange={handleInputChange}
-                      />
-                    </Form.Group>
-                  </Col>
-                  <Col md={6} className="mb-3">
-                    <Form.Group>
-                      <Form.Label className="d-flex align-items-center info-label">
-                        <Phone size={18} className="me-2" />
-                        <span>Phone</span>
-                      </Form.Label>
-                      <Form.Control
-                        type="tel"
-                        name="phone"
-                        value={formData.phone}
-                        onChange={handleInputChange}
-                      />
-                    </Form.Group>
-                  </Col>
-                  <Col md={6} className="mb-3">
-                    <Form.Group>
-                      <Form.Label className="d-flex align-items-center info-label">
-                        <Linkedin size={18} className="me-2" />
-                        <span>LinkedIn</span>
-                      </Form.Label>
-                      <Form.Control
-                        type="text"
-                        name="linkedin"
-                        value={formData.linkedin}
-                        onChange={handleInputChange}
-                      />
-                    </Form.Group>
-                  </Col>
-                </Row>
-              </Form>
-            ) : (
-              <Row>
-                <Col md={6} className="mb-3">
-                  <div className="d-flex align-items-center mb-1">
-                    <Building size={18} className="text-primary me-2" />
-                    <span className="info-label">Company</span>
-                  </div>
-                  <p className="info-value">{formData.company}</p>
-                </Col>
-                <Col md={6} className="mb-3">
-                  <div className="d-flex align-items-center mb-1">
-                    <MapPin size={18} className="text-danger me-2" />
-                    <span className="info-label">Country</span>
-                  </div>
-                  <p className="info-value">{formData.country}</p>
-                </Col>
-              
-                <Col md={6} className="mb-3">
-                  <div className="d-flex align-items-center mb-1">
-                    <Briefcase size={18} className="text-success me-2" />
-                    <span className="info-label">Industry</span>
-                  </div>
-                  <p className="info-value">{formData.industry}</p>
-                </Col>
-                <Col md={6} className="mb-3">
-                  <div className="d-flex align-items-center mb-1">
-                    <Mail size={18} className="text-primary me-2" />
-                    <span className="info-label">Email</span>
-                  </div>
-                  <p className="info-value">{formData.email}</p>
-                </Col>
-                <Col md={6} className="mb-3">
-                  <div className="d-flex align-items-center mb-1">
-                    <Phone size={18} className="text-success me-2" />
-                    <span className="info-label">Phone</span>
-                  </div>
-                  <p className="info-value">{formData.phone}</p>
-                </Col>
-                <Col md={6} className="mb-3">
-                  <div className="d-flex align-items-center mb-1">
-                    <Linkedin size={18} className="text-info me-2" />
-                    <span className="info-label">LinkedIn</span>
-                  </div>
-                  <p className="info-value">{formData.linkedin}</p>
-                </Col>
-              </Row>
-            )}
-          </Card.Body>
-        </Card>
+            <div className="action-icon save-icon" onClick={handleSaveInfo}>
+              <Save size={20} />
+            </div>
+          </div>
+        )
+      )}
+    </div>
+
+    {isEditingInfo ? (
+      <Form className="profile-form">
+        <Row>
+          <Col md={6} className="mb-3">
+            <Form.Group>
+              <Form.Label className="d-flex align-items-center info-label">
+                <Building size={18} className="me-2" />
+                <span>Company</span>
+              </Form.Label>
+              <Form.Control
+                type="text"
+                name="company"
+                value={formData.company}
+                onChange={handleInputChange}
+              />
+            </Form.Group>
+          </Col>
+          <Col md={6} className="mb-3">
+            <Form.Group>
+              <Form.Label className="d-flex align-items-center info-label">
+                <MapPin size={18} className="me-2" />
+                <span>Country</span>
+              </Form.Label>
+              <Form.Control
+                type="text"
+                name="country"
+                value={formData.country}
+                onChange={handleInputChange}
+              />
+            </Form.Group>
+          </Col>
+          <Col md={6} className="mb-3">
+            <Form.Group>
+              <Form.Label className="d-flex align-items-center info-label">
+                <Briefcase size={18} className="me-2" />
+                <span>Industry</span>
+              </Form.Label>
+              <Form.Control
+                type="text"
+                name="industry"
+                value={formData.industry}
+                onChange={handleInputChange}
+              />
+            </Form.Group>
+          </Col>
+          <Col md={6} className="mb-3">
+            <Form.Group>
+              <Form.Label className="d-flex align-items-center info-label">
+                <Mail size={18} className="me-2" />
+                <span>Email</span>
+              </Form.Label>
+              <Form.Control
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleInputChange}
+              />
+            </Form.Group>
+          </Col>
+          <Col md={6} className="mb-3">
+            <Form.Group>
+              <Form.Label className="d-flex align-items-center info-label">
+                <Phone size={18} className="me-2" />
+                <span>Phone</span>
+              </Form.Label>
+              <Form.Control
+                type="tel"
+                name="phone"
+                value={formData.phone}
+                onChange={handleInputChange}
+              />
+            </Form.Group>
+          </Col>
+          <Col md={6} className="mb-3">
+            <Form.Group>
+              <Form.Label className="d-flex align-items-center info-label">
+                <Linkedin size={18} className="me-2" />
+                <span>LinkedIn</span>
+              </Form.Label>
+              <Form.Control
+                type="text"
+                name="linkedin"
+                value={formData.linkedin}
+                onChange={handleInputChange}
+              />
+            </Form.Group>
+          </Col>
+        </Row>
+      </Form>
+    ) : (
+      <Row>
+        <Col md={6} className="mb-3">
+          <div className="d-flex align-items-center mb-1">
+            <Building size={18} className="text-primary me-2" />
+            <span className="info-label">Company</span>
+          </div>
+          <p className="info-value">{formData.company}</p>
+        </Col>
+        <Col md={6} className="mb-3">
+          <div className="d-flex align-items-center mb-1">
+            <MapPin size={18} className="text-danger me-2" />
+            <span className="info-label">Country</span>
+          </div>
+          <p className="info-value">{formData.country}</p>
+        </Col>
+        <Col md={6} className="mb-3">
+          <div className="d-flex align-items-center mb-1">
+            <Briefcase size={18} className="text-success me-2" />
+            <span className="info-label">Industry</span>
+          </div>
+          <p className="info-value">{formData.industry}</p>
+        </Col>
+        <Col md={6} className="mb-3">
+          <div className="d-flex align-items-center mb-1">
+            <Mail size={18} className="text-primary me-2" />
+            <span className="info-label">Email</span>
+          </div>
+          <p className="info-value">{formData.email}</p>
+        </Col>
+        <Col md={6} className="mb-3">
+          <div className="d-flex align-items-center mb-1">
+            <Phone size={18} className="text-success me-2" />
+            <span className="info-label">Phone</span>
+          </div>
+          <p className="info-value">{formData.phone}</p>
+        </Col>
+        <Col md={6} className="mb-3">
+          <div className="d-flex align-items-center mb-1">
+            <Linkedin size={18} className="text-info me-2" />
+            <span className="info-label">LinkedIn</span>
+          </div>
+          <p className="info-value">{formData.linkedin}</p>
+        </Col>
+      </Row>
+    )}
+  </Card.Body>
+</Card>
+
 
         {/* Account Stats */}
         <Row className="mb-4">
@@ -491,8 +499,11 @@ const handleSavePersonal = async () => {
           <Card.Body>
             <div className="profile-header">
               <h5 className="mb-0">Recent Missions</h5>
+                          { isEditable && (
+
               <Button variant="outline-primary" size="sm" onClick={() => setShowCreateMission(true)} >Post New Mission</Button>
-            </div>
+                          )}
+              </div>
             
             {missions.map((mission) => (
               <div

@@ -36,7 +36,7 @@ import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/dist/e
         };
       },
     }),
-    MissionModule,
+    MissionModule,AuthModule, ClientProfileModule, FreelancerProfileModule,UserModule,
    GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       autoSchemaFile: path.join(process.cwd(), 'src/schema.gql'),

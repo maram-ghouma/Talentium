@@ -1,6 +1,5 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
 import { UserService } from './user/user.service';
 import { seedAdmin } from './SeedAdmin';
 import * as express from 'express';
@@ -14,9 +13,8 @@ async function bootstrap() {
     origin: true,
     credentials: true,
   });
-    app.use(express.json({ limit: '10mb' }));
-  app.use(express.urlencoded({ limit: '10mb', extended: true }));
-    app.use('/uploads', express.static(join(__dirname, '..', 'uploads')));
+console.log('Serving uploads from:', join(__dirname, '..', 'uploads'));
+app.use('/uploads', express.static(join(process.cwd(), 'uploads')));
   const userService = app.get(UserService);
   await seedAdmin(userService);
 
