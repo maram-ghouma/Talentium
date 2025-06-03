@@ -27,4 +27,6 @@ export class User {
   @Field()
   @Column({ type: 'enum', enum: UserRole, default: UserRole.CLIENT })
   currentRole: UserRole;
+  @Column({ nullable: true })
+  imageUrl: string;
 }
