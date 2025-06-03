@@ -10,47 +10,58 @@ import { MissionModule } from './mission/mission.module';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import * as path from 'path';
-import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/dist/esm/plugin/landingPage/default';import { AuthModule } from './auth/auth.module';
-import { ConversationModule } from './conversation/conversation.module';
+import { AuthModule } from './auth/auth.module';
 import { ChatController } from './chat/chat.controller';
 import { ChatService } from './chat/chat.service';
 import { ChatGateway } from './chat/chat.gateway';
-import { ProjectModule } from './project/project.module';
-import { ProjectModule } from './project/project.module';
 import { ConversationModule } from './conversation/conversation.module';
+import { JwtModule } from '@nestjs/jwt';
+import { User } from './user/entities/user.entity';
+import { Conversation } from './conversation/entities/conversation.entity';
+import { Message } from './conversation/entities/message.entity'; // Import Message entity
 
 @Module({
-  imports: [UserModule, FreelancerProfileModule, ClientProfileModule,
+  imports: [
+    UserModule,
+    FreelancerProfileModule,
+    ClientProfileModule,
     ConfigModule.forRoot({
-      isGlobal: true,          // Makes ConfigService available app-wide
-      envFilePath: '.env',     // Explicit path to your .env file
+      isGlobal: true,
+      envFilePath: '.env',
+    }),
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => ({
+        secret: configService.get<string>('JWT_SECRET'),
+        signOptions: { expiresIn: '1h' },
+      }),
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (configService: ConfigService) => {
-        return {
-          type: 'mysql',
-          host: configService.get('DB_HOST'),
-          port:configService.get<number>('DB_PORT', 3306),
-          username: configService.get('DB_USERNAME'),
-          password: configService.get('DB_PASSWORD'),
-          database: configService.get('DB_DATABASE'),
-          entities: [__dirname + '/**/*.entity{.ts,.js}'],
-          synchronize: configService.get('DB_SYNCHRONIZE') === 'true',
-          logging: true,
-          autoLoadEntities: true,
-        };
-      },
+      useFactory: (configService: ConfigService) => ({
+        type: 'mysql',
+        host: configService.get('DB_HOST'),
+        port: configService.get<number>('DB_PORT', 3306),
+        username: configService.get('DB_USERNAME'),
+        password: configService.get('DB_PASSWORD'),
+        database: configService.get('DB_DATABASE'),
+        entities: [__dirname + '/**/*.entity{.ts,.js}'],
+        synchronize: configService.get('DB_SYNCHRONIZE') === 'true',
+        logging: true,
+        autoLoadEntities: true,
+      }),
     }),
+    TypeOrmModule.forFeature([User, Conversation, Message]), // Add Message here
     MissionModule,
-   GraphQLModule.forRoot<ApolloDriverConfig>({
+    GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       autoSchemaFile: path.join(process.cwd(), 'src/schema.gql'),
       installSubscriptionHandlers: true,
     }),
-   ConversationModule,
-   ProjectModule,],
+    ConversationModule,
+  ],
   controllers: [AppController, ChatController],
   providers: [AppService, ChatGateway, ChatService],
 })

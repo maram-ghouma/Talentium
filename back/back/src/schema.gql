@@ -11,6 +11,29 @@ type User {
   currentRole: String!
 }
 
+type Message {
+  id: Int!
+  content: String!
+  direction: Int!
+  timestamp: DateTime!
+  sender: User!
+  conversation: Conversation!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type Conversation {
+  id: Int!
+  isActive: Boolean!
+  startDate: DateTime!
+  mission: Mission!
+  participants: [User!]!
+  messages: [Message!]!
+}
+
 type Mission {
   id: Int!
   title: String!
@@ -61,11 +84,6 @@ input CreateMissionInput {
   progress: Int! = 0
   tasks: TaskStatsInput! = {total: 0, completed: 0}
 }
-
-"""
-A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
-"""
-scalar DateTime
 
 input TaskStatsInput {
   total: Int!
