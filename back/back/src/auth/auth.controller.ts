@@ -27,7 +27,7 @@ export class AuthController {
     async getUser(@CurrentUser() user: any) {
 
       const person = await this.userService.findById(user.userId);
-      const baseUrl = 'http://localhost:4000'; 
+      const baseUrl = 'http://localhost:3000'; 
       if (!person) {
         throw new NotFoundException('User not found');
       }

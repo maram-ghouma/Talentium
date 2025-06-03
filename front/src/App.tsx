@@ -31,6 +31,7 @@ import FreelancerProfile from './Pages/Freelancer/FreelancerProfile';
 import FreelancerHistory from './Pages/Freelancer/FreelancerHistory';
 import FreelancerChat from './Pages/Freelancer/FreelancerChat';
 import GuestHome from './Pages/GuestHome';
+import ClientEditProfile from './Pages/Client/ClientEditProfile';
 
 
 
@@ -51,6 +52,7 @@ function App() {
 
   <Route path="/admin/reports" element={<ReportsInterface />} />
   <Route path="/client" element ={<ClientHome/>}/>
+    <Route path="/client/editProfile" element ={<ClientEditProfile/>}/>
   <Route path="/client/interviews" element ={<ClientInterviewSchedule/>}/>
   <Route path="/client/profile" element ={<ClientProfilePage/>}/>
 

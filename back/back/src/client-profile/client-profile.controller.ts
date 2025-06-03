@@ -19,7 +19,7 @@ export class ClientProfileController {
   @Get('me')
   async getMyProfile(@CurrentUser() user: any) {
     const profile = await this.clientProfileService.findByUserId(user.userId);
-    const baseUrl = 'http://localhost:4000'; 
+    const baseUrl = 'http://localhost:3000'; 
     if (!profile) {
               throw new NotFoundException('User not found');
     }
