@@ -58,16 +58,12 @@
   
     export type User = {
       id: string;
-      name: string;
+      username: string;
       role: string;
-      avatar?: string;
+      imageUrl?: string;
       email: string;
-      skills?: string[];
-      bio?: string;
-      hourlyRate?: number;
-      completedMissions?: number;
-      rating?: number;
-    };
+      
+      };
     
   
     export interface Message {
@@ -144,7 +140,27 @@
         twitter?: string;
       };
     }
-    
+export interface ClientProfileType {
+  id: number;
+  companyName?: string;
+  industry?: string;
+  linkedIn?: string;
+  phoneNumber?: string;
+  country?: string;
+  bio?: string;
+  user: User;
+}
+export interface FreelancerProfileType {
+  id: number;
+  skills: string[];
+  hourlyRate?: number;
+  phoneNumber?: string;
+  country?: string;
+  bio?: string;
+  github?: string;
+  linkedIn?: string;
+  user: User;
+}
     export interface Interview {
       id: string;
       candidateName: string;
@@ -158,4 +174,14 @@
    
     
    
- 
+ export interface FormDataType {
+  name: string;
+  tagline: string;
+  company: string;
+  country: string;
+  industry: string;
+  email: string;
+  phone: string;
+  linkedin: string;
+  avatar: string;
+}

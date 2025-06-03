@@ -18,9 +18,15 @@ export class ClientProfile {
   @Column()
   country : string;
 
-  @Column()
+  @Column({ nullable: true })
   companyName: string;
-  @Field()
-  @Column()
+
+  @Column({ nullable: true })
+  linkedIn: string;
+
+  @Column({ nullable: true })
+  bio: string;
+
+  @Column({ nullable: true })
   industry: string;
 }

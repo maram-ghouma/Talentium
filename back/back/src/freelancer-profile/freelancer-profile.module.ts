@@ -5,8 +5,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { FreelancerProfile } from './entities/freelancer-profile.entity';
 
 @Module({
-  imports:[TypeOrmModule.forFeature([FreelancerProfile])],
+  imports: [TypeOrmModule.forFeature([FreelancerProfile])], 
   controllers: [FreelancerProfileController],
   providers: [FreelancerProfileService],
+  exports: [FreelancerProfileService], 
 })
 export class FreelancerProfileModule {}
