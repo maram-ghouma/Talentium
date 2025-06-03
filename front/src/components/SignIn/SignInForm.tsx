@@ -22,7 +22,7 @@ const SignInForm: React.FC = () => {
     try {
       const response = await loginUser({ email, password });
       if (response.accessToken) {
-        localStorage.setItem('authToken', response.token);
+        localStorage.setItem('authToken', response.accessToken);
         console.log('Login successful:', response);
   const role = response.user.currentRole;
 
