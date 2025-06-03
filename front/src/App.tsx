@@ -22,7 +22,7 @@ import ClientProfilePage from './Pages/Client/ClientProfile';
 import Profile from './components/Freelancer/Profile';
 import {chatConversations, messages, missions, profile, workHistory} from './Data/mockData';
 import MissionDetails from './components/Freelancer/mission';
-import Chat from './components/Freelancer/chat';
+import Chat from './components/Chat/chat';
 import History from './components/Freelancer/History';
 import { MainLayout } from './components/layout/MainLayout';
 import FreelancerHomePage from './Pages/Freelancer/FreelancerHomePage';
