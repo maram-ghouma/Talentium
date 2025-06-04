@@ -6,11 +6,13 @@ import {
   CreateDateColumn,
   ManyToMany,
   JoinTable,
+  OneToMany,
 } from 'typeorm';
 import { User } from 'src/user/entities/user.entity';
 import { ObjectType, Field, Int, GraphQLISODateTime } from '@nestjs/graphql';
 import { FreelancerProfile } from 'src/freelancer-profile/entities/freelancer-profile.entity';
 import { GraphQLDate } from 'graphql-scalars';
+import { Dispute } from 'src/dispute/entities/dispute.entity';
 
 @ObjectType()
 @Entity()
@@ -80,6 +82,10 @@ export class Mission {
 
   @ManyToOne(() => FreelancerProfile, (freelancer) => freelancer.selectedMissions, { nullable: true })
   selectedFreelancer?: FreelancerProfile;
+
+  @Field(() => [Dispute])
+  @OneToMany(() => Dispute, (dispute) => dispute.mission)
+  disputes: Dispute[];
 
 }
 

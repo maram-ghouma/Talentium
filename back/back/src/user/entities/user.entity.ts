@@ -1,4 +1,5 @@
 import { Field, ID, ObjectType } from '@nestjs/graphql';
+import { Review } from 'src/review/entities/review.entity';
 import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn } from 'typeorm';
 
 export enum UserRole {
@@ -32,4 +33,10 @@ export class User {
   @Field()
   @Column({ type: 'enum', enum: UserRole, default: UserRole.CLIENT })
   currentRole: UserRole;
+
+  @Field(() => [Review], { nullable: true })
+  @OneToOne(() => Review, (review) => review.reviewer, { eager: true })
+  reviews: Review[];
+
+  
 }
