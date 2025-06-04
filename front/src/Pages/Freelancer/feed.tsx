@@ -1,6 +1,6 @@
 import { MainLayout } from '../../components/layout/MainLayout';
 import { useState } from 'react';
-import { Feed } from '../../components/Freelancer/feed';
+import { Feed } from '../../components/Freelancer/freelancerfeed/feed';
 
 const FreelancerFeed = () => {
      const [isSidebarOpen, setIsSidebarOpen] = useState(true);

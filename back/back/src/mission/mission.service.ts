@@ -19,28 +19,45 @@ export class MissionService {
     private clientProfileRepository: Repository<ClientProfile>
   ) {}
 
-  async create(createMissionInput: CreateMissionInput,user:User): Promise<Mission> {
-    const { /*clientId,*/ ...rest } = createMissionInput;
+async create(createMissionInput: CreateMissionInput, user: any): Promise<Mission> {
+  const { ...rest } = createMissionInput;
+  const fullUser = await this.userRepository.findOne({ where: { id: user.userId } });
 
-    const client = await this.clientProfileRepository.findOne({
-      where: { user },
-    });
+  if (!fullUser) {
+    throw new Error('User not found');
+  }
+  const client = await this.clientProfileRepository.findOne({
+    where: { user: fullUser },
+  });
 
-    if (!client) throw new Error('Client not found');
-
-    const mission = this.missionRepository.create({ ...rest, client });
-    return this.missionRepository.save(mission);
+  if (!client) {
+    throw new Error('Client not found');
   }
 
-  findAll(user:User): Promise<Mission[]> {
-    return this.missionRepository
-  .createQueryBuilder('mission')
-  .leftJoinAndSelect('mission.client', 'client')
-  .leftJoinAndSelect('client.user', 'user')
-  .where('user.id = :userId', { userId: user.id })
-  .getMany();
+  const mission = this.missionRepository.create({ ...rest, client });
+  return this.missionRepository.save(mission);
+}
 
-  }
+
+findAll(user: any): Promise<Mission[]> {
+  return this.missionRepository
+    .createQueryBuilder('mission')
+    .leftJoinAndSelect('mission.client', 'client')
+    .leftJoinAndSelect('client.user', 'user')
+    .where(`user.id = :usersId`, { usersId: user.userId })
+    .getMany();
+}
+findAllNotMine(user: any): Promise<Mission[]> {
+  return this.missionRepository
+    .createQueryBuilder('mission')
+    .leftJoinAndSelect('mission.client', 'client')
+    .leftJoinAndSelect('client.user', 'user')
+    .where(`user.id != :usersId`, { usersId: user.userId })
+    .getMany();
+}
+
+
+  
 
   findOne(id: number): Promise<Mission | null> {
     return this.missionRepository.findOne({ where: { id }, relations: ['client'] });

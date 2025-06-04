@@ -52,16 +52,21 @@ const [showModify, setShowModify] = useState(false);
       </div>
 
       <div className="row g-4">
-        {missions.map((mission) => (
-          <div key={mission.id} className="col-12 col-md-6 col-lg-4">
-            <MissionCard 
-              mission={mission} 
-              isDarkMode={isDarkMode} 
-              onClick={() => {handleOpenDetails(mission);setShowDetails(true);}}
-            />
-          </div>
-        ))}
+        {missions.length === 0 ? (
+          <p>You don't have any missions created yet.</p>
+        ) : (
+          missions.map((mission) => (
+            <div key={mission.id} className="col-12 col-md-6 col-lg-4">
+              <MissionCard 
+                mission={mission} 
+                isDarkMode={isDarkMode} 
+                onClick={() => {handleOpenDetails(mission);setShowDetails(true);}}
+              />
+            </div>
+          ))
+        )}
       </div>
+
 
       {showCreateMission && (
         <CreateMission

@@ -12,15 +12,16 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import * as path from 'path';
 import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/dist/esm/plugin/landingPage/default';import { AuthModule } from './auth/auth.module';
 import { InvoiceModule } from './invoice/invoice.module';
-import { ReportModule } from './report/report.module';
+//import { ReportModule } from './report/report.module';
 import { DisputeModule } from './dispute/dispute.module';
 import { BadgeModule } from './badge/badge.module';
+import { ApplicationModule } from './application/application.module';
 
 @Module({
   imports: [UserModule, FreelancerProfileModule, ClientProfileModule,
     ConfigModule.forRoot({
-      isGlobal: true,          // Makes ConfigService available app-wide
-      envFilePath: '.env',     // Explicit path to your .env file
+      isGlobal: true,          
+      envFilePath: '.env',     
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
@@ -45,11 +46,12 @@ import { BadgeModule } from './badge/badge.module';
       driver: ApolloDriver,
       autoSchemaFile: path.join(process.cwd(), 'src/schema.gql'),
       installSubscriptionHandlers: true,
+      
     }),
    InvoiceModule,
-   ReportModule,
    DisputeModule,
-   BadgeModule,],
+   BadgeModule,
+   ApplicationModule,],
   controllers: [AppController],
   providers: [AppService],
 })

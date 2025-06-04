@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 
-import '../../Styles/client/Interviews.css';
+import '../../../Styles/client/Interviews.css';
 import { useQuery } from '@apollo/client';
-import { Mission } from '../../types';
-import { GET_MISSIONS } from '../../graphql/mission';
-import MissionDetailsModal from '../client/home page/MissionDetailsModal';
-import { MissionCard } from '../client/home page/MissionCard';
+import { Mission } from '../../../types';
+import { GET_ALL_MISSIONS } from '../../../graphql/mission';
+import { MissionCard } from './freelancerMissionCard';
+import MissionDetailsModal from './missionDetails';
 
 
 interface HomePageProps {
@@ -17,14 +17,14 @@ interface HomePageProps {
 export const Feed: React.FC<HomePageProps> = ({ isDarkMode, toggleDarkMode, isSidebarOpen }) => {
   const [showCreateMission, setShowCreateMission] = useState(false);
   const [selectedMission, setSelectedMission] = useState<Mission | null>(null);
-   const { data, loading, error,refetch } = useQuery(GET_MISSIONS);
+   const { data, loading, error,refetch } = useQuery(GET_ALL_MISSIONS);
   const [missions, setMissions] = useState<Mission[]>([]);
   const [showDetails, setShowDetails] = useState(false);
 const [showModify, setShowModify] = useState(false);
 
   useEffect(() => {
-    if (data && data.missions) {
-      setMissions(data.missions);
+    if (data && data.allMissions) {
+      setMissions(data.allMissions);
     }
   }, [data]);
 
@@ -60,10 +60,6 @@ const [showModify, setShowModify] = useState(false);
         <MissionDetailsModal
         show={!!selectedMission}
         onHide={() => {setShowDetails(false); handleCloseDetails();}}
-        onModifyClick={() => {
-        setShowDetails(false); 
-        setShowModify(true);   
-      }}
         mission={{
           id: selectedMission.id,
           price:selectedMission.price,
