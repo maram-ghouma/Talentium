@@ -4,9 +4,11 @@ import { MissionResolver } from './mission.resolver';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Mission } from './entities/mission.entity';
 import { User } from 'src/user/entities/user.entity';
+import { Dispute } from 'src/dispute/entities/dispute.entity';
 
 @Module({
-  imports : [TypeOrmModule.forFeature([Mission, User])],
+  imports : [TypeOrmModule.forFeature([Mission, User, Dispute])],
   providers: [MissionResolver, MissionService],
+  exports: [MissionService, TypeOrmModule], 
 })
 export class MissionModule {}

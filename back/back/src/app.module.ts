@@ -12,9 +12,11 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import * as path from 'path';
 import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/dist/esm/plugin/landingPage/default';import { AuthModule } from './auth/auth.module';
 import { InvoiceModule } from './invoice/invoice.module';
-import { ReportModule } from './report/report.module';
+
 import { DisputeModule } from './dispute/dispute.module';
 import { BadgeModule } from './badge/badge.module';
+import { PaymentService } from './payment/payment.service';
+import { PaymentModule } from './payment/payment.module';
 
 @Module({
   imports: [UserModule, FreelancerProfileModule, ClientProfileModule,
@@ -47,10 +49,11 @@ import { BadgeModule } from './badge/badge.module';
       installSubscriptionHandlers: true,
     }),
    InvoiceModule,
-   ReportModule,
+   
    DisputeModule,
-   BadgeModule,],
+   BadgeModule,
+   PaymentModule,],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, PaymentService],
 })
 export class AppModule {}
