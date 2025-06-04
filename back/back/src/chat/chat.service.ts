@@ -5,6 +5,24 @@ import { Conversation } from '../conversation/entities/conversation.entity';
 import { Message } from '../conversation/entities/message.entity';
 import { User } from 'src/user/entities/user.entity';
 
+export interface ConversationDTO {
+  id: number;
+  isActive: boolean;
+  messages: {
+    id: number;
+    content: string;
+    timestamp: Date;
+    isRead: boolean;
+    senderId: number;
+  }[];
+  participants: {
+    id: number;
+    name: string;
+    imageUrl: string;
+  }[];
+}
+
+
 @Injectable()
 export class ChatService {
   constructor(
@@ -93,15 +111,31 @@ export class ChatService {
     }
   }
 
-  async getConversations(userId: number): Promise<Conversation[]> {
+  async getConversations(userId: number): Promise<ConversationDTO[]> {
     const conversations = await this.conversationRepo
-        .createQueryBuilder('conversation')
-        .leftJoinAndSelect('conversation.participants', 'participants')
-        .leftJoinAndSelect('conversation.mission', 'mission')
-        .leftJoinAndSelect('conversation.messages', 'messages')
-        .where('participants.id = :userId', { userId })
-        .getMany();
+      .createQueryBuilder('conversation')
+      .leftJoinAndSelect('conversation.participants', 'participants')
+      .leftJoinAndSelect('conversation.mission', 'mission')
+      .leftJoinAndSelect('conversation.messages', 'messages')
+      .where('participants.id = :userId', { userId })
+      .getMany();
 
-    return conversations;
-    }
+    return conversations.map((conversation) => ({
+      id: conversation.id,
+      isActive: conversation.isActive,
+      messages: conversation.messages.map((msg) => ({
+        id: msg.id,
+        content: msg.content,
+        timestamp: msg.timestamp,
+        isRead: msg.isRead,
+        senderId: msg.sender.id,
+      })),
+      participants: conversation.participants.map((user) => ({
+        id: user.id,
+        name: user.username,
+        imageUrl: user.imageUrl,
+      })),
+    }));
+  }
+
 }

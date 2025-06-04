@@ -13,7 +13,7 @@ import { FreelancerProfileModule } from 'src/freelancer-profile/freelancer-profi
   imports: [ 
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.register({
-      secret: process.env.JWT_SECRET || 'defaultSecretKey', 
+      secret: 'temporary_secretkey',
       signOptions: { expiresIn: '3d' }, 
     }),
     UserModule,

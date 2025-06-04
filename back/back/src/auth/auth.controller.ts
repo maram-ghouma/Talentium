@@ -5,6 +5,7 @@ import { CreateUserDto } from '../user/dto/create-user.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { CurrentUser } from './decorators/current-user.decorator';
 import { UserService } from 'src/user/user.service';
+import { Response } from 'express';
 
 @Controller('auth')
 export class AuthController {
@@ -27,7 +28,7 @@ export class AuthController {
     async getUser(@CurrentUser() user: any) {
 
       const person = await this.userService.findById(user.userId);
-      const baseUrl = 'http://localhost:4000'; 
+      const baseUrl = 'http://localhost:3000'; 
       if (!person) {
         throw new NotFoundException('User not found');
       }

@@ -54,8 +54,8 @@ import { Message } from './conversation/entities/message.entity'; // Import Mess
       }),
     }),
     TypeOrmModule.forFeature([User, Conversation, Message]), // Add Message here
-    MissionModule,
-    GraphQLModule.forRoot<ApolloDriverConfig>({
+    MissionModule,AuthModule, ClientProfileModule, FreelancerProfileModule,UserModule,
+   GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       autoSchemaFile: path.join(process.cwd(), 'src/schema.gql'),
       installSubscriptionHandlers: true,

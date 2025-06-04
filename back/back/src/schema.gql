@@ -8,6 +8,7 @@ type User {
   email: String!
   password: String!
   isAdmin: Boolean!
+  imageUrl: String!
   currentRole: String!
 }
 
