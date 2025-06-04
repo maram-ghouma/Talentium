@@ -1,5 +1,6 @@
 // freelancer-profile/freelancer-profile.entity.ts
-import { ObjectType } from '@nestjs/graphql';
+import { Field, ObjectType } from '@nestjs/graphql';
+import { Application } from 'src/application/entities/application.entity';
 import { Mission } from 'src/mission/entities/mission.entity';
 import { User } from 'src/user/entities/user.entity';
 import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn, OneToMany } from 'typeorm';
@@ -35,7 +36,11 @@ skills: string[];
   bio: string;
 
   @OneToMany(() => Mission, (mission) => mission.selectedFreelancer)
-selectedMissions: Mission[];
+  selectedMissions: Mission[];
+
+  @Field(() => [Application], { nullable: true })
+@OneToMany(() => Application, application => application.freelancer)
+applications?: Application[];
 
    @Column({ nullable: true })
    

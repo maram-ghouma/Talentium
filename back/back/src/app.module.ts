@@ -15,14 +15,15 @@ import { InvoiceModule } from './invoice/invoice.module';
 
 import { DisputeModule } from './dispute/dispute.module';
 import { BadgeModule } from './badge/badge.module';
+import { ApplicationModule } from './application/application.module';
 import { PaymentService } from './payment/payment.service';
 import { PaymentModule } from './payment/payment.module';
 
 @Module({
   imports: [UserModule, FreelancerProfileModule, ClientProfileModule,
     ConfigModule.forRoot({
-      isGlobal: true,          // Makes ConfigService available app-wide
-      envFilePath: '.env',     // Explicit path to your .env file
+      isGlobal: true,          
+      envFilePath: '.env',     
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
@@ -47,11 +48,13 @@ import { PaymentModule } from './payment/payment.module';
       driver: ApolloDriver,
       autoSchemaFile: path.join(process.cwd(), 'src/schema.gql'),
       installSubscriptionHandlers: true,
+      
     }),
    InvoiceModule,
    
    DisputeModule,
    BadgeModule,
+   ApplicationModule,
    PaymentModule,],
   controllers: [AppController],
   providers: [AppService, PaymentService],

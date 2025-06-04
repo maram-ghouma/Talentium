@@ -58,7 +58,7 @@ const [formData, setFormData] = useState({
             },
             refetchQueries: ['GetMissions'],
           }).then(() => {
-            onClose(); // optionally close modal
+            onClose();
           });
 
           }}
@@ -103,7 +103,7 @@ const [formData, setFormData] = useState({
     value={formData.deadline || ''}
     onChange={(e) => setFormData({ ...formData, deadline: e.target.value })}
     className="form-control"
-    min={new Date().toISOString().split('T')[0]} // Sets min date to today
+    min={new Date().toISOString().split('T')[0]} 
     required
   />
 </div>

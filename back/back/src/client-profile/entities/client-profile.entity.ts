@@ -7,7 +7,7 @@ export class ClientProfile {
   @Field(() => ID)
   @PrimaryGeneratedColumn()
   id: number;
-  @Field()
+  @Field(()=>User)
   @OneToOne(() => User)
   @JoinColumn()
   user: User;

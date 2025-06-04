@@ -13,6 +13,8 @@ import { ObjectType, Field, Int, GraphQLISODateTime } from '@nestjs/graphql';
 import { FreelancerProfile } from 'src/freelancer-profile/entities/freelancer-profile.entity';
 import { GraphQLDate } from 'graphql-scalars';
 import { Dispute } from 'src/dispute/entities/dispute.entity';
+import { ClientProfile } from 'src/client-profile/entities/client-profile.entity';
+import { Application } from 'src/application/entities/application.entity';
 
 @ObjectType()
 @Entity()
@@ -41,9 +43,9 @@ export class Mission {
   @Column({ type: 'date' })
   date: string;
 
-  @Field(() => User)
-  @ManyToOne(() => User)
-  client: User;
+  @Field(() => ClientProfile)
+  @ManyToOne(() => ClientProfile)
+  client: ClientProfile;
 
   @Field(() => [String])
   @Column('simple-array')
@@ -94,6 +96,10 @@ export class Mission {
   @Field({ nullable: true })
   @Column({ nullable: true })
   paymentStatus?: string;
+
+  @Field(() => [Application], { nullable: true })
+  @OneToMany(() => Application, application => application.mission)
+  applications?: Application[];
 
 }
 

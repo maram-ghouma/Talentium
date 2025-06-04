@@ -31,6 +31,8 @@ import FreelancerProfile from './Pages/Freelancer/FreelancerProfile';
 import FreelancerHistory from './Pages/Freelancer/FreelancerHistory';
 import FreelancerChat from './Pages/Freelancer/FreelancerChat';
 import GuestHome from './Pages/GuestHome';
+import { HomePage } from './components/client/home page/homePage';
+import FreelancerFeed from './Pages/Freelancer/feed';
 import ClientEditProfile from './Pages/Client/ClientEditProfile';
 import JalonsPage from './Pages/PaymentPage/JalonsPage';
 
@@ -48,7 +50,8 @@ function App() {
   <Route path="/Freelancer/mission/:id" element={<MissionDetails mission={missions[0]} />} />
   <Route path="/Freelancer/chat" element={<FreelancerChat />} />
   <Route path="/Freelancer/history" element={<FreelancerHistory historyItems={workHistory} />} />
-  <Route path="/Freelancer" element={<FreelancerDashboard />} />
+  <Route path="/Freelancer/dashboard" element={<FreelancerDashboard />} />
+  <Route path="/Freelancer" element={<FreelancerFeed />} />
           
 
   <Route path="/admin/reports" element={<ReportsInterface />} />
