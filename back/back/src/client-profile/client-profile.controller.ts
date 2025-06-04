@@ -11,7 +11,7 @@ import { diskStorage } from 'multer';
 import { Express } from 'express';
 
 
-@Controller('client-profiles')
+@Controller('client-profile')
 export class ClientProfileController {
   constructor(private readonly clientProfileService: ClientProfileService) {}
 

@@ -219,3 +219,9 @@
   .dark-mode .stat-label {
     color: var(--slate);
   }
+.profile-header-meta{
+  justify-self: center;
+    display: flex;
+
+}
+

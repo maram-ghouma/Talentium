@@ -52,7 +52,7 @@ interface ProfileProps {
          profileName="Freelancer"
          profileRole=""
        >
-        <Profile profile={profile} isEditable={false} />
+        <Profile profile={profile} isEditable={true} />
 
     </MainLayout>
   );

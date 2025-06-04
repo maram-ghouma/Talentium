@@ -126,14 +126,8 @@ const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
   }
 };
 
-  const fileToBase64 = (file: File): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => resolve(reader.result as string);
-    reader.onerror = error => reject(error);
-  });
-};
+  
+
 
 const handleSavePersonal = async () => {
   try {
@@ -270,15 +264,47 @@ const handleSavePersonal = async () => {
               </div>
             </div>
           )}
-          <img
-            src={formData.avatar}
-            alt={formData.name}
-            className="rounded-circle mb-3"
-            style={{ width: '100px', height: '100px', objectFit: 'cover' }}
-          />
-          <h4 className="mb-1">{formData.name}</h4>
-          <p className="text-muted mb-0">{formData.tagline}</p>
+          <div className="profile-header-meta">
+        <img src={formData.avatar} alt={formData.name} className="profile-avatar" />
+
+        <div className="profile-header-info">
+          <h1 className="prof-name">{formData.name}</h1>
+          <h2 className="prof-title" style={{fontSize: 'var(--font-size-sm)'}}>{formData.tagline}</h2>
+
+          <div className="profile-meta">
+            <div className="profile-meta-item">
+              <MapPin size={16} />
+              <span>{formData.country}</span>
+            </div>
+            
+            <div className="profile-meta-item">
+              <Mail size={16} />
+              <span>{formData.email}</span>
+            </div>
+
+            <div className="profile-meta-item">
+              <Phone size={16} />
+              <span>{formData.phone}</span>
+            </div>
+          </div>
+          
+          <div className="profile-social">
+            {formData.linkedin && (
+              <a 
+                href={formData.linkedin.startsWith('http') ? formData.linkedin : `https://${formData.linkedin}`} 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="profile-social-link"
+                aria-label="LinkedIn profile"
+              >
+                <Linkedin size={18} />
+              </a>
+            )}
+            
+      </div>
         </div>
+      </div>
+      </div>
       )}
     </Card.Body>
   </Card>
@@ -501,7 +527,7 @@ const handleSavePersonal = async () => {
               <h5 className="mb-0">Recent Missions</h5>
                           { isEditable && (
 
-              <Button variant="outline-primary" size="sm" onClick={() => setShowCreateMission(true)} >Post New Mission</Button>
+              <Button variant="outline-primary" size="sm" onClick={() => setShowCreateMission(true)} >see more </Button>
                           )}
               </div>
             

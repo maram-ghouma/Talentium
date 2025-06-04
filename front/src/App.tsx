@@ -32,6 +32,7 @@ import FreelancerHistory from './Pages/Freelancer/FreelancerHistory';
 import FreelancerChat from './Pages/Freelancer/FreelancerChat';
 import GuestHome from './Pages/GuestHome';
 import ClientEditProfile from './Pages/Client/ClientEditProfile';
+import FreelancerEditProfile from './Pages/Freelancer/FreelancerEditProfile';
 
 
 
@@ -43,7 +44,8 @@ function App() {
   <Route path="/admin" element={<AdminDashboard />} />
   <Route path="/admin/freelancers" element={<FreelancersList />} />
 
-  <Route path="/Freelancer/profile" element={<FreelancerProfile profile={profile} />} />
+  <Route path="/Freelancer/profile" element={<FreelancerProfile />} />
+  <Route path="/Freelancer/editProfile" element={<FreelancerEditProfile />} />
   <Route path="/Freelancer/mission/:id" element={<MissionDetails mission={missions[0]} />} />
   <Route path="/Freelancer/chat" element={<FreelancerChat />} />
   <Route path="/Freelancer/history" element={<FreelancerHistory historyItems={workHistory} />} />

@@ -150,9 +150,10 @@ export interface ClientProfileType {
   bio?: string;
   user: User;
 }
+
 export interface FreelancerProfileType {
   id: number;
-  skills: string[];
+  skills?: string[];
   hourlyRate?: number;
   phoneNumber?: string;
   country?: string;

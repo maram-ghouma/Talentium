@@ -30,7 +30,7 @@ const ClientProfilePage: React.FC = () => {
     fetchProfile();
 
   }, []);
-              console.log("Profile data:", profile);
+    
 
 
   if (loading) return <p>Loading...</p>;

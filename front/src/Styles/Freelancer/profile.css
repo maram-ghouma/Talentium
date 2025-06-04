@@ -2,7 +2,11 @@
 
 .profile-header {
   display: flex;
-  margin-bottom: var(--space-xl);
+}
+.profile-header-meta{
+  justify-self: center;
+    display: flex;
+
 }
 
 .profile-avatar {
@@ -17,16 +21,17 @@
 .profile-header-info {
   margin-left: var(--space-lg);
   flex: 1;
+  text-align: left;
 }
 
-.profile-name {
+.prof-name {
   font-size: var(--font-size-2xl);
   color: var(--navy-primary);
   margin-bottom: var(--space-xs);
 }
 
-.profile-title {
-  font-size: var(--font-size-lg);
+.prof-title {
+  font-size: var(--font-size-md)!;
   color: var(--slate);
   margin-bottom: var(--space-sm);
 }
