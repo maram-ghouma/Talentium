@@ -34,6 +34,7 @@ import GuestHome from './Pages/GuestHome';
 import { HomePage } from './components/client/home page/homePage';
 import FreelancerFeed from './Pages/Freelancer/feed';
 import ClientEditProfile from './Pages/Client/ClientEditProfile';
+import JalonsPage from './Pages/PaymentPage/JalonsPage';
 
 
 
@@ -58,6 +59,7 @@ function App() {
     <Route path="/client/editProfile" element ={<ClientEditProfile/>}/>
   <Route path="/client/interviews" element ={<ClientInterviewSchedule/>}/>
   <Route path="/client/profile" element ={<ClientProfilePage/>}/>
+  <Route path="/jalons" element ={<JalonsPage/>}/>
 
   <Route path="/signup" element={<SignUpPage />} />
   <Route path="/signin" element={<SignInPage />} />

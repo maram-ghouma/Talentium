@@ -41,4 +41,9 @@ skills: string[];
   @Field(() => [Application], { nullable: true })
 @OneToMany(() => Application, application => application.freelancer)
 applications?: Application[];
+
+   @Column({ nullable: true })
+   
+  stripeAccountId: string; 
+
 }

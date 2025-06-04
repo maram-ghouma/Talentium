@@ -89,6 +89,14 @@ export class Mission {
   @OneToMany(() => Dispute, (dispute) => dispute.mission)
   disputes: Dispute[];
 
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  paymentIntentId?: string; 
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  paymentStatus?: string;
+
   @Field(() => [Application], { nullable: true })
   @OneToMany(() => Application, application => application.mission)
   applications?: Application[];

@@ -1,7 +1,10 @@
-import { ObjectType, Field, Int, registerEnumType } from "@nestjs/graphql";
+import { Field, ID, ObjectType } from "@nestjs/graphql";
 import { Mission } from "src/mission/entities/mission.entity";
 import { User } from "src/user/entities/user.entity";
 import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { registerEnumType } from '@nestjs/graphql';
+
+
 
 export enum DisputeStatus {
   OPEN = 'OPEN',
@@ -9,18 +12,18 @@ export enum DisputeStatus {
   RESOLVED = 'RESOLVED',
   REJECTED = 'REJECTED',
 }
-
 registerEnumType(DisputeStatus, {
-  name: 'DisputeStatus',
+  name: 'DisputeStatus', 
+  description: 'The status of a dispute',
 });
 
 @ObjectType()
 @Entity()
 export class Dispute {
-  @Field(() => Int)
+  @Field(() => ID)
   @PrimaryGeneratedColumn()
   id: number;
-  
+
   @Field(() => Mission)
   @ManyToOne(() => Mission, mission => mission.disputes)
   mission: Mission;
@@ -29,7 +32,7 @@ export class Dispute {
   @ManyToOne(() => User)
   openedBy: User;
 
-  @Field()
+  @Field(() => String)
   @Column()
   reason: string;
 
@@ -37,11 +40,11 @@ export class Dispute {
   @Column({ type: 'enum', enum: DisputeStatus, default: DisputeStatus.OPEN })
   status: DisputeStatus;
 
-  @Field()
+  @Field(() => Date)
   @CreateDateColumn()
   openedAt: Date;
 
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   @Column({ nullable: true })
   resolution: string;
 }
