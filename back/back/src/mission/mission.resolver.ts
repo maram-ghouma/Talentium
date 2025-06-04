@@ -3,19 +3,21 @@ import { MissionService } from './mission.service';
 import { Mission } from './entities/mission.entity';
 import { CreateMissionInput } from './dto/create-mission.input';
 import { UpdateMissionInput } from './dto/update-mission.input';
+import { GqlCurrentUser } from 'src/auth/decorators/gql-current-user.decorator';
+import { User } from 'src/user/entities/user.entity';
 
 @Resolver(() => Mission)
 export class MissionResolver {
   constructor(private readonly missionService: MissionService) {}
 
   @Mutation(() => Mission)
-  createMission(@Args('createMissionInput') createMissionInput: CreateMissionInput) {
-    return this.missionService.create(createMissionInput);
+  createMission(@Args('createMissionInput') createMissionInput: CreateMissionInput,@GqlCurrentUser() User : User) {
+    return this.missionService.create(createMissionInput,User);
   }
 
   @Query(() => [Mission], { name: 'missions' })
-  findAll() {
-    return this.missionService.findAll();
+  findAll(@GqlCurrentUser() user : User) {
+    return this.missionService.findAll(user);
   }
 
   @Query(() => Mission, { name: 'mission' })

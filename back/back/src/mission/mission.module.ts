@@ -4,9 +4,10 @@ import { MissionResolver } from './mission.resolver';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Mission } from './entities/mission.entity';
 import { User } from 'src/user/entities/user.entity';
+import { ClientProfile } from 'src/client-profile/entities/client-profile.entity';
 
 @Module({
-  imports : [TypeOrmModule.forFeature([Mission, User])],
+  imports : [TypeOrmModule.forFeature([Mission, User,ClientProfile])],
   providers: [MissionResolver, MissionService],
 })
 export class MissionModule {}
