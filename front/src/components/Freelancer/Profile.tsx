@@ -4,7 +4,7 @@ import { Container, Card, Button, Badge, Row, Col, Form } from 'react-bootstrap'
 import { Star, Building, Globe, MapPin, Users, Briefcase, Award, Clock, Mail, Linkedin, Phone, Edit, Save, X, Circle, DollarSign, Github } from 'lucide-react';
 import '../../Styles/Freelancer/profile.css';
 import { FreelancerProfileType, Mission } from '../../types';
-import { updateFreelancerProfile } from '../../services/userService';
+import { updateClientProfile, updateFreelancerProfile } from '../../services/userService';
 import MissionDetailsModal from '../client/home page/MissionDetailsModal';
 import { CreateMission } from '../client/home page/CreateMission';
 
@@ -160,7 +160,7 @@ const handleSavePersonal = async () => {
       formPayload.append('imageUrl', file); 
     }
 
-    const result = await updateFreelancerProfile(formPayload); // This should be a function that POSTs/PUTs with multipart/form-data
+    const result = await updateClientProfile(formPayload); // This should be a function that POSTs/PUTs with multipart/form-data
     console.log('Personal data updated', result);
     window.location.reload(); 
     setIsEditingPersonal(false);
@@ -168,7 +168,6 @@ const handleSavePersonal = async () => {
     console.error('Error updating personal data:', error);
   }
 };
-
   const handleOpenDetails = (mission: Mission) => {
       setSelectedMission(mission);
   };
