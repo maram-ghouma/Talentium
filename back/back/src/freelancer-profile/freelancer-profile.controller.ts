@@ -38,13 +38,13 @@ export class FreelancerProfileController {
     }),
   }))
     async updateProfile(
-      @CurrentUser() user: User,
+      @CurrentUser() user: any,
       @UploadedFile() imageUrl: Express.Multer.File,
       @Body() updateProfileDto: UpdateFreelancerProfileDto,
     ) {
       const imagePath = imageUrl?.filename ? `/uploads/${imageUrl.filename}` : undefined;
-  
-      return this.freelancerProfileService.updateProfile(user.id, {
+      console.log(user.userId);
+      return this.freelancerProfileService.updateFreelancerProfile(user.userId, {
         ...updateProfileDto,
         imageUrl: imagePath, 
       });

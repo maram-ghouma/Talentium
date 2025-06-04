@@ -1,26 +1,43 @@
 import { Injectable } from '@nestjs/common';
-import { CreateReviewDto } from './dto/create-review.dto';
-import { UpdateReviewDto } from './dto/update-review.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Review } from './entities/review.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class ReviewService {
-  create(createReviewDto: CreateReviewDto) {
-    return 'This action adds a new review';
-  }
+  constructor(
+    @InjectRepository(Review)
+    private reviewRepository: Repository<Review>,
+  ) {}
 
-  findAll() {
-    return `This action returns all review`;
-  }
+  async getReviewsFreelancer(userId: number): Promise<Review[]> {
+  return this.reviewRepository
+    .createQueryBuilder('review')
+    .leftJoinAndSelect('review.reviewedUser', 'reviewedUser')
+    .leftJoinAndSelect('review.reviewer', 'reviewer')
+    .leftJoinAndSelect('review.mission', 'mission')
+    .leftJoinAndSelect('mission.selectedFreelancer', 'freelancerProfile')
+    .leftJoinAndSelect('freelancerProfile.user', 'freelancerUser')
+    .where('freelancerUser.id = :userId', { userId })
+    .andWhere('reviewedUser.id = :userId', { userId })
+    .orderBy('review.date', 'DESC')
+    .limit(3)
+    .getMany(); 
 
-  findOne(id: number) {
-    return `This action returns a #${id} review`;
-  }
+}
 
-  update(id: number, updateReviewDto: UpdateReviewDto) {
-    return `This action updates a #${id} review`;
-  }
+async getReviewsClient(userId: number): Promise<Review[]> {
+  return this.reviewRepository
+    .createQueryBuilder('review')
+    .leftJoinAndSelect('review.reviewedUser', 'reviewedUser')
+    .leftJoinAndSelect('review.reviewer', 'reviewer')
+    .leftJoinAndSelect('review.mission', 'mission')
+    .leftJoinAndSelect('mission.client', 'client')
+    .where('reviewedUser.id = :userId', { userId })
+    .andWhere('mission.client.id = :userId', { userId })
+    .orderBy('review.date', 'DESC')
+    .limit(3)
+    .getMany(); 
 
-  remove(id: number) {
-    return `This action removes a #${id} review`;
-  }
+}
 }

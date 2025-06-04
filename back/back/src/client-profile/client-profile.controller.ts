@@ -41,13 +41,13 @@ profile.user.imageUrl = profile.user.imageUrl ? `${baseUrl}${profile.user.imageU
   }),
 }))
   async updateProfile(
-    @CurrentUser() user: User,
+    @CurrentUser() user: any,
     @UploadedFile() imageUrl: Express.Multer.File,
     @Body() updateProfileDto: UpdateClientProfileDto,
   ) {
     const imagePath = imageUrl?.filename ? `/uploads/${imageUrl.filename}` : undefined;
-
-    return this.clientProfileService.updateProfile(user.id, {
+    console.log(user.userId);
+    return this.clientProfileService.updateClientProfile(user.userId, {
       ...updateProfileDto,
       imageUrl: imagePath, 
     });

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useRef } from 'react';
-import { Mission ,ClientProfileType} from '../../../types';
+import { Mission ,ClientProfileType, Review} from '../../../types';
 import { Container, Card, Button, Badge, Row, Col, Form } from 'react-bootstrap';
 import { Star, Building, Globe, MapPin, Users, Briefcase, Award, Clock, Mail, Linkedin, Phone, Edit, Save, X, Circle } from 'lucide-react';
 import MissionDetailsModal from '../home page/MissionDetailsModal';
@@ -12,6 +12,8 @@ interface ClientProfileProps {
   darkMode?: boolean;
   profile: ClientProfileType
   isEditable?: boolean; 
+  missions?: Mission[]; 
+  reviews?: Review[];
 }
 
 
@@ -23,90 +25,29 @@ const clientData = {
     developersHired: 12,
     rating: 4.8
   },
-  reviews: [
-    {
-      id: 1,
-      developer: "John Smith",
-      avatar: "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg",
-      rating: 5,
-      comment: "Great communication and clear requirements. Would love to work again!"
-    },
-    {
-      id: 2,
-      developer: "Emma Wilson",
-      avatar: "https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg",
-      rating: 4.5,
-      comment: "Professional client with well-defined project scope."
-    }
-  ]
+  
 };
 
-const ClientProfile: React.FC<ClientProfileProps> = ({ darkMode = false , profile,isEditable }) => {
+const ClientProfile: React.FC<ClientProfileProps> = ({ darkMode = false , profile,isEditable, missions,reviews}) => {
   const [selectedMission, setSelectedMission] = useState<Mission | null>(null);
   const [showCreateMission, setShowCreateMission] = useState(false);
   const [isEditingPersonal, setIsEditingPersonal] = useState(false);
   const [isEditingInfo, setIsEditingInfo] = useState(false);
   const [formData, setFormData] = useState({
-  name: profile.user?.username || '',
-  tagline: profile?.bio || '',
-  company: profile.companyName || '',
-  country: profile.country || '',
-  industry: profile.industry || '',
-  email: profile.user?.email || '',
-  phone: profile.phoneNumber || '',
-  linkedin: profile.linkedIn || '',
-  avatar: profile.user?.imageUrl || '',
+  name: profile.user?.username,
+  tagline: profile.bio ,
+  company: profile.companyName ,
+  country: profile.country ,
+  industry: profile.industry ,
+  email: profile.user?.email ,
+  phone: profile.phoneNumber ,
+  linkedin: profile.linkedIn ,
+  avatar: profile.user?.imageUrl ,
 
   });
+  console.log(formData)
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [missions, setMissions] = useState<Mission[]>([
-    {
-      id: '1',
-      title: 'Website Redesign',
-      description: 'Need a complete redesign of our e-commerce website with modern UI/UX principles.',
-      status: 'not_assigned',
-      price: 2500,
-      date: '2024-03-15',
-      clientId: 'client1',
-      client: 'EcoShop Inc.', // just a name string
-      clientLogo: '/logos/ecoshop.png', // optional
-      requiredSkills: ['UI/UX', 'HTML', 'CSS', 'JavaScript'],
-      deadline: new Date('2024-04-15'),
-      budget: '$2,500',
-      createdAt: new Date('2024-03-15'),
-      clientName: 'EcoShop Inc.',
-      paymentStatus: 'Unpaid',
-      priority: 'High',
-      progress: 0,
-      tasks: {
-        total: 10,
-        completed: 0,
-      },
-    },
-    {
-      id: '2',
-      title: 'Mobile App Development',
-      description: 'Looking for a developer to create an iOS/Android app for our service.',
-      status: 'in_progress',
-      price: 5000,
-      date: '2024-03-14',
-      clientId: 'client1',
-      client: 'TechStart Solutions',
-      clientLogo: '/logos/techstart.png',
-      requiredSkills: ['React Native', 'iOS', 'Android', 'API Integration'],
-      deadline: new Date('2024-05-01'),
-      budget: '$5,000',
-      createdAt: new Date('2024-03-14'),
-      clientName: 'TechStart Solutions',
-      paymentStatus: 'Partial',
-      priority: 'Medium',
-      progress: 50,
-      tasks: {
-        total: 20,
-        completed: 10,
-      },
-    },
-  ]);
+  
     const statusColors = {
       not_assigned: '#F59E0B',
       in_progress: '#3B82F6',
@@ -134,13 +75,13 @@ const handleSavePersonal = async () => {
     const formPayload = new FormData();
 
     formPayload.append('username', formData.name); 
-    formPayload.append('bio', formData.tagline);
+    formPayload.append('bio', formData.tagline ?? '');
 
     if (file) {
       formPayload.append('imageUrl', file); 
     }
 
-    const result = await updateClientProfile(formPayload); // This should be a function that POSTs/PUTs with multipart/form-data
+    const result = await updateClientProfile(formPayload); 
     console.log('Personal data updated', result);
     window.location.reload(); 
     setIsEditingPersonal(false);
@@ -165,6 +106,7 @@ const handleSavePersonal = async () => {
       email: formData.email,
       phoneNumber: formData.phone,
       linkedIn: formData.linkedin,
+      bio: formData.tagline, 
     };
 
     const result = await updateClientProfile(updatedInfoData);
@@ -336,6 +278,7 @@ const handleSavePersonal = async () => {
     {isEditingInfo ? (
       <Form className="profile-form">
         <Row>
+          
           <Col md={6} className="mb-3">
             <Form.Group>
               <Form.Label className="d-flex align-items-center info-label">
@@ -521,37 +464,41 @@ const handleSavePersonal = async () => {
         </Row>
 
         {/* Recent Missions */}
-        <Card className="mb-4 card">
-          <Card.Body>
-            <div className="profile-header">
-              <h5 className="mb-0">Recent Missions</h5>
-                          { isEditable && (
+<Card className="mb-4 card">
+  <Card.Body>
+    <div className="profile-header d-flex justify-content-between align-items-center">
+      <h5 className="mb-0">Recent Missions</h5>
+      {isEditable && (
+        <Button variant="outline-primary" size="sm" onClick={() => setShowCreateMission(true)}>
+          See more
+        </Button>
+      )}
+    </div>
 
-              <Button variant="outline-primary" size="sm" onClick={() => setShowCreateMission(true)} >see more </Button>
-                          )}
+    {!missions ||  missions.length === 0 ? (
+      <p className="text-muted mt-3">No previous missions.</p>
+    ) : (
+      missions.map((mission) => (
+        <div
+          key={mission.id}
+          className="border-bottom mb-3 pb-3"
+          onClick={() => handleOpenDetails(mission)}
+          style={{ cursor: 'pointer' }}
+        >
+          <div className="d-flex justify-content-between align-items-start">
+            <div>
+              <h6 className="mb-1">{mission.title}</h6>
+              <div className="mission-status d-flex align-items-center gap-1">
+                <Circle size={12} style={{ color: statusColors[mission.status] }} />
+                <span>{mission.status.replace('_', ' ')}</span>
               </div>
-            
-            {missions.map((mission) => (
-              <div
-                key={mission.id}
-                className="border-bottom mb-3 pb-3"
-                onClick={() => handleOpenDetails(mission)}
-                style={{ cursor: 'pointer' }}
-              >
-                <div className="d-flex justify-content-between align-items-start">
-                  <div>
-                    <h6 className="mb-1">{mission.title}</h6>
-                    <div className="mission-status">
-                      <Circle size={12} style={{ color: statusColors[mission.status] }} />
-                      <span>{mission.status.replace('_', ' ')}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-
-          </Card.Body>
-        </Card>
+            </div>
+          </div>
+        </div>
+      ))
+    )}
+  </Card.Body>
+</Card>
 
         {/* Developer Reviews */}
         <Card className="card">
@@ -559,83 +506,41 @@ const handleSavePersonal = async () => {
             <div className="profile-header">
               <h5 className="mb-0">Developer Reviews</h5>
             </div>
-            
-            {clientData.reviews.map(review => (
-              <div key={review.id} className="review-card mb-3 pb-3">
-                <div className="d-flex align-items-start">
-                  <img
-                    src={review.avatar}
-                    alt={review.developer}
-                    className="rounded-circle me-3"
-                    style={{ width: '48px', height: '48px', objectFit: 'cover' }}
-                  />
-                  <div>
-                    <h6 className="mb-1">{review.developer}</h6>
-                    <div className="mb-2">
-                      {[...Array(5)].map((_, i) => (
-                        <Star
-                          key={i}
-                          size={16}
-                          className={i < review.rating ? 'text-warning' : 'text-muted'}
-                          fill={i < review.rating ? 'currentColor' : 'none'}
-                        />
-                      ))}
+        
+            {reviews && reviews.length > 0 ? (
+              reviews.map((review) => (
+                <div key={review.id} className="review-card mb-3 pb-3">
+                  <div className="d-flex align-items-start">
+                    <img
+                      src={review.reviewer.imageUrl}
+                      alt={review.reviewer.username}
+                      className="rounded-circle me-3"
+                      style={{ width: '48px', height: '48px', objectFit: 'cover' }}
+                    />
+                    <div>
+                      <h6 className="mb-1">{review.reviewer.username}</h6>
+                      <div className="mb-2">
+                        {[...Array(5)].map((_, i) => (
+                          <Star
+                            key={i}
+                            size={16}
+                            className={i < review.stars ? 'text-warning' : 'text-muted'}
+                            fill={i < review.stars ? 'currentColor' : 'none'}
+                          />
+                        ))}
+                      </div>
+                      <p className="mb-0 text-muted">{review.comment}</p>
                     </div>
-                    <p className="mb-0 text-muted">{review.comment}</p>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))
+            ) : (
+              <p className="text-muted mt-3">No reviews yet.</p>
+            )}
           </Card.Body>
         </Card>
-        {selectedMission && (
-        <MissionDetailsModal
-        show={!!selectedMission}
-        onHide={handleCloseDetails}
-        mission={{
-          id: selectedMission.id,
-          date:selectedMission.date,
-          title: selectedMission.title,
-          price:selectedMission.price,
-          clientId: '1',
-          clientName:'john Client',
-          tasks: {
-        total: 2,
-        completed: 0
-      },
-
-          description: selectedMission.description,
-          requiredSkills: selectedMission.requiredSkills || [],
-          deadline: typeof selectedMission.deadline === 'string' 
-            ? new Date(selectedMission.deadline) 
-            : (selectedMission.deadline || new Date(selectedMission.date)),
-            budget: selectedMission.budget || `$${selectedMission.price}`,
-            status: selectedMission.status as 'not_assigned' | 'assigned' | 'completed',
-            createdAt: selectedMission.createdAt || new Date(selectedMission.date)
-          }}
-          darkMode={darkMode}
-        />
-      )}
-      {showCreateMission && (
-              <CreateMission
-                onClose={() => setShowCreateMission(false)}
-                onSubmit={(newMission) => {
-                  const mission = {
-                    ...newMission,
-                    id: String(missions.length + 1),
-                    clientId: 'client1',
-                    requiredSkills: newMission.requiredSkills || [],
-                    deadline: newMission.date ? new Date(newMission.date) : new Date(),
-                    budget: `$${newMission.price || 0}`,
-                    createdAt: new Date()
-                  } as Mission;
-                  
-                  setMissions([...missions, mission]);
-                  setShowCreateMission(false);
-                }}
-                isDarkMode={darkMode}
-              />
-            )}
+        
+       
       </Container>
     </>
   );

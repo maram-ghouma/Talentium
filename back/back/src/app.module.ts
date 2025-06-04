@@ -15,6 +15,7 @@ import { InvoiceModule } from './invoice/invoice.module';
 //import { ReportModule } from './report/report.module';
 import { DisputeModule } from './dispute/dispute.module';
 import { BadgeModule } from './badge/badge.module';
+import { ReviewModule } from './review/review.module';
 
 @Module({
   imports: [UserModule, FreelancerProfileModule, ClientProfileModule,
@@ -40,7 +41,7 @@ import { BadgeModule } from './badge/badge.module';
         };
       },
     }),
-    MissionModule,AuthModule, ClientProfileModule, FreelancerProfileModule,UserModule,
+    MissionModule,AuthModule, ClientProfileModule, FreelancerProfileModule,UserModule,ReviewModule,
    GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       autoSchemaFile: path.join(process.cwd(), 'src/schema.gql'),

@@ -186,3 +186,12 @@ export interface FreelancerProfileType {
   linkedin: string;
   avatar: string;
 }
+export interface Review {
+  id: string;
+  reviewer: User;
+  reviewee: User;
+  stars: number;
+  comment: string;
+  date: string;
+  
+}

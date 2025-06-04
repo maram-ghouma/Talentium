@@ -13,7 +13,9 @@ export class FreelancerProfileService {
     private readonly freelancerProfileRepository: Repository<FreelancerProfile>,
     @InjectRepository(User)
     private userRepo: Repository<User>,
-  ) {}
+  ) {
+    
+  }
 
   async findByUserId(userId: number) {
   return this.freelancerProfileRepository.findOne({
@@ -31,21 +33,23 @@ async createProfileForUser(user: User,clientData: { phoneNumber?: string; countr
   return this.freelancerProfileRepository.save(profile);
 }
 
-async updateProfile(freelancerId: number, updateDto: UpdateFreelancerProfileDto) {
-    const profile = await this.freelancerProfileRepository.findOne({
-      where: { id: freelancerId },
-      relations: ['user'],
-    });
-
+async updateFreelancerProfile(freelancerId: number, updateDto: UpdateFreelancerProfileDto) {
+    const profile = await this.freelancerProfileRepository
+    
+  .createQueryBuilder('profile')
+  .leftJoinAndSelect('profile.user', 'user')
+  .where('user.id = :freelancerId', { freelancerId })
+  .getOne();
     if (!profile) {
       throw new NotFoundException('Freelancer profile not found');
     }
 
     // Update user data
-    if (updateDto.username || updateDto.email || updateDto.imageUrl) {
+    if (updateDto.username || updateDto.email || updateDto.imageUrl || updateDto.bio) {
       profile.user.username = updateDto.username ?? profile.user.username;
       profile.user.email = updateDto.email ?? profile.user.email;
       profile.user.imageUrl = updateDto.imageUrl ?? profile.user.imageUrl;
+        profile.user.imageUrl = updateDto.imageUrl ?? profile.user.imageUrl;
       await this.userRepo.save(profile.user);
     }
 
@@ -57,7 +61,6 @@ async updateProfile(freelancerId: number, updateDto: UpdateFreelancerProfileDto)
     profile.phoneNumber = updateDto.phoneNumber ?? profile.phoneNumber;
     profile.linkedIn = updateDto.linkedIn ?? profile.linkedIn;
     profile.skills = updateDto.skills ?? profile.skills;
-
     return await this.freelancerProfileRepository.save(profile);
   }
 

@@ -5,6 +5,7 @@ import { Mission } from './entities/mission.entity';
 import { CreateMissionInput } from './dto/create-mission.input';
 import { UpdateMissionInput } from './dto/update-mission.input';
 import { User } from 'src/user/entities/user.entity';
+import { FreelancerProfile } from 'src/freelancer-profile/entities/freelancer-profile.entity';
 
 @Injectable()
 export class MissionService {
@@ -14,6 +15,9 @@ export class MissionService {
 
     @InjectRepository(User)
     private userRepository: Repository<User>,
+
+    @InjectRepository(FreelancerProfile)
+    private freelancerProfileRepository: Repository<FreelancerProfile>,
   ) {}
 
   async create(createMissionInput: CreateMissionInput): Promise<Mission> {
@@ -46,5 +50,33 @@ async remove(id: number): Promise<boolean> {
   const result = await this.missionRepository.delete(id);
   return (result.affected ?? 0) > 0;
 }
+   async getClientMissions(userId: number): Promise<Mission[]> {
+    return this.missionRepository.find({
+      where: { client: { id: userId } },
+      relations: ['client', ],
+      take: 2,
+    });
+  }
+
+ async getFreelancerMissions(userId: number): Promise<Mission[]> {
+
+  const freelancerProfile = await this.freelancerProfileRepository
+  .createQueryBuilder('profile')
+  .leftJoinAndSelect('profile.user', 'user')
+  .where('user.id = :freelancerId', { freelancerId: userId })
+  .getOne();
+  if (!freelancerProfile) {
+    return []; // or throw an error
+  }
+
+  return this.missionRepository.find({
+    where: {
+      selectedFreelancer: { id: freelancerProfile.id },
+    },
+    relations: ['client', 'selectedFreelancer'],
+    take: 2,
+  });
+}
+
 
 }

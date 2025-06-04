@@ -36,6 +36,8 @@ export const updateFreelancerProfile = async (formData) => {
     const response = await api.put('/freelancer-profile/update', formData, {
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('authToken')}`, 
+        'Content-Type': 'multipart/form-data',
+
       },
     });
     return response.data;
@@ -43,4 +45,29 @@ export const updateFreelancerProfile = async (formData) => {
     console.error('Update profile error:', error);
     throw error;
   }
+};
+
+export const getFreelancerMissions = async () => {
+  const response = await api.get('/mission/my-freelancer-missions');
+  return response.data;
+};
+
+export const getClientMissions = async () => {
+  const response = await api.get('/mission/my-client-missions');
+  return response.data;
+};
+
+export const getClientReviews = async () => {
+  const response = await api.get('/review/myReviewsClient');
+  return response.data;
+};
+
+
+export const getFreelancerReviews = async () => {
+  const response = await api.get('/review/myReviewsFreelancer');
+  return response.data;
+};
+export const signOut = () => {
+  localStorage.removeItem('authToken'); 
+  window.location.href = '/';
 };

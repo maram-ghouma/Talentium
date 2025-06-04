@@ -7,6 +7,7 @@ export class UpdateFreelancerProfileDto {
       @IsString()
       username?: string;
     
+      
       @IsOptional()
       @IsEmail()
       email?: string;
