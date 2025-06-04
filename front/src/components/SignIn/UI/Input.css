@@ -1,0 +1,37 @@
+.custom-input {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .custom-input label {
+    font-size: 14px;
+    margin-bottom: 6px;
+    color: var(--navy-primary);
+    font-weight: 500;
+  }
+  
+  .custom-input input {
+    height: 46px;
+    border: 1px solid var(--slate);
+    border-radius: 8px;
+    padding: 0 16px;
+    font-size: 15px;
+    transition: all 0.2s ease;
+    color: var(--navy-primary);
+    background-color: #fff;
+  }
+  
+  .custom-input input::placeholder {
+    color: var(--slate);
+    opacity: 0.7;
+  }
+  
+  .custom-input input:focus {
+    outline: none;
+    border-color: var(--navy-secondary);
+    box-shadow: 0 0 0 3px rgba(58, 75, 109, 0.1);
+  }
+  
+  .custom-input input:hover:not(:focus) {
+    border-color: var(--navy-secondary);
+  }

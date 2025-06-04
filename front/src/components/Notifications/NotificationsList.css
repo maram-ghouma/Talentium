@@ -1,0 +1,71 @@
+.notifications-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: var(--navy-primary);
+    padding: 20px;
+  }
+  
+  .notifications-container {
+    width: 100%;
+    max-width: 600px;
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    padding: 32px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .notifications-container:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+  }
+  
+  .notifications-header {
+    text-align: center;
+    margin-bottom: 24px;
+  }
+  
+  .notifications-header h1 {
+    color: var(--navy-primary);
+    font-size: 32px;
+    font-weight: bold;
+    margin: 0 0 8px 0;
+    letter-spacing: -0.5px;
+  }
+  
+  .empty-state {
+    text-align: center;
+    padding: 40px 0;
+    color: var(--slate);
+  }
+  
+  .empty-state p {
+    font-size: 16px;
+    margin: 0;
+  }
+  
+  .notifications-list {
+    max-height: 60vh;
+    overflow-y: auto;
+    padding-right: 8px;
+  }
+  
+  .notifications-list::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  .notifications-list::-webkit-scrollbar-track {
+    background: var(--powder);
+    border-radius: 4px;
+  }
+  
+  .notifications-list::-webkit-scrollbar-thumb {
+    background: var(--slate);
+    border-radius: 4px;
+  }
+  
+  .notifications-list::-webkit-scrollbar-thumb:hover {
+    background: var(--navy-secondary);
+  }

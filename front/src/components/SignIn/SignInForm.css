@@ -1,0 +1,80 @@
+.sign-in-form-card {
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    padding: 40px 30px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+  
+.sign-in-form-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+}
+  
+.sign-in-header {
+    text-align: center;
+    margin-bottom: 32px;
+}
+  
+.sign-in-header h1 {
+    color: var(--navy-primary);
+    font-size: 32px;
+    font-weight: bold;
+    margin-bottom: 16px;
+    letter-spacing: -0.5px;
+}
+  
+.logo-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 60px;
+    height: 60px;
+    margin: 0 auto;
+    background-color: var(--powder);
+    border-radius: 50%;
+    padding: 12px;
+    transition: transform 0.3s ease;
+}
+  
+.logo-container:hover {
+    transform: rotate(10deg);
+}
+  
+.form-group {
+    margin-bottom: 24px;
+}
+  
+.form-action {
+    margin-top: 32px;
+    margin-bottom: 24px;
+}
+  
+.sign-up-prompt {
+    text-align: center;
+    margin-top: 16px;
+    font-size: 14px;
+    color: var(--slate);
+}
+  
+.sign-up-prompt a {
+    color: var(--navy-secondary);
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.2s ease;
+}
+  
+.sign-up-prompt a:hover {
+    color: var(--navy-primary);
+    text-decoration: underline;
+}
+  
+@media (max-width: 480px) {
+    .sign-in-form-card {
+      padding: 30px 20px;
+    }
+    
+    .sign-in-header h1 {
+      font-size: 28px;
+    }
+}
