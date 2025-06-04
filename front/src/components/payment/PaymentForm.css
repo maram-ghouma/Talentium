@@ -1,125 +1,420 @@
-.payment-page {
-    display: flex;
-    height: 100vh;
-    width: 100%;
-    background-color: var(--navy-primary);
+/* Main container styles */
+.payment-interface {
+  min-height: 100vh;
+  padding: 24px;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #fef2f2 100%);
+}
+
+.payment-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Header styles */
+.header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.header h1 {
+  font-size: 2.25rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+  background: linear-gradient(45deg, #2C3850, #3A4B6D, #C99E9E);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.header p {
+  color: #96A5B3;
+}
+
+/* Tab navigation styles */
+.tab-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 32px;
+}
+
+.tab-wrapper {
+  background: white;
+  border-radius: 16px;
+  padding: 8px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #C5D8E5;
+}
+
+.tab-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.tab-button {
+  padding: 12px 24px;
+  border-radius: 12px;
+  font-weight: 500;
+  transition: all 0.3s;
+  cursor: pointer;
+}
+
+.tab-button:hover:not(.active) {
+  background: rgba(245, 245, 245, 0.8);
+}
+
+.tab-button.active {
+  color: white;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.tab-create.active {
+  background: linear-gradient(45deg, #2C3850, #3A4B6D);
+}
+
+.tab-confirm.active {
+  background: linear-gradient(45deg, #3A4B6D, #C99E9E);
+}
+
+.tab-milestones.active {
+  background: linear-gradient(45deg, #C99E9E, #3A4B6D);
+}
+
+/* Feature cards styles */
+.features-grid {
+  margin-top: 48px;
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 24px;
+}
+
+@media (min-width: 768px) {
+  .features-grid {
+    grid-template-columns: repeat(3, 1fr);
   }
-  
-  .freelancer-section {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    padding: 40px;
-    color: white;
+}
+
+.feature-card {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  border: 1px solid #C5D8E5;
+}
+
+.feature-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.feature-header h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #2C3850;
+}
+
+.feature-icon {
+  width: 32px;
+  height: 32px;
+  margin-right: 12px;
+}
+
+.feature-content {
+  color: #96A5B3;
+}
+
+/* View-specific styles */
+.view-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.view-header h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: #2C3850;
+}
+
+.view-header p {
+  color: #96A5B3;
+}
+
+/* Mission card styles */
+.mission-grid {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 24px;
+}
+
+@media (min-width: 768px) {
+  .mission-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
-  
-  .freelancer-content {
-    display: flex;
-    align-items: center;
-    max-width: 600px;
-    margin: 0 auto;
-  }
-  
-  .profile-image {
-    min-width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    background-color: var(--powder);
-    margin-right: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 3px solid white;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-  }
-  
-  .profile-image:hover {
-    transform: scale(1.05);
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
-  }
-  
-  .freelancer-info h2 {
-    font-size: 24px;
-    font-weight: bold;
-    margin: 0 0 8px 0;
-    color: white;
-  }
-  
-  .freelancer-info p {
-    margin: 0;
-    color: var(--powder);
-    line-height: 1.5;
-  }
-  
-  .payment-section {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 40px;
-  }
-  
-  .payment-form-card {
-    background-color: #ffffff;
-    border-radius: 12px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-    padding: 40px 30px;
-    width: 100%;
-    max-width: 420px;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-  }
-  
-  .payment-form-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
-  }
-  
-  .payment-header {
-    text-align: center;
-    margin-bottom: 32px;
-  }
-  
-  .payment-header h1 {
-    color: var(--navy-primary);
-    font-size: 32px;
-    font-weight: bold;
-    margin-bottom: 16px;
-    letter-spacing: -0.5px;
-  }
-  
-  .form-group {
-    margin-bottom: 24px;
-  }
-  
-  .form-row {
-    display: flex;
-    gap: 16px;
-  }
-  
-  .form-row .form-group {
-    flex: 1;
-  }
-  
-  .form-action {
-    margin-top: 32px;
-  }
-  
-  @media (max-width: 768px) {
-    .payment-page {
-      flex-direction: column;
-    }
-    
-    .freelancer-section,
-    .payment-section {
-      padding: 20px;
-    }
-    
-    .payment-form-card {
-      padding: 30px 20px;
-    }
-    
-    .payment-header h1 {
-      font-size: 28px;
-    }
-  }
+}
+
+.mission-card {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  height: 325px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  border: 1px solid #C5D8E5;
+  transition: all 0.3s;
+}
+
+.mission-card:hover {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.mission-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+
+.mission-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #2C3850;
+}
+
+.mission-price {
+  padding: 4px 12px;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: white;
+  background: linear-gradient(45deg, #2C3850, #3A4B6D);
+}
+
+.mission-details {
+  margin-bottom: 24px;
+}
+
+.mission-detail {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+  color: #96A5B3;
+}
+
+.detail-label {
+  font-weight: 500;
+  margin-right: 8px;
+  color: #2C3850;
+}
+
+/* Button styles */
+.button-primary {
+  width: 100%;
+  padding: 12px 24px;
+  border-radius: 12px;
+  font-weight: 500;
+  color: white;
+  background: linear-gradient(45deg, #2C3850, #3A4B6D, #C99E9E);
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.button-primary:hover {
+  transform: scale(1.02);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.button-primary:disabled {
+  opacity: 0.5;
+  transform: none;
+  background: #96A5B3;
+}
+
+.button-icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 8px;
+}
+
+/* Status styles */
+.status-badge {
+  padding: 4px 12px;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border: 1px solid;
+  display: flex;
+  align-items: center;
+}
+
+.status-pending {
+  background-color: #FFF3CD;
+  color: #856404;
+  border-color: #FFEAA7;
+}
+
+.status-escrowed {
+  background-color: #C5D8E5;
+  color: #2C3850;
+  border-color: #96A5B3;
+}
+
+.status-released {
+  background-color: #D4EDDA;
+  color: #155724;
+  border-color: #C3E6CB;
+}
+
+.status-refunded {
+  background-color: #F8D7DA;
+  color: #721C24;
+  border-color: #F5C6CB;
+}
+
+/* Success message styles */
+.success-message {
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 24px;
+  background-color: #D4EDDA;
+  border: 1px solid #C3E6CB;
+  display: flex;
+  align-items: center;
+}
+
+.success-icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 8px;
+  color: #155724;
+}
+
+.success-text {
+  color: #155724;
+}
+
+/* Form styles */
+.payment-form {
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.form-card {
+  background: white;
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  border: 1px solid #C5D8E5;
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-bottom: 8px;
+  color: #2C3850;
+}
+
+.form-input {
+  width: 100%;
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid #C5D8E5;
+  background-color: rgba(255, 255, 255, 0.9);
+  transition: border-color 0.3s;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #3A4B6D;
+}
+
+/* Milestone buttons */
+.milestone-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.milestone-button {
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: 500;
+  color: white;
+  background: linear-gradient(45deg, #3A4B6D, #C99E9E);
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.milestone-button:hover:not(:disabled) {
+  transform: scale(1.05);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.milestone-button:disabled {
+  opacity: 0.5;
+  background: #96A5B3;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.action-button {
+  flex: 1;
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-weight: 500;
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.action-button:hover:not(:disabled) {
+  transform: scale(1.02);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.action-button:disabled {
+  opacity: 0.5;
+}
+
+.release-button {
+  background: linear-gradient(45deg, #10B981, #059669);
+}
+
+.refund-button {
+  background: linear-gradient(45deg, #EF4444, #DC2626);
+}
+
+.back-button {
+  background: #96A5B3;
+}
+
+/* Loading spinner */
+.loading-spinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: white;
+  animation: spin 1s ease-in-out infinite;
+  margin-right: 8px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

@@ -2,14 +2,28 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-type User {
+type Dispute {
   id: ID!
-  username: String!
-  email: String!
-  password: String!
-  isAdmin: Boolean!
-  currentRole: String!
+  mission: Mission!
+  openedBy: User!
+  reason: String!
+  status: DisputeStatus!
+  openedAt: DateTime!
+  resolution: String
 }
+
+"""The status of a dispute"""
+enum DisputeStatus {
+  OPEN
+  IN_REVIEW
+  RESOLVED
+  REJECTED
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
 
 type Mission {
   id: Int!
@@ -26,6 +40,9 @@ type Mission {
   clientName: String!
   progress: Int!
   tasks: TaskStats!
+  disputes: [Dispute!]!
+  paymentIntentId: String
+  paymentStatus: String
 }
 
 """
@@ -36,6 +53,27 @@ scalar Date
 type TaskStats {
   total: Int!
   completed: Int!
+}
+
+type Review {
+  id: ID!
+  stars: Float!
+  comment: String
+  date: String!
+  reviewer: User!
+  reviewedUser: User!
+  mission: Mission!
+}
+
+type User {
+  id: ID!
+  username: String!
+  email: String!
+  password: String!
+  isAdmin: Boolean!
+  imageUrl: String!
+  currentRole: String!
+  reviews: [Review!]
 }
 
 type Query {
@@ -61,11 +99,6 @@ input CreateMissionInput {
   progress: Int! = 0
   tasks: TaskStatsInput! = {total: 0, completed: 0}
 }
-
-"""
-A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
-"""
-scalar DateTime
 
 input TaskStatsInput {
   total: Int!
