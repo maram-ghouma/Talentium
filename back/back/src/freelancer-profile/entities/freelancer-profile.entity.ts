@@ -36,4 +36,9 @@ skills: string[];
 
   @OneToMany(() => Mission, (mission) => mission.selectedFreelancer)
 selectedMissions: Mission[];
+
+   @Column({ nullable: true })
+   
+  stripeAccountId: string; 
+
 }
