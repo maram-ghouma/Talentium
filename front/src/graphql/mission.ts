@@ -47,6 +47,30 @@ export const GET_MISSIONS = gql`
   }
 `;
 
+export const GET_ALL_MISSIONS = gql`
+  query GetAllMissions {
+    allMissions {
+      id
+      title
+      description
+      status
+      price
+      date
+      requiredSkills
+      deadline
+      budget
+      createdAt
+      clientName
+      progress
+      tasks {
+        total
+        completed
+      }
+    
+    }
+  }
+`;
+
 export const GET_MISSION = gql`
   query GetMission($id: Int!) {
     mission(id: $id) {
