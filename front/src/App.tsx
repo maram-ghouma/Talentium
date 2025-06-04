@@ -32,6 +32,7 @@ import FreelancerHistory from './Pages/Freelancer/FreelancerHistory';
 import FreelancerChat from './Pages/Freelancer/FreelancerChat';
 import GuestHome from './Pages/GuestHome';
 import ClientEditProfile from './Pages/Client/ClientEditProfile';
+import JalonsPage from './Pages/PaymentPage/JalonsPage';
 
 
 
@@ -55,6 +56,7 @@ function App() {
     <Route path="/client/editProfile" element ={<ClientEditProfile/>}/>
   <Route path="/client/interviews" element ={<ClientInterviewSchedule/>}/>
   <Route path="/client/profile" element ={<ClientProfilePage/>}/>
+  <Route path="/jalons" element ={<JalonsPage/>}/>
 
   <Route path="/signup" element={<SignUpPage />} />
   <Route path="/signin" element={<SignInPage />} />
