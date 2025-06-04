@@ -28,6 +28,7 @@ const FreelancerDashboard = () => {
                 stats={{ completedMissions: 10, totalEarnings: 5000, activeClients: 3, not_assignedMissions: 2 }} 
                 missions={missions} 
               />
+        
     </MainLayout>
   );
 };
