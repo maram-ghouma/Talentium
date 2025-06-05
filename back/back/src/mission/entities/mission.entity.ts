@@ -9,10 +9,23 @@ import {
   OneToMany,
 } from 'typeorm';
 import { User } from 'src/user/entities/user.entity';
-import { ObjectType, Field, Int, GraphQLISODateTime } from '@nestjs/graphql';
+import { ObjectType, Field, Int, GraphQLISODateTime, registerEnumType } from '@nestjs/graphql';
 import { FreelancerProfile } from 'src/freelancer-profile/entities/freelancer-profile.entity';
 import { GraphQLDate } from 'graphql-scalars';
 import { Dispute } from 'src/dispute/entities/dispute.entity';
+
+export enum PaymentStatus {
+  PENDING = 'PENDING',
+  ESCROWED = 'ESCROWED',
+  RELEASED = 'RELEASED',
+  REFUNDED = 'REFUNDED'
+}
+
+// Register the enum for GraphQL
+registerEnumType(PaymentStatus, {
+  name: 'PaymentStatus',
+  description: 'The status of payment for a mission',
+});
 
 @ObjectType()
 @Entity()
@@ -49,7 +62,7 @@ export class Mission {
   @Column('simple-array')
   requiredSkills: string[];
 
-@Field(() => GraphQLDate)
+  @Field(() => GraphQLDate)
   @Column({ type: 'date' })
   deadline: Date;
 
@@ -57,12 +70,12 @@ export class Mission {
   @Column()
   budget: string;
 
- @Field(() => GraphQLDate)
+  @Field(() => GraphQLDate)
   @CreateDateColumn()
   createdAt: Date;
 
   @Field()
-  @Column({  default: "john Client" })
+  @Column({ default: "john Client" })
   clientName: string;
 
   @Field(() => Int)
@@ -70,7 +83,7 @@ export class Mission {
   progress: number;
 
   @Field(() => TaskStats)
-@Column('json',  { nullable: true })
+  @Column('json', { nullable: true })
   tasks: {
     total: number;
     completed: number;
@@ -80,6 +93,7 @@ export class Mission {
   @JoinTable()
   preselectedFreelancers: FreelancerProfile[];
 
+  @Field(() => FreelancerProfile, { nullable: true })
   @ManyToOne(() => FreelancerProfile, (freelancer) => freelancer.selectedMissions, { nullable: true })
   selectedFreelancer?: FreelancerProfile;
 
@@ -89,12 +103,15 @@ export class Mission {
 
   @Field({ nullable: true })
   @Column({ nullable: true })
-  paymentIntentId?: string; 
+  paymentIntentId?: string;
 
-  @Field({ nullable: true })
-  @Column({ nullable: true })
-  paymentStatus?: string;
-
+  @Field(() => PaymentStatus)
+  @Column({
+    type: 'enum',
+    enum: PaymentStatus,
+    default: PaymentStatus.PENDING
+  })
+  paymentStatus: PaymentStatus;
 }
 
 @ObjectType()

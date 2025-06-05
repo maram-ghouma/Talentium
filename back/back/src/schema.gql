@@ -2,6 +2,20 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type FreelancerProfile {
+  id: Int!
+  user: User!
+  skills: [String!]
+  phoneNumber: String!
+  country: String!
+  linkedIn: String
+  github: String
+  hourlyRate: Float
+  bio: String
+  selectedMissions: [Mission!]
+  stripeAccountId: String
+}
+
 type Dispute {
   id: ID!
   mission: Mission!
@@ -40,15 +54,24 @@ type Mission {
   clientName: String!
   progress: Int!
   tasks: TaskStats!
+  selectedFreelancer: FreelancerProfile
   disputes: [Dispute!]!
   paymentIntentId: String
-  paymentStatus: String
+  paymentStatus: PaymentStatus!
 }
 
 """
 A date string, such as 2007-12-03, compliant with the `full-date` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar.
 """
 scalar Date
+
+"""The status of payment for a mission"""
+enum PaymentStatus {
+  PENDING
+  ESCROWED
+  RELEASED
+  REFUNDED
+}
 
 type TaskStats {
   total: Int!
@@ -76,15 +99,48 @@ type User {
   reviews: [Review!]
 }
 
+type Invoice {
+  id: ID!
+  amount: Float!
+  date: String!
+  description: String!
+  clientId: Float!
+  freelancerId: Float
+  missionId: Float!
+  client: User!
+  freelancer: FreelancerProfile
+  mission: Mission!
+}
+
+type CreateEscrowResponse {
+  clientSecret: String
+  paymentIntentId: String!
+}
+
+type ReleaseMilestoneResponse {
+  success: Boolean!
+  amountReleased: Float!
+}
+
+type RefundResponse {
+  success: Boolean!
+  refundId: String!
+}
+
 type Query {
   missions: [Mission!]!
   mission(id: Int!): Mission!
+  getMissionsByPaymentStatus(status: PaymentStatus!): [Mission!]!
+  getPaymentHistory(missionId: Int!): [Invoice!]!
 }
 
 type Mutation {
   createMission(createMissionInput: CreateMissionInput!): Mission!
   updateMission(updateMissionInput: UpdateMissionInput!): Mission!
   removeMission(id: Int!): Boolean!
+  createEscrowPayment(missionId: Int!, clientId: Int!): CreateEscrowResponse!
+  releaseMilestonePayment(missionId: Int!, milestonePercentage: Int!): ReleaseMilestoneResponse!
+  refundPayment(missionId: Int!, reason: String!): RefundResponse!
 }
 
 input CreateMissionInput {
