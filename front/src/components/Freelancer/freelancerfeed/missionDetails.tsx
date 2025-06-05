@@ -3,8 +3,8 @@ import { Modal, ListGroup, Card, Button, Badge, Row, Col, Form } from 'react-boo
 import { X, Star, User, Upload } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import '../../../Styles/client/MissionDetails.css';
-import { useMutation } from '@apollo/client';
-import { CREATE_APPLICATION } from '../../../graphql/application';
+import { useMutation, useQuery } from '@apollo/client';
+import { CREATE_APPLICATION, GET_MY_APPLICATIONS_BY_MISSION } from '../../../graphql/application';
 import { useNavigate } from 'react-router-dom';
 import { Mission } from '../../../types';
 
@@ -65,7 +65,6 @@ const [submitError, setSubmitError] = useState<string | null>(null);
 const [createApplication] = useMutation(CREATE_APPLICATION, {
   context: { hasUpload: true }
 });
-
 
   const getStatusBadgeVariant = (status: string) => {
     switch (status) {
@@ -149,6 +148,11 @@ fetch(`http://localhost:3000/files/upload/resume/${applicationId}`, {
   const handleEasyApply = () => {
     setShowApplyForm(true);
   };
+const { loading, error, data } = useQuery(GET_MY_APPLICATIONS_BY_MISSION, {
+  variables: { missionId: mission.id.toString() },
+});
+
+const applications = data?.myApplicationsByMission || [];
 
   return (
       <>
@@ -243,6 +247,7 @@ fetch(`http://localhost:3000/files/upload/resume/${applicationId}`, {
                   <Button
                     size="lg"
                     onClick={handleEasyApply}
+                    disabled={applications.length > 0}
                     style={{
                     backgroundColor: 'var(  --rose-darker)',
                     borderColor: 'var(  --rose-darker)',
@@ -251,7 +256,7 @@ fetch(`http://localhost:3000/files/upload/resume/${applicationId}`, {
                       fontWeight: 'bold'
                     }}
                   >
-                    Easy Apply
+                    {applications.length > 0? "Already Applied":"Easy Apply"}
                   </Button>
                 </div>
               ) : (

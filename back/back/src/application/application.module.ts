@@ -9,10 +9,11 @@ import { ApplicationResolver } from './application.resolver';
 import { FileController } from './file.controller';
 import { UploadScalar } from './upload.scalar';
 import { FreelancerProfileModule } from 'src/freelancer-profile/freelancer-profile.module';
+import { Mission } from 'src/mission/entities/mission.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Application,User,FreelancerProfile]),
+    TypeOrmModule.forFeature([Application,User,FreelancerProfile,Mission]),
     MulterModule.register({
       limits: {
         fileSize: 5 * 1024 * 1024, 

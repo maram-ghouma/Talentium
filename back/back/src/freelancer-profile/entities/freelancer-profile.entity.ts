@@ -1,5 +1,5 @@
 // freelancer-profile/freelancer-profile.entity.ts
-import { Field, ObjectType } from '@nestjs/graphql';
+import { Field, ID, ObjectType } from '@nestjs/graphql';
 import { Application } from 'src/application/entities/application.entity';
 import { Mission } from 'src/mission/entities/mission.entity';
 import { User } from 'src/user/entities/user.entity';
@@ -7,15 +7,18 @@ import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn, OneToMany
 @ObjectType()
 @Entity()
 export class FreelancerProfile {
+  @Field(()=>ID)
   @PrimaryGeneratedColumn()
   id: number;
-
+  @Field(()=>User)
   @OneToOne(() => User)
   @JoinColumn()
   user: User;
 
-  @Column('simple-array', { nullable: true })
+@Field(() => [String], { nullable: true })
+@Column('simple-array', { nullable: true })
 skills: string[];
+
 
   @Column()
   phoneNumber: string;
@@ -32,15 +35,17 @@ skills: string[];
   @Column({ nullable: true })
   hourlyRate: number;
 
+  @Field({nullable: true})
   @Column({ nullable: true })
   bio: string;
 
+  @Field(()=>[Mission])
   @OneToMany(() => Mission, (mission) => mission.selectedFreelancer)
   selectedMissions: Mission[];
 
   @Field(() => [Application], { nullable: true })
-@OneToMany(() => Application, application => application.freelancer)
-applications?: Application[];
+  @OneToMany(() => Application, application => application.freelancer)
+  applications?: Application[];
 
    @Column({ nullable: true })
    

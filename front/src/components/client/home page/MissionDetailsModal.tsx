@@ -1,20 +1,23 @@
 import React, { useState } from 'react';
 import { Modal, ListGroup, Card, Button, Badge, Row, Col } from 'react-bootstrap';
-import { X, Star, User } from 'lucide-react';
+import { X, Star } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import '../../../Styles/client/MissionDetails.css';
-import { useMutation } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import { REMOVE_MISSION } from '../../../graphql/mission';
 import { useNavigate } from 'react-router-dom';
-import { Mission } from '../../../types';
-import { ModifyMission } from './ModifyMission';
+import { ApplicationStatus, Mission } from '../../../types';
+import { GET_APPLICATIONS_BY_MISSION, UPDATE_APPLICATION_STATUS } from '../../../graphql/application';
 
 interface Applicant {
   id: string;
   name: string;
-  rating: number;
   profileUrl: string;
-  profilePictureUrl:string;
+  imageUrl:string;
+  status:ApplicationStatus;
+  applicationId:string;
+  message:string;
+  resumePath:string;
 }
 
 interface Developer {
@@ -39,21 +42,6 @@ interface MissionDetailsModalProps {
   onModifyClick?:()=>void;
 }
 
-const sampleApplicants: Applicant[] = [
-  { id: '1', name: 'Sarah Wilson', rating: 4.8, profileUrl: '#',profilePictureUrl:'#'},
-  { id: '2', name: 'James Rodriguez', rating: 4.9, profileUrl: '#',profilePictureUrl:'#'},
-  { id: '3', name: 'Emma Thompson', rating: 4.7, profileUrl: '#' ,profilePictureUrl:'#'}
-];
-
-const assignedDeveloper: Developer = {
-  id: '2',
-  name: 'James Rodriguez',
-  rating: 4.9,
-  profileUrl: '#',
-  specialty: 'Frontend Development',
-  completedProjects: 34,
-  profilePictureUrl:'#'
-};
 
 const MissionDetailsModal: React.FC<MissionDetailsModalProps> = ({
   onMissionModified,
@@ -63,6 +51,7 @@ const MissionDetailsModal: React.FC<MissionDetailsModalProps> = ({
   mission,
   darkMode = false,
 }) => {
+  const assignedDeveloper=mission.selectedFreelancer;
   const navigate = useNavigate();
   const [openModifyAfterClose, setOpenModifyAfterClose] = useState(false);
   const getStatusBadgeVariant = (status: string) => {
@@ -92,7 +81,8 @@ const MissionDetailsModal: React.FC<MissionDetailsModalProps> = ({
   const [removeMission] = useMutation(REMOVE_MISSION);
 
 const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-
+const [showApplicationInfo, setShowApplicationInfo] = useState(false);
+const [selectedApplicant, setSelectedApplicant] = useState<Applicant | null>(null);
 const handleDelete = () => {
   removeMission({
     variables: { id: mission.id },
@@ -106,28 +96,140 @@ const handleDelete = () => {
     onError: (error) => console.error('Error deleting mission:', error)
   });
 };
+const { loading, error, data } = useQuery(GET_APPLICATIONS_BY_MISSION, {
+  variables: { missionId: mission.id.toString() },
+});
+
+const applications = data?.applicationsByMission || [];
+
+const applicants: Applicant[] = applications
+  .filter(app => app.status !== 'REJECTED')
+  .map(app => ({
+    id: app.freelancer.id,
+    name: app.freelancer.user.username,
+    imageUrl: app.freelancer.user.imageUrl || '#',
+    profileUrl: `#`,
+    status: app.status,
+    applicationId: app.id,
+    message: app.message,
+    resumePath:app.resumePath
+  }));
+
+
+  const [updateStatus] = useMutation(UPDATE_APPLICATION_STATUS);
+
+  const handlePreselect = (applicationId) => {
+    updateStatus({
+      variables: { applicationId, newStatus: 'PRE_SELECTED' },
+      refetchQueries:['GetApplicationsByMission']
+    }).catch(console.error);
+  };
+
+  const handleSelect = (applicationId) => {
+    updateStatus({
+      variables: { applicationId, newStatus: 'ACCEPTED' },
+      refetchQueries:['GetApplicationsByMission']
+    }).catch(console.error);
+  };
+
+const handleOpenResume = async () => {
+  const token = localStorage.getItem('authToken');
+
+  const response = await fetch(`http://localhost:3000/files/resume/${selectedApplicant?.applicationId}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    console.error('Failed to fetch resume');
+    return;
+  }
+
+  const blob = await response.blob();
+  const blobUrl = window.URL.createObjectURL(blob);
+  window.open(blobUrl, '_blank');
+};
 
   return (
       <>
       {showDeleteConfirm && (
         <div className="confirm-overlay" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
           <div className="confirm-box" style={{ backgroundColor: !darkMode? 'var(--white)':'var(--navy-secondary)' }}>
-            <p>Are you sure you want to delete this mission?</p>
             <div className="confirm-buttons">
               <button 
-                onClick={() => setShowDeleteConfirm(false)}
+                onClick={() => setShowApplicationInfo(false)}
                 style={{ backgroundColor: 'var(--slate)' }}
               >
                 No
               </button>
               <button 
                 onClick={() => {
-                  setShowDeleteConfirm(false);
+                  setShowApplicationInfo(false);
                   handleDelete(); 
                 }}
                 style={{ backgroundColor: 'var(--rose)' }}
               >
                 Yes
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {showApplicationInfo && (
+        <div className="confirm-overlay" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+          <div className="confirm-box" style={{ backgroundColor: !darkMode? 'var(--white)':'var(--navy-secondary)' }}>
+                  <div
+                    style={{
+                      border: '1px solid var(--slate)',
+                      borderRadius: '6px',
+                      padding: '0.5rem 1rem',
+                      marginBottom: '1rem',
+                      backgroundColor: darkMode ? 'var(--navy)' : 'var(--light-gray)',
+                    }}
+                  >
+                    <strong>Message:</strong>
+                    <p style={{ marginTop: '0.5rem' }}>{selectedApplicant?.message || 'No message provided.'}</p>
+                  </div>
+        {selectedApplicant?.resumePath && (
+            <div
+              style={{
+                border: '1px solid var(--slate)',
+                borderRadius: '6px',
+                padding: '0.5rem 1rem',
+                marginBottom: '1rem',
+                backgroundColor: darkMode ? 'var(--navy)' : 'var(--light-gray)',
+              }}
+            >
+              <strong>Resume:</strong>
+              <p style={{ marginTop: '0.5rem' }}>
+                <a
+                  onClick={handleOpenResume}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    color: 'var(--powder)',
+                    textDecoration: 'underline',
+                    cursor: 'pointer',
+                  }}
+                >
+                  View Resume
+                </a>
+              </p>
+            </div>
+          )}
+            <div className="confirm-buttons">
+              <button 
+                onClick={() => setShowApplicationInfo(false)}
+                style={{ backgroundColor: 'var(--slate)' }}
+              >
+                close
+              </button>
+              <button 
+                style={{ backgroundColor: 'var(--rose)' }}
+              onClick={() => selectedApplicant?.status.toLowerCase() === 'pending' ? handlePreselect(selectedApplicant?.applicationId) : handleSelect(selectedApplicant?.applicationId)}
+              >
+              {selectedApplicant?.status.toLowerCase() === 'pending' ? 'Preselect' : 'Select'}
               </button>
             </div>
           </div>
@@ -222,7 +324,7 @@ const handleDelete = () => {
             <>
               <h5 className="mb-3">Applicants</h5>
               <ListGroup>
-                {sampleApplicants.map((applicant) => (
+                {applicants.map((applicant) => (
                   <ListGroup.Item
                     key={applicant.id}
                     className="border-start-0 border-end-0 py-2"
@@ -235,7 +337,7 @@ const handleDelete = () => {
                       <div className="d-flex align-items-center">
                       <div className="me-3">
                         <img
-                          src={applicant.profilePictureUrl}
+                          src={applicant.imageUrl}
                           className="rounded-circle"
                           style={{ width: '30px', height: '30px', objectFit: 'cover' }}
                         />
@@ -245,7 +347,7 @@ const handleDelete = () => {
                           <h6 className="mb-0">{applicant.name}</h6>
                           <div className="d-flex align-items-center">
                             <Star size={14} className="text-warning me-1" />
-                            <span className="text-muted small">{applicant.rating} / 5.0</span>
+                            <span className="text-muted small">5.0 / 5.0</span>
                           </div>
                         </div>
                       </div>
@@ -260,7 +362,6 @@ const handleDelete = () => {
                       >
                         View profile
                       </a>
-
                         <Button
                           variant="outline-primary"
                           size="sm"
@@ -269,9 +370,15 @@ const handleDelete = () => {
                             borderColor: darkMode ? 'var(--powder)' : undefined,
                             color: darkMode ? 'var(--powder)' : undefined
                           }}
+                            onClick={() => {
+                              setSelectedApplicant(applicant); 
+                              setShowApplicationInfo(true);    
+                            }}
                         >
-                          Preselect
+                          View Details
+
                         </Button>
+
                       </div>
                     </div>
                   </ListGroup.Item>
@@ -291,34 +398,34 @@ const handleDelete = () => {
                       <div className="d-flex align-items-center mb-3">
                       <div className="me-3">
                         <img
-                          src={assignedDeveloper.profilePictureUrl}
+                          src={assignedDeveloper?.user.imageUrl}
                           className="rounded-circle"
                           style={{ width: '40px', height: '40px', objectFit: 'cover' }}
                         />
                       </div>
                         <div>
-                          <h5 className="mb-0">{assignedDeveloper.name}</h5>
+                          <h5 className="mb-0">{assignedDeveloper?.user.name}</h5>
                           <div className="d-flex align-items-center">
                             <Star size={16} className="text-warning me-1" />
-                            <span className="text-muted">{assignedDeveloper.rating} / 5.0</span>
+                            <span className="text-muted">5.0 / 5.0</span>{/*  baddel lehne!!!!!!!!!!!!!!!!!!!!!!!!!!!!!(w fi lokhra) */}
                           </div>
                         </div>
                       </div>
                       <div className="mb-2">
                         <h6 className="text-muted">Specialty</h6>
-                        <p>{assignedDeveloper.specialty}</p>
+                        <p>{assignedDeveloper?.skills}</p>
                       </div>
                       <div>
                         <h6 className="text-muted">Completed Projects</h6>
-                        <p>{assignedDeveloper.completedProjects}</p>
+                        <p><p>{assignedDeveloper?.selectedMissions?.length ?? 0}</p></p>
                       </div>
                     </Col>
                     <Col md={4} className="d-flex flex-column justify-content-center align-items-end">
                       <a
-                        href={assignedDeveloper.profileUrl}
+                        href='#'    
                         className="text-decoration-none mb-3 small"
                         style={{ color: darkMode ? 'var(--powder)' : 'var(--navy-secondary)' }}
-                      >
+                      >{/*baddel lehna zeda*/}
                         View full profile
                       </a>
                       <Button
@@ -348,9 +455,8 @@ const handleDelete = () => {
           <Button 
               onClick={() => {
     if (onModifyClick) {
-      onModifyClick(); // Let parent handle the modal transition
+      onModifyClick(); 
     } else {
-      // Fallback to current behavior
       setIsModalOpen(true);
     }
   }}

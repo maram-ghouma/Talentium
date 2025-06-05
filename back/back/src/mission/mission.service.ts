@@ -38,15 +38,20 @@ async create(createMissionInput: CreateMissionInput, user: any): Promise<Mission
   return this.missionRepository.save(mission);
 }
 
-
 findAll(user: any): Promise<Mission[]> {
-  return this.missionRepository
-    .createQueryBuilder('mission')
-    .leftJoinAndSelect('mission.client', 'client')
-    .leftJoinAndSelect('client.user', 'user')
-    .where(`user.id = :usersId`, { usersId: user.userId })
-    .getMany();
+return this.missionRepository
+  .createQueryBuilder('mission')
+  .leftJoinAndSelect('mission.client', 'client')
+  .leftJoinAndSelect('client.user', 'clientUser')
+  .leftJoinAndSelect('mission.selectedFreelancer', 'freelancer')
+  .leftJoinAndSelect('freelancer.user', 'freelancerUser') 
+  .leftJoinAndSelect('freelancer.selectedMissions', 'freelancerSelectedMissions')
+  .where('clientUser.id = :usersId', { usersId: user.userId })
+  .getMany();
+
+
 }
+
 findAllNotMine(user: any): Promise<Mission[]> {
   return this.missionRepository
     .createQueryBuilder('mission')

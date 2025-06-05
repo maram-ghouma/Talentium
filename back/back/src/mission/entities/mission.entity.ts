@@ -8,7 +8,6 @@ import {
   JoinTable,
   OneToMany,
 } from 'typeorm';
-import { User } from 'src/user/entities/user.entity';
 import { ObjectType, Field, Int, GraphQLISODateTime } from '@nestjs/graphql';
 import { FreelancerProfile } from 'src/freelancer-profile/entities/freelancer-profile.entity';
 import { GraphQLDate } from 'graphql-scalars';
@@ -51,7 +50,7 @@ export class Mission {
   @Column('simple-array')
   requiredSkills: string[];
 
-@Field(() => GraphQLDate)
+  @Field(() => GraphQLDate)
   @Column({ type: 'date' })
   deadline: Date;
 
@@ -72,19 +71,21 @@ export class Mission {
   progress: number;
 
   @Field(() => TaskStats)
-@Column('json',  { nullable: true })
+  @Column('json',  { nullable: true })
   tasks: {
     total: number;
     completed: number;
   };
 
+  @Field(() => FreelancerProfile, { nullable: true })
   @ManyToMany(() => FreelancerProfile)
   @JoinTable()
   preselectedFreelancers: FreelancerProfile[];
 
+  @Field(() => FreelancerProfile, { nullable: true })
   @ManyToOne(() => FreelancerProfile, (freelancer) => freelancer.selectedMissions, { nullable: true })
   selectedFreelancer?: FreelancerProfile;
-
+  
   @Field(() => [Dispute])
   @OneToMany(() => Dispute, (dispute) => dispute.mission)
   disputes: Dispute[];

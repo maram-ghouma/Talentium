@@ -2,6 +2,40 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type Application {
+  id: ID!
+  message: String!
+  resumePath: String!
+  status: ApplicationStatus!
+  mission: Mission!
+  missionId: String!
+  freelancer: FreelancerProfile!
+  freelancerId: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+enum ApplicationStatus {
+  PENDING
+  PRE_SELECTED
+  ACCEPTED
+  REJECTED
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type FreelancerProfile {
+  id: ID!
+  user: User!
+  skills: [String!]
+  bio: String
+  selectedMissions: [Mission!]!
+  applications: [Application!]
+}
+
 type Dispute {
   id: ID!
   mission: Mission!
@@ -20,10 +54,11 @@ enum DisputeStatus {
   REJECTED
 }
 
-"""
-A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
-"""
-scalar DateTime
+type ClientProfile {
+  id: ID!
+  user: User!
+  phoneNumber: String!
+}
 
 type Mission {
   id: Int!
@@ -32,7 +67,7 @@ type Mission {
   status: String!
   price: Int!
   date: Date!
-  client: User!
+  client: ClientProfile!
   requiredSkills: [String!]!
   deadline: Date!
   budget: String!
@@ -40,9 +75,12 @@ type Mission {
   clientName: String!
   progress: Int!
   tasks: TaskStats!
+  preselectedFreelancers: FreelancerProfile
+  selectedFreelancer: FreelancerProfile
   disputes: [Dispute!]!
   paymentIntentId: String
   paymentStatus: String
+  applications: [Application!]
 }
 
 """
@@ -71,20 +109,33 @@ type User {
   email: String!
   password: String!
   isAdmin: Boolean!
-  imageUrl: String!
+  imageUrl: String
   currentRole: String!
   reviews: [Review!]
 }
 
+"""Upload custom scalar type"""
+scalar Upload
+
 type Query {
   missions: [Mission!]!
+  allMissions: [Mission!]!
   mission(id: Int!): Mission!
+  applications: [Application!]!
+  applicationsByMission(missionId: String!): [Application!]!
+  myApplicationsByMission(missionId: String!): [Application!]!
+  applicationsByFreelancer(freelancerId: String!): [Application!]!
+  application(id: String!): Application!
 }
 
 type Mutation {
   createMission(createMissionInput: CreateMissionInput!): Mission!
   updateMission(updateMissionInput: UpdateMissionInput!): Mission!
   removeMission(id: Int!): Boolean!
+  createApplication(createApplicationInput: CreateApplicationInput!): Application!
+  updateApplication(id: String!, updateApplicationInput: UpdateApplicationInput!): Application!
+  removeApplication(id: String!): Boolean!
+  updateApplicationStatus(applicationId: ID!, newStatus: ApplicationStatus!): Application!
 }
 
 input CreateMissionInput {
@@ -117,4 +168,14 @@ input UpdateMissionInput {
   progress: Int = 0
   tasks: TaskStatsInput = {total: 0, completed: 0}
   id: Int!
+}
+
+input CreateApplicationInput {
+  message: String!
+  missionId: String!
+}
+
+input UpdateApplicationInput {
+  message: String
+  status: ApplicationStatus
 }
