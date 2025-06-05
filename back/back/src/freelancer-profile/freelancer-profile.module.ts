@@ -12,6 +12,6 @@ import { Review } from 'src/review/entities/review.entity';
   imports: [TypeOrmModule.forFeature([FreelancerProfile,User, Mission, Review])], 
   controllers: [FreelancerProfileController],
   providers: [FreelancerProfileService],
-  exports: [FreelancerProfileService], 
+  exports: [FreelancerProfileService,TypeOrmModule], 
 })
 export class FreelancerProfileModule {}

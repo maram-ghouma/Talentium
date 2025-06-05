@@ -1,18 +1,11 @@
-
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import Stripe from 'stripe';
-import { Mission } from '../mission/entities/mission.entity';
+import { Mission, PaymentStatus } from '../mission/entities/mission.entity';
 import { User } from '../user/entities/user.entity';
 import { Invoice } from '../invoice/entities/invoice.entity';
-
-export enum PaymentStatus {
-  PENDING = 'PENDING',
-  ESCROWED = 'ESCROWED',
-  RELEASED = 'RELEASED',
-  REFUNDED = 'REFUNDED'
-}
+import { FreelancerProfile } from '../freelancer-profile/entities/freelancer-profile.entity';
 
 @Injectable()
 export class PaymentService {
@@ -23,8 +16,11 @@ export class PaymentService {
     private missionRepository: Repository<Mission>,
     @InjectRepository(Invoice)
     private invoiceRepository: Repository<Invoice>,
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
+    @InjectRepository(FreelancerProfile)
+    private freelancerRepository: Repository<FreelancerProfile>,
   ) {
-    //stripe test secret key : "sk_test_51OyjfCLP09EeDvhaQKed2zemxoS5nkUOnsy22lqz52tXfxWCrs7sUIMxDGLIyWyoqCXY9vfjkS44Yhkqb0eeBCNq00ksDn2Xnc" in .env
     this.stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
       apiVersion: '2025-05-28.basil',
     });
@@ -33,23 +29,27 @@ export class PaymentService {
   async createEscrowPayment(missionId: number, clientId: number) {
     const mission = await this.missionRepository.findOne({
       where: { id: missionId },
-      relations: ['client', 'selectedFreelancer']
+      relations: ['client', 'selectedFreelancer', 'selectedFreelancer.user']
     });
 
     if (!mission) {
       throw new Error('Mission non trouvée');
     }
 
+    if (!mission.selectedFreelancer) {
+      throw new Error('Aucun freelancer sélectionné pour cette mission');
+    }
+
     try {
       const paymentIntent = await this.stripe.paymentIntents.create({
-        amount: mission.price * 100, 
+        amount: mission.price * 100, // Convert to cents
         currency: 'eur',
         payment_method_types: ['card'],
-        capture_method: 'manual', //pour l'escrow
+        capture_method: 'manual', // For escrow
         metadata: {
           missionId: missionId.toString(),
           clientId: clientId.toString(),
-          freelancerId: mission.selectedFreelancer?.id.toString() || '',
+          freelancerId: mission.selectedFreelancer.id.toString(),
         },
       });
 
@@ -70,26 +70,27 @@ export class PaymentService {
   async releaseMilestonePayment(missionId: number, milestonePercentage: number) {
     const mission = await this.missionRepository.findOne({
       where: { id: missionId },
-      relations: ['selectedFreelancer']
+      relations: ['selectedFreelancer', 'client']
     });
 
     if (!mission || !mission.paymentIntentId) {
       throw new Error('Mission ou paiement non trouvé');
     }
 
+    if (!mission.selectedFreelancer?.stripeAccountId) {
+      throw new Error('Compte Stripe du freelancer non configuré');
+    }
+
     try {
       const paymentIntent = await this.stripe.paymentIntents.retrieve(mission.paymentIntentId);
       const releaseAmount = Math.floor((paymentIntent.amount * milestonePercentage) / 100);
 
-      // Capturer partiellement le paiement
+      // Capture partial payment
       const capture = await this.stripe.paymentIntents.capture(mission.paymentIntentId, {
         amount_to_capture: releaseAmount,
       });
 
-      // Créer un transfert vers le freelancer
-      if (!mission.selectedFreelancer || !mission.selectedFreelancer.stripeAccountId) {
-        throw new Error('Freelancer ou compte Stripe du freelancer non trouvé');
-      }
+      // Create transfer to freelancer
       await this.stripe.transfers.create({
         amount: releaseAmount,
         currency: 'eur',
@@ -100,8 +101,19 @@ export class PaymentService {
         }
       });
 
-      
-      await this.generateInvoice(missionId, releaseAmount / 100, `Paiement jalon ${milestonePercentage}%`);
+      // Generate invoice
+      await this.generateInvoice(
+        missionId, 
+        releaseAmount / 100, 
+        `Paiement jalon ${milestonePercentage}%`
+      );
+
+      // Update mission status if 100% released
+      if (milestonePercentage === 100) {
+        await this.missionRepository.update(missionId, {
+          paymentStatus: PaymentStatus.RELEASED
+        });
+      }
 
       return { success: true, amountReleased: releaseAmount / 100 };
     } catch (error) {
@@ -125,20 +137,25 @@ export class PaymentService {
       clientId: mission.client.id,
       freelancerId: mission.selectedFreelancer?.id,
       missionId: mission.id,
-      date: new Date().toISOString(),
+      client: mission.client,
+      freelancer: mission.selectedFreelancer,
+      mission: mission,
     });
 
     const savedInvoice = await this.invoiceRepository.save(invoice);
 
-    await this.generateInvoicePDF(savedInvoice);
+    // Generate PDF asynchronously
+    this.generateInvoicePDF(savedInvoice).catch(error => {
+      console.error('Error generating PDF:', error);
+    });
 
     return savedInvoice;
   }
 
   private async generateInvoicePDF(invoice: Invoice) {
-    // Logique de génération PDF avec pdfkit ou html-pdf
-  
+    // PDF generation logic with pdfkit or html-pdf
     console.log(`Génération PDF pour facture ${invoice.id}`);
+    // Implementation details...
   }
 
   async refundPayment(missionId: number, reason: string) {
@@ -168,5 +185,20 @@ export class PaymentService {
     } catch (error) {
       throw new Error(`Erreur lors du remboursement: ${error.message}`);
     }
+  }
+
+  async getMissionsByPaymentStatus(status: PaymentStatus): Promise<Mission[]> {
+    return await this.missionRepository.find({
+      where: { paymentStatus: status },
+      relations: ['client', 'selectedFreelancer', 'selectedFreelancer.user']
+    });
+  }
+
+  async getPaymentHistory(missionId: number): Promise<Invoice[]> {
+    return await this.invoiceRepository.find({
+      where: { missionId },
+      relations: ['client', 'freelancer', 'mission'],
+      order: { date: 'DESC' }
+    });
   }
 }
