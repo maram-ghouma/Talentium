@@ -32,11 +32,13 @@ async createProfileForUser(user: User,clientData: { phoneNumber?: string; countr
   return this.clientProfileRepository.save(profile);
 }
 
-async updateProfile(clientId: number, updateDto: UpdateClientProfileDto) {
-    const profile = await this.clientProfileRepository.findOne({
-      where: { id: clientId },
-      relations: ['user'],
-    });
+async updateClientProfile(clientId: number, updateDto: UpdateClientProfileDto) {
+  
+    const profile = await this.clientProfileRepository
+  .createQueryBuilder('profile')
+  .leftJoinAndSelect('profile.user', 'user')
+  .where('user.id = :clientId', { clientId })
+  .getOne();
 
     if (!profile) {
       throw new NotFoundException('Client profile not found');
@@ -57,7 +59,6 @@ async updateProfile(clientId: number, updateDto: UpdateClientProfileDto) {
     profile.industry = updateDto.industry ?? profile.industry;
     profile.phoneNumber = updateDto.phoneNumber ?? profile.phoneNumber;
     profile.linkedIn = updateDto.linkedIn ?? profile.linkedIn;
-
     return await this.clientProfileRepository.save(profile);
   }
 }

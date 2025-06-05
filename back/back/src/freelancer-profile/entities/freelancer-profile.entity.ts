@@ -1,4 +1,8 @@
+
 import { ObjectType, Field, Int, Float } from '@nestjs/graphql';
+
+import { Application } from 'src/application/entities/application.entity';
+
 import { Mission } from 'src/mission/entities/mission.entity';
 import { User } from 'src/user/entities/user.entity';
 import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn, OneToMany } from 'typeorm';
@@ -46,6 +50,13 @@ export class FreelancerProfile {
   @Field(() => [Mission], { nullable: true })
   @OneToMany(() => Mission, (mission) => mission.selectedFreelancer)
   selectedMissions: Mission[];
+
+
+  @Field(() => [Application], { nullable: true })
+@OneToMany(() => Application, application => application.freelancer)
+applications?: Application[];
+
+ 
 
   @Field({ nullable: true })
   @Column({ nullable: true })

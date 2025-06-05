@@ -14,12 +14,19 @@ async function bootstrap() {
   });
 console.log('Serving uploads from:', join(__dirname, '..', 'uploads'));
 app.use('/uploads', express.static(join(process.cwd(), 'uploads')));
+
+
+
+  app.use(express.json({ limit: '10mb' }));
+  app.use(express.urlencoded({ limit: '10mb', extended: true }));
+  app.use('/uploads', express.static(join(__dirname, '..', 'uploads')));
   const userService = app.get(UserService);
-  await seedAdmin(userService);
+  //await seedAdmin(userService);
 
-
-  await app.listen(process.env.PORT ?? 3000, () => {
-    console.log(`Server running on http://localhost:${process.env.PORT ?? 3000}/graphql`);
+  const port = process.env.PORT ?? 3000;
+  await app.listen(port, () => {
+    console.log(`🚀 REST & GraphQL server running at http://localhost:${port}`);
+    console.log(`🔗 GraphQL Playground: http://localhost:${port}/graphql`);
   });
 }
 bootstrap();

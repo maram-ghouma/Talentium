@@ -36,6 +36,7 @@ interface MissionDetailsModalProps {
   onMissionModified?: () => void;
   mission: Mission
   darkMode?: boolean;
+  onModifyClick?:()=>void;
 }
 
 const sampleApplicants: Applicant[] = [
@@ -56,12 +57,14 @@ const assignedDeveloper: Developer = {
 
 const MissionDetailsModal: React.FC<MissionDetailsModalProps> = ({
   onMissionModified,
+  onModifyClick,
   show,
   onHide,
   mission,
   darkMode = false,
 }) => {
   const navigate = useNavigate();
+  const [openModifyAfterClose, setOpenModifyAfterClose] = useState(false);
   const getStatusBadgeVariant = (status: string) => {
     switch (status) {
       case 'not_assigned':
@@ -136,7 +139,7 @@ const handleDelete = () => {
           onHide={onHide}
           size="lg"
           centered
-          lassName={darkMode ? 'dark-mode' : ''}
+          className={darkMode ? 'dark-mode' : ''}
           backdropClassName={darkMode ? 'dark-backdrop' : ''}
           
         >
@@ -343,7 +346,14 @@ const handleDelete = () => {
             Delete
           </Button>
           <Button 
-          onClick={() => setIsModalOpen(true)}
+              onClick={() => {
+    if (onModifyClick) {
+      onModifyClick(); // Let parent handle the modal transition
+    } else {
+      // Fallback to current behavior
+      setIsModalOpen(true);
+    }
+  }}
             style={{ 
               backgroundColor: darkMode ? 'var(--slate)' : 'var(--navy-primary)',
               borderColor: darkMode ? 'var(--slate)' : 'var(--navy-primary)'
@@ -353,14 +363,7 @@ const handleDelete = () => {
           </Button>
         </Modal.Footer>
       </Modal>
-      {isModalOpen && (
-        <ModifyMission
-          onClose={handleModalClose}
-          onSubmit={handleMissionModified}
-          isDarkMode={darkMode}
-          mission={mission}
-        />
-      )}
+      
     </>
   );
 };

@@ -3,19 +3,33 @@ import { MissionService } from './mission.service';
 import { Mission } from './entities/mission.entity';
 import { CreateMissionInput } from './dto/create-mission.input';
 import { UpdateMissionInput } from './dto/update-mission.input';
+import { GqlCurrentUser } from 'src/auth/decorators/gql-current-user.decorator';
+import { User } from 'src/user/entities/user.entity';
+import { UseGuards } from '@nestjs/common';
+import { GqlAuthGuard } from 'src/auth/gql-auth-guard';
 
 @Resolver(() => Mission)
 export class MissionResolver {
   constructor(private readonly missionService: MissionService) {}
-
+  @UseGuards(GqlAuthGuard)
   @Mutation(() => Mission)
-  createMission(@Args('createMissionInput') createMissionInput: CreateMissionInput) {
-    return this.missionService.create(createMissionInput);
+  createMission(@Args('createMissionInput') createMissionInput: CreateMissionInput,@GqlCurrentUser() User : User) {
+    return this.missionService.create(createMissionInput,User);
+  }
+  @UseGuards(GqlAuthGuard)
+  @Query(() => [Mission], { name: 'missions' })
+  findAll(@GqlCurrentUser() user : User) {
+    console.log('User passed to findAll:', user);
+
+    return this.missionService.findAll(user);
   }
 
-  @Query(() => [Mission], { name: 'missions' })
-  findAll() {
-    return this.missionService.findAll();
+    @UseGuards(GqlAuthGuard)
+  @Query(() => [Mission], { name: 'allMissions' })
+  findAllMissions(@GqlCurrentUser() user : User) {
+    console.log('User passed to findAll:', user);
+
+    return this.missionService.findAllNotMine(user);
   }
 
   @Query(() => Mission, { name: 'mission' })

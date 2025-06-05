@@ -13,16 +13,21 @@ import * as path from 'path';
 import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/dist/esm/plugin/landingPage/default';import { AuthModule } from './auth/auth.module';
 import { InvoiceModule } from './invoice/invoice.module';
 
+//import { ReportModule } from './report/report.module';
+
+import { ReviewModule } from './review/review.module';
 import { DisputeModule } from './dispute/dispute.module';
 import { BadgeModule } from './badge/badge.module';
+import { ApplicationModule } from './application/application.module';
 import { PaymentService } from './payment/payment.service';
 import { PaymentModule } from './payment/payment.module';
+
 
 @Module({
   imports: [UserModule, FreelancerProfileModule, ClientProfileModule,
     ConfigModule.forRoot({
-      isGlobal: true,          // Makes ConfigService available app-wide
-      envFilePath: '.env',     // Explicit path to your .env file
+      isGlobal: true,          
+      envFilePath: '.env',     
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
@@ -42,16 +47,20 @@ import { PaymentModule } from './payment/payment.module';
         };
       },
     }),
-    MissionModule,AuthModule, ClientProfileModule, FreelancerProfileModule,UserModule,
+    MissionModule,AuthModule, ClientProfileModule, FreelancerProfileModule,UserModule,ReviewModule,
    GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       autoSchemaFile: path.join(process.cwd(), 'src/schema.gql'),
       installSubscriptionHandlers: true,
+      
     }),
    InvoiceModule,
-   
+
+  // ReportModule,
+
    DisputeModule,
    BadgeModule,
+   ApplicationModule,
    PaymentModule,],
   controllers: [AppController],
   providers: [AppService, PaymentService],
