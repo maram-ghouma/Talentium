@@ -17,9 +17,9 @@ type Application {
 
 enum ApplicationStatus {
   PENDING
+  PRE_SELECTED
   ACCEPTED
   REJECTED
-  WITHDRAWN
 }
 
 """
@@ -81,6 +81,7 @@ type Mission {
   clientName: String!
   progress: Int!
   tasks: TaskStats!
+  preselectedFreelancers: FreelancerProfile
   selectedFreelancer: FreelancerProfile
   disputes: [Dispute!]!
   paymentIntentId: String
@@ -122,7 +123,7 @@ type User {
   email: String!
   password: String!
   isAdmin: Boolean!
-  imageUrl: String!
+  imageUrl: String
   currentRole: String!
   reviews: [Review!]
 }
@@ -166,20 +167,25 @@ type Query {
   getPaymentHistory(missionId: Int!): [Invoice!]!
   applications: [Application!]!
   applicationsByMission(missionId: String!): [Application!]!
+  myApplicationsByMission(missionId: String!): [Application!]!
   applicationsByFreelancer(freelancerId: String!): [Application!]!
   application(id: String!): Application!
+  applications: [Application!]!
+  getMissionsByPaymentStatus(status: PaymentStatus!): [Mission!]!
+  getPaymentHistory(missionId: Int!): [Invoice!]!
 }
 
 type Mutation {
   createMission(createMissionInput: CreateMissionInput!): Mission!
   updateMission(updateMissionInput: UpdateMissionInput!): Mission!
   removeMission(id: Int!): Boolean!
-  createEscrowPayment(missionId: Int!, clientId: Int!): CreateEscrowResponse!
-  releaseMilestonePayment(missionId: Int!, milestonePercentage: Int!): ReleaseMilestoneResponse!
-  refundPayment(missionId: Int!, reason: String!): RefundResponse!
   createApplication(createApplicationInput: CreateApplicationInput!): Application!
   updateApplication(id: String!, updateApplicationInput: UpdateApplicationInput!): Application!
   removeApplication(id: String!): Boolean!
+  updateApplicationStatus(applicationId: ID!, newStatus: ApplicationStatus!): Application!
+  createEscrowPayment(missionId: Int!, clientId: Int!): CreateEscrowResponse!
+  releaseMilestonePayment(missionId: Int!, milestonePercentage: Int!): ReleaseMilestoneResponse!
+  refundPayment(missionId: Int!, reason: String!): RefundResponse!
 }
 
 input CreateMissionInput {
