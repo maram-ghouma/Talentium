@@ -23,19 +23,46 @@ export const GET_APPLICATIONS_BY_MISSION = gql`
       resumePath
       freelancer {
         id
-        name
-        rating
-        profilePictureUrl
+        user{
+          username
+          imageUrl
+        }
       }
     }
   }
 `;
 
+export const GET_MY_APPLICATIONS_BY_MISSION = gql`
+  query GetMyApplicationsByMission($missionId: String!) {
+    myApplicationsByMission(missionId: $missionId) {
+      id
+      message
+      status
+      createdAt
+      resumePath
+    }
+  }
+`;
+
+
 export const UPDATE_APPLICATION_STATUS = gql`
-  mutation UpdateApplicationStatus($id: String!, $updateApplicationInput: UpdateApplicationInput!) {
-    updateApplication(id: $id, updateApplicationInput: $updateApplicationInput) {
+  mutation UpdateApplicationStatus($applicationId: ID!, $newStatus: ApplicationStatus!) {
+    updateApplicationStatus(applicationId: $applicationId, newStatus: $newStatus) {
       id
       status
+      mission {
+        id
+        selectedFreelancer {
+          id
+          user{
+            username}
+          }
+          preselectedFreelancers {
+            id
+            user{
+            username}
+          }
+      }
     }
   }
 `;

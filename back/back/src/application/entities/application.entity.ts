@@ -1,4 +1,3 @@
-// entities/Application.entity.ts
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 import { ObjectType, Field, ID, registerEnumType } from '@nestjs/graphql';
 import { Mission } from 'src/mission/entities/mission.entity';
@@ -6,9 +5,9 @@ import { FreelancerProfile } from 'src/freelancer-profile/entities/freelancer-pr
 
 export enum ApplicationStatus {
   PENDING = 'pending',
+  PRE_SELECTED = 'pre-selected',
   ACCEPTED = 'accepted',
-  REJECTED = 'rejected',
-  WITHDRAWN = 'withdrawn'
+  REJECTED = 'rejected'
 }
 
 registerEnumType(ApplicationStatus, {

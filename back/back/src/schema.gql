@@ -80,6 +80,7 @@ type Mission {
   clientName: String!
   progress: Int!
   tasks: TaskStats!
+  preselectedFreelancers: FreelancerProfile
   selectedFreelancer: FreelancerProfile
   disputes: [Dispute!]!
   paymentIntentId: String
@@ -121,7 +122,7 @@ type User {
   email: String!
   password: String!
   isAdmin: Boolean!
-  imageUrl: String!
+  imageUrl: String
   currentRole: String!
   reviews: [Review!]
 }
@@ -163,8 +164,10 @@ type Query {
   mission(id: Int!): Mission!
   applications: [Application!]!
   applicationsByMission(missionId: String!): [Application!]!
+  myApplicationsByMission(missionId: String!): [Application!]!
   applicationsByFreelancer(freelancerId: String!): [Application!]!
   application(id: String!): Application!
+  applications: [Application!]!
   getMissionsByPaymentStatus(status: PaymentStatus!): [Mission!]!
   getPaymentHistory(missionId: Int!): [Invoice!]!
 }
@@ -176,6 +179,7 @@ type Mutation {
   createApplication(createApplicationInput: CreateApplicationInput!): Application!
   updateApplication(id: String!, updateApplicationInput: UpdateApplicationInput!): Application!
   removeApplication(id: String!): Boolean!
+  updateApplicationStatus(applicationId: ID!, newStatus: ApplicationStatus!): Application!
   createEscrowPayment(missionId: Int!, clientId: Int!): CreateEscrowResponse!
   releaseMilestonePayment(missionId: Int!, milestonePercentage: Int!): ReleaseMilestoneResponse!
   refundPayment(missionId: Int!, reason: String!): RefundResponse!
