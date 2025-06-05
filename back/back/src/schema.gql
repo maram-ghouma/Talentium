@@ -15,7 +15,6 @@ type User {
 type Message {
   id: Int!
   content: String!
-  direction: Int!
   timestamp: DateTime!
   sender: User!
   conversation: Conversation!

@@ -20,10 +20,6 @@ export class Message {
   @Column('text')
   content: string;
 
-  @Field(() => Int)
-  @Column({ type: 'int' })
-  direction: number; // 0 = freelancer, 1 = client
-
   @Field(() => Date)
   @CreateDateColumn()
   timestamp: Date;

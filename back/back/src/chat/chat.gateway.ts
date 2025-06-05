@@ -1,12 +1,5 @@
-import {
-  WebSocketGateway,
-  SubscribeMessage,
-  OnGatewayConnection,
-  OnGatewayDisconnect,
-  MessageBody,
-  ConnectedSocket,
-  WebSocketServer,
-} from '@nestjs/websockets';
+// src/chat/chat.gateway.ts
+import { WebSocketGateway, SubscribeMessage, OnGatewayConnection, OnGatewayDisconnect, MessageBody, ConnectedSocket, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { ChatService } from './chat.service';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -14,151 +7,145 @@ import { Repository } from 'typeorm';
 import { User } from 'src/user/entities/user.entity';
 import { JwtService } from '@nestjs/jwt';
 import { Conversation } from 'src/conversation/entities/conversation.entity';
-import * as jwt from 'jsonwebtoken';
 import { ConfigService } from '@nestjs/config';
+import { Logger } from '@nestjs/common';
 
 @WebSocketGateway({
-  cors: { 
-    origin: 'http://localhost:4200', 
-    credentials: true,
-  }, 
+  cors: { origin: 'http://localhost:4200', credentials: true },
   namespace: 'chat',
 })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;
 
+  private logger = new Logger('ChatGateway');
+
   constructor(
     private readonly chatService: ChatService,
     private readonly jwtService: JwtService,
-    private readonly configService: ConfigService,  // Add this
+    private readonly configService: ConfigService,
     @InjectRepository(User) private userRepo: Repository<User>,
     @InjectRepository(Conversation) private conversationRepo: Repository<Conversation>,
-  ) {}
-
-  async handleConnection(client: Socket) {
-    console.log('received websockets:', client.id);
-    try{
-      const cookies = client.handshake.headers.cookie;
-      if (!cookies) {
-        console.log('ChatGateway: No cookies found');
-        client.disconnect();
-        return;
-      }
-
-      // Parse the access token from cookies
-      const accessToken = cookies
-        .split(';')
-        .find(cookie => cookie.trim().startsWith('access_token='))
-        ?.split('=')[1];
-
-      if (!accessToken) {
-        console.log('ChatGateway: No access token found in cookies');
-        client.disconnect();
-        return;
-      }
-
-      // Verify the token
-      const payload = this.jwtService.verify(accessToken, {
-        secret: this.configService.get<string>('SECRET_KEY')
-      });
-      const user = await this.userRepo.findOne({ where: { id: payload.sub } });
-      
-      if (!user) {
-        console.log('ChatGateway: User not found');
-        client.disconnect();
-        return;
-      }
-
-      client.data.userId = user.id;
-      console.log(`ChatGateway: User ${user.id} connected successfully`);
-      
-    } catch (err) {
-      console.error('ChatGateway: Connection error:', err.message);
-      client.disconnect();
-    }
+  ) {
+    console.log('[ChatGateway][INIT] Gateway initialized');
   }
 
+  async handleConnection(client: Socket) {
+
+    console.log('[ChatGateway] Received auth:', client.handshake.auth); 
+  const token = client.handshake.auth.token;
+
+  if (!token) {
+    client.emit('error', { message: 'No token provided' });
+    client.disconnect();
+    return;
+  }
+
+  try {
+    const payload = this.jwtService.verify(token, {
+      secret: this.configService.get<string>('SECRET_KEY'),
+    });
+
+    const user = await this.userRepo.findOne({ where: { id: payload.sub } });
+    if (!user) {
+      client.emit('error', { message: 'User not found' });
+      client.disconnect();
+      return;
+    }
+
+    client.data.userId = user.id;
+    console.log('[ChatGateway][CONNECT] User connected:', user.id);
+  } catch (err) {
+    client.emit('error', { message: 'Authentication failed' });
+    client.disconnect();
+  }
+}
+
   handleDisconnect(client: Socket) {
-    const userId = client.data?.userId;
-    console.log(`User ${userId || 'unknown'} disconnected from chat`);
+    console.log('[ChatGateway][DISCONNECT] User:', client.data?.userId || 'unknown', 'ID:', client.id);
+  }
+
+  @SubscribeMessage('testEvent')
+  handleTestEvent(client: Socket, payload: any) {
+    console.log('[ChatGateway][EVENT] testEvent:', JSON.stringify(payload));
+    client.emit('testResponse', { status: 'ok', payload });
   }
 
   @SubscribeMessage('joinRoom')
-  async handleJoinRoom(
-    @MessageBody() conversationId: number,
-    @ConnectedSocket() client: Socket
-  ) {
-    console.log('Received joinRoom request:', { conversationId, userId: client.data.userId });
+  async handleJoinRoom(@MessageBody() conversationId: number, @ConnectedSocket() client: Socket) {
+    console.log('[ChatGateway][EVENT] joinRoom: User:', client.data.userId, 'Conversation:', conversationId);
     const userId = client.data.userId;
     if (!userId) {
-      console.log('Unauthorized join attempt');
-      client.emit('error', 'Unauthorized');
+      console.log('[ChatGateway][EVENT] joinRoom: Unauthorized');
+      client.emit('error', { message: 'Unauthorized' });
       return;
     }
 
     const convo = await this.conversationRepo.findOne({
       where: { id: conversationId },
       relations: ['participants'],
-  });
+    });
 
-    if (!convo || !convo.participants.some(p => p.id === userId)) {
-      client.emit('error', 'Forbidden');
+    if (!convo || !convo.participants.some((p) => p.id === userId)) {
+      console.log('[ChatGateway][EVENT] joinRoom: Invalid conversation:', conversationId);
+      client.emit('error', { message: 'Forbidden' });
       return;
     }
 
-    // Join the room
     client.join(`conversation-${conversationId}`);
-    console.log(`User ${userId} joined room conversation-${conversationId}`);
+    console.log('[ChatGateway][EVENT] joinRoom: User:', userId, 'Joined:', `conversation-${conversationId}`);
   }
 
-
-
   @SubscribeMessage('sendMessage')
-  async handleSendMessage(
-    @MessageBody() data: { conversationId: number; content: string },
-    @ConnectedSocket() client: Socket,
-  ) {
+  async handleSendMessage(@MessageBody() data: { conversationId: number; content: string }, @ConnectedSocket() client: Socket) {
+    console.log('[ChatGateway][EVENT] sendMessage:', JSON.stringify({ ...data, senderId: client.data.userId }));
     const userId = client.data.userId;
-
     const { conversationId, content } = data;
 
     if (!userId || !conversationId || !content?.trim()) {
-      client.emit('error', { message: 'Invalid message data.' });
+      console.error('[ChatGateway][EVENT] sendMessage: Invalid data');
+      client.emit('error', { message: 'Invalid message data' });
       return;
     }
 
     try {
-      const conversation = await this.conversationRepo.findOne({
-        where: { id: conversationId },
-        relations: ['bid', 'bid.bidder'],
-      });
-
-      if (!conversation) {
-        client.emit('error', { message: 'Conversation not found' });
-        return;
-      }
-
       const message = await this.chatService.saveMessage({
         conversationId,
         senderId: userId,
         content,
       });
-      const room = `conversation-${conversationId}`;
-      this.server.to(room).emit('newMessage', message);
-
+      const newMessage = {
+        id: message.id,
+        conversation: { id: message.conversation.id },
+        sender: { id: message.sender.id },
+        content: message.content,
+        timestamp: message.timestamp,
+        isRead: message.isRead,
+      };
+      console.log('[ChatGateway][EVENT] Emitting newMessage to:', `conversation-${conversationId}`);
+      this.server.to(`conversation-${conversationId}`).emit('newMessage', newMessage);
     } catch (error) {
-      console.error('Error saving message:', error);
-      client.emit('error', { message: 'Failed to send message.' });
+      console.error('[ChatGateway][EVENT] sendMessage error:', error.message);
+      client.emit('error', { message: 'Failed to send message', error: error.message });
     }
   }
 
   @SubscribeMessage('markAsRead')
-  async handleMarkAsRead(
-    @MessageBody() data: { conversationId: number },
-    @ConnectedSocket() client: Socket,
-  ) {
+  async handleMarkAsRead(@MessageBody() data: { conversationId: number }, @ConnectedSocket() client: Socket) {
+    console.log('[ChatGateway][EVENT] markAsRead: User:', client.data.userId, 'Conversation:', data.conversationId);
     const userId = client.data.userId;
-    await this.chatService.markMessagesAsRead(data.conversationId, userId);
+    if (!userId || !data.conversationId) {
+      console.error('[ChatGateway][EVENT] markAsRead: Invalid data');
+      client.emit('error', { message: 'Invalid data' });
+      return;
+    }
+
+    try {
+      await this.chatService.markMessagesAsRead(data.conversationId, userId);
+      console.log('[ChatGateway][EVENT] markAsRead: Updated for:', data.conversationId);
+    } catch (error) {
+      console.error('[ChatGateway][EVENT] markAsRead error:', error.message);
+      client.emit('error', { message: 'Failed to mark messages as read', error: error.message });
+    }
   }
 }

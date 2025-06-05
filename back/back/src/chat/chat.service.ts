@@ -52,6 +52,7 @@ export class ChatService {
       }),
       this.userRepo.findOne({ where: { id: senderId } }),
     ]);
+    console.log(`Attempting to save message in conversation ${conversationId} from user ${senderId}:`, { conversation, sender });
 
     if (!conversation) {
       throw new NotFoundException('Conversation not found');
@@ -72,6 +73,7 @@ export class ChatService {
       sender,
       conversation,
     });
+    console.log(`Saving message from user ${senderId} in conversation ${conversationId}:`, message);
 
     return this.messageRepo.save(message);
   }
@@ -112,30 +114,55 @@ export class ChatService {
   }
 
   async getConversations(userId: number): Promise<ConversationDTO[]> {
-    const conversations = await this.conversationRepo
-      .createQueryBuilder('conversation')
-      .leftJoinAndSelect('conversation.participants', 'participants')
-      .leftJoinAndSelect('conversation.mission', 'mission')
-      .leftJoinAndSelect('conversation.messages', 'messages')
-      .where('participants.id = :userId', { userId })
-      .getMany();
+  // Step 1: Find conversation IDs for the user
+  const conversationIds = await this.conversationRepo
+    .createQueryBuilder('conversation')
+    .leftJoin('conversation.participants', 'participants')
+    .where('participants.id = :userId', { userId })
+    .select('conversation.id')
+    .getRawMany()
+    .then(results => results.map(result => result.conversation_id));
 
-    return conversations.map((conversation) => ({
-      id: conversation.id,
-      isActive: conversation.isActive,
-      messages: conversation.messages.map((msg) => ({
-        id: msg.id,
-        content: msg.content,
-        timestamp: msg.timestamp,
-        isRead: msg.isRead,
-        senderId: msg.sender.id,
-      })),
-      participants: conversation.participants.map((user) => ({
-        id: user.id,
-        name: user.username,
-        imageUrl: user.imageUrl,
-      })),
-    }));
+  console.log(`[ConversationService] Found conversation IDs for user ${userId}:`, conversationIds);
+
+  if (!conversationIds.length) {
+    return [];
   }
+
+  // Step 2: Fetch full conversations with all relations
+  const conversations = await this.conversationRepo
+    .createQueryBuilder('conversation')
+    .leftJoinAndSelect('conversation.participants', 'participants')
+    .leftJoinAndSelect('conversation.mission', 'mission')
+    .leftJoinAndSelect('conversation.messages', 'messages')
+    .leftJoinAndSelect('messages.sender', 'sender') // Explicitly load sender
+    .where('conversation.id IN (:...conversationIds)', { conversationIds })
+    .orderBy('messages.timestamp', 'DESC') // Sort messages by timestamp
+    .getMany();
+
+  console.log(`[ConversationService] Found ${conversations.length} conversations for user ${userId}`);
+  console.log('[ConversationService] Raw conversations:', JSON.stringify(conversations, (key, value) => 
+    key === 'password' ? '***' : value, 2)); // Exclude sensitive fields
+  console.log('[ConversationService] Raw participants:', conversations.map(c => c.participants.map(p => ({ id: p.id, username: p.username }))));
+  console.log('[ConversationService] Raw messages:', conversations.map(c => (c.messages || []).map(m => ({ id: m.id, content: m.content, senderId: m.sender?.id }))));
+
+  return conversations.map((conversation) => ({
+    id: conversation.id || 0, // Fallback
+    isActive: conversation.isActive ?? true,
+    messages: (conversation.messages || []).map((msg) => ({
+      id: msg.id || 0,
+      content: msg.content || '',
+      timestamp: msg.timestamp || new Date(),
+      isRead: msg.isRead ?? false,
+      senderId: msg.sender?.id || 0, // Safe access
+    })),
+    participants: (conversation.participants || []).filter(user => user).map((user) => ({
+      id: user.id || 0,
+      name: user.username || 'Unknown',
+      imageUrl: user.imageUrl || '',
+    })),
+  }));
+}
+
 
 }
