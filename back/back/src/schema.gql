@@ -63,6 +63,7 @@ type ClientProfile {
   id: ID!
   user: User!
   phoneNumber: String!
+  stripeAccountId: String
 }
 
 type Mission {
@@ -161,24 +162,24 @@ type Query {
   missions: [Mission!]!
   allMissions: [Mission!]!
   mission(id: Int!): Mission!
+  getMissionsByPaymentStatus(status: PaymentStatus!): [Mission!]!
+  getPaymentHistory(missionId: Int!): [Invoice!]!
   applications: [Application!]!
   applicationsByMission(missionId: String!): [Application!]!
   applicationsByFreelancer(freelancerId: String!): [Application!]!
   application(id: String!): Application!
-  getMissionsByPaymentStatus(status: PaymentStatus!): [Mission!]!
-  getPaymentHistory(missionId: Int!): [Invoice!]!
 }
 
 type Mutation {
   createMission(createMissionInput: CreateMissionInput!): Mission!
   updateMission(updateMissionInput: UpdateMissionInput!): Mission!
   removeMission(id: Int!): Boolean!
-  createApplication(createApplicationInput: CreateApplicationInput!): Application!
-  updateApplication(id: String!, updateApplicationInput: UpdateApplicationInput!): Application!
-  removeApplication(id: String!): Boolean!
   createEscrowPayment(missionId: Int!, clientId: Int!): CreateEscrowResponse!
   releaseMilestonePayment(missionId: Int!, milestonePercentage: Int!): ReleaseMilestoneResponse!
   refundPayment(missionId: Int!, reason: String!): RefundResponse!
+  createApplication(createApplicationInput: CreateApplicationInput!): Application!
+  updateApplication(id: String!, updateApplicationInput: UpdateApplicationInput!): Application!
+  removeApplication(id: String!): Boolean!
 }
 
 input CreateMissionInput {

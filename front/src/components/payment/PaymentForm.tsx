@@ -71,7 +71,7 @@ const PaymentInterface = () => {
           <p>Gestion des paiements en escrow pour vos missions</p>
         </div>
 
-        {/* Debug section */}
+        {/* Debug section 
         <div style={{ 
           backgroundColor: '#f0f8ff', 
           padding: '15px', 
@@ -89,7 +89,7 @@ const PaymentInterface = () => {
               {JSON.stringify(missions, null, 2)}
             </pre>
           </details>
-        </div>
+        </div>*/}
 
         <PaymentConfirmationView missions={missions} />
 
