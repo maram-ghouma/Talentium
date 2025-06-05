@@ -118,18 +118,30 @@ const applicants: Applicant[] = applications
 
   const [updateStatus] = useMutation(UPDATE_APPLICATION_STATUS);
 
-  const handlePreselect = (applicationId) => {
-    updateStatus({
+const handlePreselect = async (applicationId) => {
+  try {
+    await updateStatus({
       variables: { applicationId, newStatus: 'PRE_SELECTED' },
-      refetchQueries:['GetApplicationsByMission']
-    }).catch(console.error);
-  };
+      refetchQueries: ['GetApplicationsByMission']
+    });
+    
+    if (selectedApplicant && selectedApplicant.applicationId === applicationId) {
+      setSelectedApplicant({
+        ...selectedApplicant,
+        status: ApplicationStatus.PRE_SELECTED
+      });
+    }
+  } catch (error) {
+    console.error('Error preselecting applicant:', error);
+  }
+};
 
   const handleSelect = (applicationId) => {
     updateStatus({
       variables: { applicationId, newStatus: 'ACCEPTED' },
-      refetchQueries:['GetApplicationsByMission']
+      refetchQueries:['GetApplicationsByMission','GetMissions']
     }).catch(console.error);
+    setShowApplicationInfo(false);
   };
 
 const handleOpenResume = async () => {
@@ -156,6 +168,7 @@ const handleOpenResume = async () => {
       {showDeleteConfirm && (
         <div className="confirm-overlay" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
           <div className="confirm-box" style={{ backgroundColor: !darkMode? 'var(--white)':'var(--navy-secondary)' }}>
+            <p>are you sure you want to delete this?</p>
             <div className="confirm-buttons">
               <button 
                 onClick={() => setShowApplicationInfo(false)}
