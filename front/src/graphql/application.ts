@@ -66,3 +66,14 @@ export const UPDATE_APPLICATION_STATUS = gql`
     }
   }
 `;
+
+export const GET_ALL_FREELANCERS = gql`
+  query {
+    getFreelancersWhoAppliedToMyMissions {
+      id
+      user {
+        username
+      }
+    }
+  }
+`;

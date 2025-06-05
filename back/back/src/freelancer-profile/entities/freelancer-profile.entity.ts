@@ -4,6 +4,7 @@ import { ObjectType, Field, Int, Float } from '@nestjs/graphql';
 import { Mission } from 'src/mission/entities/mission.entity';
 import { User } from 'src/user/entities/user.entity';
 import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn, OneToMany } from 'typeorm';
+import { Interview } from 'src/interview/entities/interview.entity';
 
 @ObjectType()
 @Entity()
@@ -59,4 +60,8 @@ export class FreelancerProfile {
   @Field({ nullable: true })
   @Column({ nullable: true })
   stripeAccountId: string;
+
+    @Field(() => [Interview], { nullable: true })
+  @OneToMany(() => Interview, (interview) =>interview.freelancer)
+  interviews: Interview[];
 }

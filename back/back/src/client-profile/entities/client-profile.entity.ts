@@ -1,6 +1,7 @@
 import { Field, ID, ObjectType } from '@nestjs/graphql';
+import { Interview } from 'src/interview/entities/interview.entity';
 import { User } from 'src/user/entities/user.entity';
-import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn, OneToMany } from 'typeorm';
 @ObjectType()
 @Entity()
 export class ClientProfile {
@@ -29,4 +30,8 @@ export class ClientProfile {
 
   @Column({ nullable: true })
   industry: string;
+
+  @Field(() => [Interview], { nullable: true })
+  @OneToMany(() => Interview, (interview) =>interview.client)
+  interviews: Interview[];
 }

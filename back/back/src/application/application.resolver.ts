@@ -8,6 +8,7 @@ import { CreateApplicationInput } from './dto/create-application.input';
 import { GqlCurrentUser } from 'src/auth/decorators/gql-current-user.decorator';
 import { GqlAuthGuard } from 'src/auth/gql-auth-guard';
 import { UpdateApplicationInput } from './dto/update-application.input';
+import { FreelancerProfile } from 'src/freelancer-profile/entities/freelancer-profile.entity';
 
 @Resolver(() => Application)
 export class ApplicationResolver {
@@ -70,4 +71,11 @@ export class ApplicationResolver {
   ): Promise<Application> {
     return this.applicationService.updateApplicationStatus(applicationId, newStatus);
   }
+
+  @Query(() => [FreelancerProfile])
+  @UseGuards(GqlAuthGuard)
+  getFreelancersWhoAppliedToMyMissions(@GqlCurrentUser() user:any) {
+  return this.applicationService.getFreelancersByClient(user.userId);
+}
+
 }

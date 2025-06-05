@@ -21,6 +21,7 @@ import { BadgeModule } from './badge/badge.module';
 import { ApplicationModule } from './application/application.module';
 import { PaymentService } from './payment/payment.service';
 import { PaymentModule } from './payment/payment.module';
+import { InterviewModule } from './interview/interview.module';
 
 
 @Module({
@@ -61,7 +62,8 @@ import { PaymentModule } from './payment/payment.module';
    DisputeModule,
    BadgeModule,
    ApplicationModule,
-   PaymentModule,],
+   PaymentModule,
+   InterviewModule,],
   controllers: [AppController],
   providers: [AppService, PaymentService],
 })
