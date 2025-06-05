@@ -5,6 +5,9 @@ import { Mission } from './entities/mission.entity';
 import { CreateMissionInput } from './dto/create-mission.input';
 import { UpdateMissionInput } from './dto/update-mission.input';
 import { User } from 'src/user/entities/user.entity';
+import {FreelancerProfile } from 'src/freelancer-profile/entities/freelancer-profile.entity';
+import { ClientProfile } from 'src/client-profile/entities/client-profile.entity';
+
 
 @Injectable()
 export class MissionService {
@@ -14,21 +17,54 @@ export class MissionService {
 
     @InjectRepository(User)
     private userRepository: Repository<User>,
+
+    @InjectRepository(FreelancerProfile)
+    private freelancerProfileRepository: Repository<FreelancerProfile>,
+
+    @InjectRepository(ClientProfile)
+    private clientProfileRepository: Repository<ClientProfile>
+
   ) {}
 
-  async create(createMissionInput: CreateMissionInput): Promise<Mission> {
-    const { /*clientId,*/ ...rest } = createMissionInput;
+async create(createMissionInput: CreateMissionInput, user: any): Promise<Mission> {
+  const { ...rest } = createMissionInput;
+  const fullUser = await this.userRepository.findOne({ where: { id: user.userId } });
 
-    const client = await this.userRepository.findOne({ where: { id: 1 } });
-    if (!client) throw new Error('Client not found');
+  if (!fullUser) {
+    throw new Error('User not found');
+  }
+  const client = await this.clientProfileRepository.findOne({
+    where: { user: fullUser },
+  });
 
-    const mission = this.missionRepository.create({ ...rest, client });
-    return this.missionRepository.save(mission);
+  if (!client) {
+    throw new Error('Client not found');
   }
 
-  findAll(): Promise<Mission[]> {
-    return this.missionRepository.find({ relations: ['client'] });
-  }
+  const mission = this.missionRepository.create({ ...rest, client });
+  return this.missionRepository.save(mission);
+}
+
+
+findAll(user: any): Promise<Mission[]> {
+  return this.missionRepository
+    .createQueryBuilder('mission')
+    .leftJoinAndSelect('mission.client', 'client')
+    .leftJoinAndSelect('client.user', 'user')
+    .where(`user.id = :usersId`, { usersId: user.userId })
+    .getMany();
+}
+findAllNotMine(user: any): Promise<Mission[]> {
+  return this.missionRepository
+    .createQueryBuilder('mission')
+    .leftJoinAndSelect('mission.client', 'client')
+    .leftJoinAndSelect('client.user', 'user')
+    .where(`user.id != :usersId`, { usersId: user.userId })
+    .getMany();
+}
+
+
+  
 
   findOne(id: number): Promise<Mission | null> {
     return this.missionRepository.findOne({ where: { id }, relations: ['client'] });
@@ -46,5 +82,33 @@ async remove(id: number): Promise<boolean> {
   const result = await this.missionRepository.delete(id);
   return (result.affected ?? 0) > 0;
 }
+   async getClientMissions(userId: number): Promise<Mission[]> {
+    return this.missionRepository.find({
+      where: { client: { id: userId } },
+      relations: ['client', ],
+      take: 2,
+    });
+  }
+
+ async getFreelancerMissions(userId: number): Promise<Mission[]> {
+
+  const freelancerProfile = await this.freelancerProfileRepository
+  .createQueryBuilder('profile')
+  .leftJoinAndSelect('profile.user', 'user')
+  .where('user.id = :freelancerId', { freelancerId: userId })
+  .getOne();
+  if (!freelancerProfile) {
+    return []; // or throw an error
+  }
+
+  return this.missionRepository.find({
+    where: {
+      selectedFreelancer: { id: freelancerProfile.id },
+    },
+    relations: ['client', 'selectedFreelancer'],
+    take: 2,
+  });
+}
+
 
 }

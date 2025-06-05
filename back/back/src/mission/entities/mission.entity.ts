@@ -13,6 +13,8 @@ import { ObjectType, Field, Int, GraphQLISODateTime, registerEnumType } from '@n
 import { FreelancerProfile } from 'src/freelancer-profile/entities/freelancer-profile.entity';
 import { GraphQLDate } from 'graphql-scalars';
 import { Dispute } from 'src/dispute/entities/dispute.entity';
+import { ClientProfile } from 'src/client-profile/entities/client-profile.entity';
+import { Application } from 'src/application/entities/application.entity';
 
 export enum PaymentStatus {
   PENDING = 'PENDING',
@@ -21,7 +23,7 @@ export enum PaymentStatus {
   REFUNDED = 'REFUNDED'
 }
 
-// Register the enum for GraphQL
+
 registerEnumType(PaymentStatus, {
   name: 'PaymentStatus',
   description: 'The status of payment for a mission',
@@ -54,9 +56,9 @@ export class Mission {
   @Column({ type: 'date' })
   date: string;
 
-  @Field(() => User)
-  @ManyToOne(() => User)
-  client: User;
+  @Field(() => ClientProfile)
+  @ManyToOne(() => ClientProfile)
+  client: ClientProfile;
 
   @Field(() => [String])
   @Column('simple-array')
@@ -104,6 +106,12 @@ export class Mission {
   @Field({ nullable: true })
   @Column({ nullable: true })
   paymentIntentId?: string;
+
+
+
+  @Field(() => [Application], { nullable: true })
+  @OneToMany(() => Application, application => application.mission)
+  applications?: Application[];
 
   @Field(() => PaymentStatus)
   @Column({

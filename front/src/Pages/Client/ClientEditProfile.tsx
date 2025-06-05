@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { MainLayout } from '../../components/layout/MainLayout'; // Ensure MainLayout is correctly imported
 import ClientProfile from '../../components/client/profile/ClientProfile';
-import { getClientProfile } from '../../services/userService';
+import { getClientMissions, getClientProfile, getClientReviews } from '../../services/userService';
 
 
 const ClientProfilePage: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isDarkMode, setIsDarkMode] = useState(false);
-
+  const [mission, setMission] = useState<any>(null);
   const handleSearch = (query: string) => {
     console.log("Search query:", query);
   };
@@ -15,6 +15,21 @@ const ClientProfilePage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  useEffect(() => {
+      const fetchMissions = async () => {
+        try {
+          const data = await getClientMissions();
+          setMission(data);
+        } catch (err) {
+          setError('Failed to load missions');
+        } finally {
+          setLoading(false);
+        }
+      };
+  
+      fetchMissions();
+  
+    }, []);
   useEffect(() => {
     const fetchProfile = async () => {
       try {
@@ -30,8 +45,25 @@ const ClientProfilePage: React.FC = () => {
     fetchProfile();
 
   }, []);
-              console.log("Profile data:", profile);
-
+  const [Reviews, setReviews] = useState<any>(null);
+    useEffect(() => {
+      const fetchReviews = async () => {
+        try {
+          const data = await getClientReviews();
+          setReviews(data);
+        } catch (err) {
+          setError('Failed to load reviews');
+        } finally {
+          setLoading(false);
+        }
+      };
+  
+      fetchReviews();
+  
+    }, []);
+if (!profile || !profile.user) {
+  return <div>Loading profile...</div>; 
+}
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>{error}</p>;
@@ -47,7 +79,7 @@ const ClientProfilePage: React.FC = () => {
       profileRole="Client"
     >
       {/* Pass darkMode state to the ClientProfile component */}
-      <ClientProfile profile= {profile} isEditable={true} darkMode={isDarkMode}  />
+      <ClientProfile reviews={Reviews} missions={mission} profile={profile} isEditable={true} darkMode={isDarkMode}  />
     </MainLayout>
   );
 };

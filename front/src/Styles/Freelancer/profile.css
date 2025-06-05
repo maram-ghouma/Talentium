@@ -2,7 +2,17 @@
 
 .profile-header {
   display: flex;
-  margin-bottom: var(--space-xl);
+}
+.profile-header-meta {
+  display: flex;
+  justify-content: center; /* center horizontally */
+  align-items: center;     /* center vertically (optional) */
+  flex-wrap: wrap;         /* allow items to wrap if needed */
+  overflow: hidden;        /* prevent overflow */
+  max-width: 100%;         /* keep it within its parent */
+  gap: 8px;                /* optional: spacing between items */
+  justify-self: center;
+  padding-bottom: 20px;
 }
 
 .profile-avatar {
@@ -17,16 +27,17 @@
 .profile-header-info {
   margin-left: var(--space-lg);
   flex: 1;
+  text-align: left;
 }
 
-.profile-name {
+.prof-name {
   font-size: var(--font-size-2xl);
   color: var(--navy-primary);
   margin-bottom: var(--space-xs);
 }
 
-.profile-title {
-  font-size: var(--font-size-lg);
+.prof-title {
+  font-size: var(--font-size-md)!;
   color: var(--slate);
   margin-bottom: var(--space-sm);
 }
