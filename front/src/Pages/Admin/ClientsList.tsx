@@ -46,8 +46,7 @@ const ClientsList = () => {
       toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
       onSearch={handleSearch}
       usertype='admin'
-      profileName = "Admin"
-      profileRole = ""
+      
     >
        <ClientTable  clients={clients} />
     </MainLayout>

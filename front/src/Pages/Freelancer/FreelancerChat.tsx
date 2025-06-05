@@ -20,8 +20,7 @@ const FreelancerChat: React.FC = () => {
       toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
       onSearch={handleSearch}
       usertype="freelancer"
-      profileName="Freelancer"
-      profileRole=""
+     
     >
     <Chat />
     </MainLayout>

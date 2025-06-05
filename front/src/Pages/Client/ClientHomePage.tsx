@@ -17,8 +17,7 @@ const ClientHome= () => {
       toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
       onSearch={handleSearch}
       usertype='client'
-      profileName = "Alex Morgan"
-      profileRole = "UI/UX Designer"
+   
     >
       <HomePage 
         isDarkMode={isDarkMode}

@@ -47,8 +47,7 @@ const FreelancersList = () => {
       toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
       onSearch={handleSearch}
       usertype='admin'
-      profileName = "Admin"
-      profileRole = ""
+      
     >
        <FreelancerTable  freelancers={freelancers} />
     </MainLayout>

@@ -80,3 +80,14 @@ export const getClientStats = async () => {
   const response = await api.get('/client-profile/stats');
   return response.data;
 };
+
+export const SwitchProfile = async (newRole) => {
+  const response = await api.patch('/auth/switch-role', { newRole });
+  if (newRole === 'freelancer') {
+    window.location.href = '/Freelancer/dashboard';
+  }
+  else if (newRole === 'client') {
+    window.location.href = '/Client';
+  }
+  return response.data;
+};

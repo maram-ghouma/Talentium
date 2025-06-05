@@ -20,8 +20,7 @@ const AdminDashboard = () => {
       toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
       onSearch={handleSearch}
       usertype='admin'
-      profileName = "Admin"
-      profileRole = ""
+    
     >
        <Stats  isDarkMode={isDarkMode} />
        <Rankings  isDarkMode={isDarkMode} />

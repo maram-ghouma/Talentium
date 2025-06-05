@@ -68,8 +68,7 @@ const ReportsInterface = () => {
       toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
       onSearch={handleSearch}
       usertype='admin'
-      profileName = "Admin"
-      profileRole = ""
+    
     >
         <div className="reports-container">
       <ReportsHeader 

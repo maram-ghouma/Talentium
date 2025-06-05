@@ -53,8 +53,7 @@ const FreelancerHistory: React.FC<HistoryProps> = ({ historyItems }) => {
         toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
         onSearch={handleSearch}
         usertype="freelancer"
-        profileName="Freelancer"
-        profileRole=""
+
       >
     <History historyItems={historyItems} />
   </MainLayout>

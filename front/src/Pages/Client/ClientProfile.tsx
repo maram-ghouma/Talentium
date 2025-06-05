@@ -89,8 +89,7 @@ const ClientProfilePage: React.FC = () => {
       toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
       onSearch={handleSearch}
       usertype="client"
-      profileName={profile.user.username}
-      profileRole="Client"
+    
     >
       {/* Pass darkMode state to the ClientProfile component */}
       <ClientProfile stats={Stats} reviews={Reviews} missions={mission} profile={profile} darkMode={isDarkMode} />

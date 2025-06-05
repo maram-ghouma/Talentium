@@ -20,8 +20,7 @@ const FreelancerDashboard = () => {
       toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
       onSearch={handleSearch}
       usertype="freelancer"
-      profileName="Freelancer"
-      profileRole=""
+  
     >
        <FreelancerHomePage 
                 freelancerName="John Doe" 
