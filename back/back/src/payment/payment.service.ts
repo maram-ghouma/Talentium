@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, IsNull } from 'typeorm';
 import Stripe from 'stripe';
 import { Mission, PaymentStatus } from '../mission/entities/mission.entity';
 import { User } from '../user/entities/user.entity';
@@ -39,7 +39,7 @@ export class PaymentService {
     if (!mission.selectedFreelancer) {
       throw new Error('Aucun freelancer sélectionné pour cette mission');
     }
-
+    console.log(`Création du paiement pour la mission ${missionId} par le client ${clientId} et avec ${mission.selectedFreelancer.id} en tant que freelancer sélectionné`);
     try {
       const paymentIntent = await this.stripe.paymentIntents.create({
         amount: mission.price * 100, // Convert to cents
@@ -188,10 +188,29 @@ export class PaymentService {
   }
 
   async getMissionsByPaymentStatus(status: PaymentStatus): Promise<Mission[]> {
-    return await this.missionRepository.find({
-      where: { paymentStatus: status },
+    console.log(`Récupération des missions avec le statut de paiement: ${status}`);
+    
+    // Handle the case where we want to get missions with null/undefined paymentStatus
+    // This is useful for missions that haven't been assigned a payment status yet
+    let whereCondition: any;
+    
+    if (status === PaymentStatus.PENDING) {
+      // Get missions that are either explicitly PENDING or have null paymentStatus
+      whereCondition = [
+        { paymentStatus: PaymentStatus.PENDING },
+        { paymentStatus: IsNull() }
+      ];
+    } else {
+      whereCondition = { paymentStatus: status };
+    }
+
+    const missions = await this.missionRepository.find({
+      where: whereCondition,
       relations: ['client', 'selectedFreelancer', 'selectedFreelancer.user']
     });
+    
+    console.log(`Missions trouvées: ${JSON.stringify(missions, null, 2)}`);
+    return missions;
   }
 
   async getPaymentHistory(missionId: number): Promise<Invoice[]> {
