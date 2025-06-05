@@ -7,7 +7,7 @@ import { FreelancerProfile } from './entities/freelancer-profile.entity';
 
 import { UpdateFreelancerProfileDto } from './dto/update-freelancer-profile.dto';
 
-import { NotFoundException } from '@nestjs/common';
+
 @Injectable()
 export class FreelancerProfileService {
   constructor(

@@ -10,6 +10,6 @@ import { User } from 'src/user/entities/user.entity';
   imports: [TypeOrmModule.forFeature([FreelancerProfile,User])], 
   controllers: [FreelancerProfileController],
   providers: [FreelancerProfileService],
-  exports: [FreelancerProfileService], 
+  exports: [FreelancerProfileService,TypeOrmModule], 
 })
 export class FreelancerProfileModule {}
