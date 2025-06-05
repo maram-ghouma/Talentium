@@ -1,7 +1,7 @@
 
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import * as fs from 'fs';
 import * as path from 'path';
 import { Application, ApplicationStatus } from './entities/application.entity';
@@ -212,4 +212,27 @@ async findMineByMission(missionId: string, user: any): Promise<Application[]> {
 
     return application;
   }
+
+  async getFreelancersByClient(userId: string): Promise<FreelancerProfile[]> {
+  const missions = await this.missionRepository.find({
+    where: { client: { user: { id: +userId } } },
+    relations: ['client', 'client.user'],
+  });
+
+  if (!missions.length) return [];
+
+  const missionIds = missions.map(m => m.id);
+
+  const applications = await this.applicationRepository.find({
+    where: { mission: { id: In(missionIds) } },
+    relations: ['freelancer', 'freelancer.user'], 
+  });
+
+  const freelancers = applications.map(app => app.freelancer);
+
+  const uniqueFreelancers = Array.from(new Map(freelancers.map(f => [f.id, f])).values());
+
+  return uniqueFreelancers;
+}
+
 }

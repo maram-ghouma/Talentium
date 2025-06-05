@@ -26,14 +26,12 @@ const NewInterviewForm: React.FC<NewInterviewFormProps> = ({ onSubmit }) => {
       remindMe,
     });
 
-    // Reset form
     setCandidateName('');
     setTopic('');
     setScheduledDateTime('');
     setRemindMe(true);
   };
 
-  // Get current date-time in ISO format for the min attribute of datetime-local
   const now = new Date();
   const localDateTime = now.toISOString().slice(0, 16);
 
