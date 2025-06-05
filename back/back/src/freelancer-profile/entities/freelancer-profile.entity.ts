@@ -49,9 +49,12 @@ export class FreelancerProfile {
   @OneToMany(() => Mission, (mission) => mission.selectedFreelancer)
   selectedMissions: Mission[];
 
+
   @Field(() => [Application], { nullable: true })
 @OneToMany(() => Application, application => application.freelancer)
 applications?: Application[];
+
+ 
   
 
   @Field({ nullable: true })

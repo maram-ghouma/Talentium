@@ -24,6 +24,7 @@ export enum PaymentStatus {
 }
 
 
+
 registerEnumType(PaymentStatus, {
   name: 'PaymentStatus',
   description: 'The status of payment for a mission',
@@ -120,7 +121,11 @@ export class Mission {
     default: PaymentStatus.PENDING
   })
   paymentStatus: PaymentStatus;
+
+
+
 }
+
 
 @ObjectType()
 class TaskStats {
