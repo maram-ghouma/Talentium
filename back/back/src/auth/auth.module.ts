@@ -8,6 +8,7 @@ import { JwtStrategy } from './strategies/jwt.strategy';
 import { UserModule } from 'src/user/user.module';
 import { ClientProfileModule } from 'src/client-profile/client-profile.module';
 import { FreelancerProfileModule } from 'src/freelancer-profile/freelancer-profile.module';
+import { PaymentModule } from 'src/payment/payment.module';
 
 @Module({
   imports: [ 
@@ -19,6 +20,7 @@ import { FreelancerProfileModule } from 'src/freelancer-profile/freelancer-profi
     UserModule,
     ClientProfileModule,
     FreelancerProfileModule,
+    PaymentModule
   ],
   providers: [AuthService, JwtStrategy],
   controllers: [AuthController],

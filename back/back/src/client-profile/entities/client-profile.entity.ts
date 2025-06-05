@@ -34,4 +34,8 @@ export class ClientProfile {
   @Field(() => [Interview], { nullable: true })
   @OneToMany(() => Interview, (interview) =>interview.client)
   interviews: Interview[];
+  
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  stripeAccountId: string;
 }

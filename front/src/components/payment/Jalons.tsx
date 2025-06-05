@@ -17,7 +17,7 @@ const Jalons = () => {
         const fetchMissions = async () => {
           try {
             setLoading(true);
-            const data = await paymentService.getMissionsByPaymentStatus('PENDING');
+            const data = await paymentService.getMissionsByPaymentStatus('ESCROWED');
             setMissions(data);
           } catch (err) {
             console.error('Error loading missions:', err);
@@ -41,51 +41,6 @@ const Jalons = () => {
           <p>Gestion des paiements en escrow pour vos missions</p>
         </div>
 
-        {/*<div className="tab-container">
-          <div className="tab-wrapper">
-            <div className="tab-buttons">
-              <button
-                onClick={() => setCurrentView('create')}
-                className={`tab-button ${currentView === 'create' ? 'active tab-create' : ''}`}
-              >
-                Créer Paiement
-              </button>
-              <button
-                onClick={() => setCurrentView('confirm')}
-                className={`tab-button ${currentView === 'confirm' ? 'active tab-confirm' : ''}`}
-              >
-                Confirmer Paiement
-              </button>
-              <button
-                onClick={() => setCurrentView('milestones')}
-                className={`tab-button ${currentView === 'milestones' ? 'active tab-milestones' : ''}`}
-              >
-                Jalons
-              </button>
-            </div>
-          </div>
-        </div>*/}
-
-       {/*} {currentView === 'create' && (
-          <CreatePaymentView 
-            missions={missions.filter(m => m.paymentStatus === 'PENDING')}
-            apiCall={apiCall}
-          />
-        )}
-        
-        {currentView === 'confirm' && (
-          <PaymentConfirmationView 
-            missions={missions.filter(m => m.paymentStatus === 'PENDING')}
-            apiCall={apiCall}
-          />
-        )}
-
-        {currentView === 'milestones' && (
-          <MilestoneView 
-            missions={missions.filter(m => m.paymentStatus === 'ESCROWED')}
-            apiCall={apiCall}
-          />
-        )}*/}
          <MilestoneView 
             missions={missions.filter(m => m.paymentStatus === 'ESCROWED')}
             

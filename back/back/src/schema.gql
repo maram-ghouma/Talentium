@@ -17,9 +17,9 @@ type Application {
 
 enum ApplicationStatus {
   PENDING
+  PRE_SELECTED
   ACCEPTED
   REJECTED
-  WITHDRAWN
 }
 
 """
@@ -63,6 +63,7 @@ type ClientProfile {
   id: ID!
   user: User!
   phoneNumber: String!
+  stripeAccountId: String
 }
 
 type Mission {
@@ -162,6 +163,8 @@ type Query {
   missions: [Mission!]!
   allMissions: [Mission!]!
   mission(id: Int!): Mission!
+  getMissionsByPaymentStatus(status: PaymentStatus!): [Mission!]!
+  getPaymentHistory(missionId: Int!): [Invoice!]!
   applications: [Application!]!
   applicationsByMission(missionId: String!): [Application!]!
   myApplicationsByMission(missionId: String!): [Application!]!
