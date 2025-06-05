@@ -34,11 +34,12 @@ async findByUserId(userId: number): Promise<FreelancerProfile> {
   return profile;
 }
 
-async createProfileForUser(user: User,clientData: { phoneNumber?: string; country?: string }) {
+async createProfileForUser(user: User, clientData: { phoneNumber?: string; country?: string; stripeAccountId: string }) {
   const profile = this.freelancerProfileRepository.create({
     user: user,
     phoneNumber: clientData.phoneNumber ?? undefined,
     country: clientData.country ?? undefined,
+    stripeAccountId: clientData.stripeAccountId,
   });
 
   return this.freelancerProfileRepository.save(profile);

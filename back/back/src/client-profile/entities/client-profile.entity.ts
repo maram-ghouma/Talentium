@@ -29,4 +29,8 @@ export class ClientProfile {
 
   @Column({ nullable: true })
   industry: string;
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  stripeAccountId: string;
 }
