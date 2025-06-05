@@ -1,35 +1,37 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import MilestoneView from './MilestoneView';
 import { CreditCard, Shield, CheckCircle } from 'lucide-react';
 import './PaymentForm.css';
+import { paymentService } from '../../services/paymentService';
+import {  MissionLight } from '../../types';
 
-// Mock API function
-const apiCall = async (endpoint, data) => {
-  await new Promise(resolve => setTimeout(resolve, 1000));
-  console.log(`API Call to ${endpoint}:`, data);
-  return { success: true, data };
-};
+
 
 const Jalons = () => {
-  const [currentView, setCurrentView] = useState('create');
-  const [missions] = useState([
-    {
-      id: 1,
-      title: "Développement Site Web E-commerce",
-      price: 2500,
-      client: { name: "Marie Dubois" },
-      selectedFreelancer: { name: "Jean Developer" },
-      paymentStatus: "PENDING"
-    },
-    {
-      id: 2,
-      title: "Design Application Mobile",
-      price: 1800,
-      client: { name: "Pierre Martin" },
-      selectedFreelancer: { name: "Sophie Designer" },
-      paymentStatus: "ESCROWED"
-    }
-  ]);
+  
+    const [missions, setMissions] = useState<MissionLight[]>([]);
+      const [loading, setLoading] = useState(true);
+      const [error, setError] = useState<string | null>(null);
+    
+      useEffect(() => {
+        const fetchMissions = async () => {
+          try {
+            setLoading(true);
+            const data = await paymentService.getMissionsByPaymentStatus('PENDING');
+            setMissions(data);
+          } catch (err) {
+            console.error('Error loading missions:', err);
+            setError('Error loading missions');
+          } finally {
+            setLoading(false);
+          }
+        };
+    
+        fetchMissions();
+      }, []);
+
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error loading missions</p>;
 
   return (
     <div className="payment-interface">
@@ -86,7 +88,7 @@ const Jalons = () => {
         )}*/}
          <MilestoneView 
             missions={missions.filter(m => m.paymentStatus === 'ESCROWED')}
-            apiCall={apiCall}
+            
           />
 
         <div className="features-grid">

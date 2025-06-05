@@ -2,7 +2,6 @@ import '../../Styles/Freelancer/home.css';
 import FreelancerHomePage from './FreelancerHomePage';
 import { MainLayout } from '../../components/layout/MainLayout';
 import { useState } from 'react';
-import { missions } from '../../Data/mockData';
 
 const FreelancerDashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -11,7 +10,7 @@ const FreelancerDashboard = () => {
   const handleSearch = (query: string) => {
     console.log('Search query:', query);
   };
-
+const missions = [];// Mock data for missions, replace with actual data fetching logic
   return (
     <MainLayout
       isDarkMode={isDarkMode}

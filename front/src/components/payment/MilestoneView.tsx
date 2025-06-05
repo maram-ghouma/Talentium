@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { CheckCircle, Clock, Shield, XCircle } from 'lucide-react';
 import './PaymentForm.css';
+import { paymentService } from '../../services/paymentService';
+import { MissionLight } from '../../types';
 
 const statusColors = {
   PENDING: { className: 'status-pending' },
@@ -16,41 +18,48 @@ const statusIcons = {
   REFUNDED: <XCircle className="icon" />
 };
 
-const MilestoneView = ({ missions, apiCall }) => {
+
+
+const MilestoneView = ({ missions }: { missions: MissionLight[]; }) => {
   const [loading, setLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
 
-  const handleMilestoneRelease = async (missionId, percentage) => {
+  const handleMilestoneRelease = async (missionId: number, percentage: number) => {
     setLoading(true);
     try {
-      const response = await apiCall('/api/payment/release-milestone', {
-        missionId,
-        milestonePercentage: percentage
-      });
+      const response = await paymentService.releaseMilestonePayment(missionId, percentage);
       
-      setSuccessMessage(`${percentage}% du paiement libéré avec succès!`);
-      setTimeout(() => setSuccessMessage(''), 3000);
+      if (response.success) {
+        setSuccessMessage(`${percentage}% du paiement libéré avec succès!`);
+        setTimeout(() => setSuccessMessage(''), 3000);
+      }
     } catch (error) {
       console.error('Erreur libération jalon:', error);
+      setSuccessMessage('Erreur lors de la libération du paiement');
+      setTimeout(() => setSuccessMessage(''), 3000);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleRefund = async (missionId) => {
+  const handleRefund = async (missionId: number) => {
     if (!window.confirm('Êtes-vous sûr de vouloir rembourser cette mission?')) return;
     
     setLoading(true);
     try {
-      await apiCall('/api/payment/refund', {
+      const response = await paymentService.refundPayment(
         missionId,
-        reason: 'Demande de remboursement client'
-      });
-      
-      setSuccessMessage('Remboursement traité avec succès!');
-      setTimeout(() => setSuccessMessage(''), 3000);
+        'Demande de remboursement client'
+      );
+
+      if (response.success) {
+        setSuccessMessage('Remboursement traité avec succès!');
+        setTimeout(() => setSuccessMessage(''), 3000);
+      }
     } catch (error) {
       console.error('Erreur remboursement:', error);
+      setSuccessMessage('Erreur lors du remboursement');
+      setTimeout(() => setSuccessMessage(''), 3000);
     } finally {
       setLoading(false);
     }
@@ -75,9 +84,9 @@ const MilestoneView = ({ missions, apiCall }) => {
           <div key={mission.id} className="mission-card" style={{height: 'auto'}}>
             <div className="mission-header">
               <h3 className="mission-title">{mission.title}</h3>
-              <div className={`status-badge ${statusColors[mission.paymentStatus].className}`}>
-                {statusIcons[mission.paymentStatus]}
-                <span>{mission.paymentStatus}</span>
+              <div className={`status-badge ${(statusColors[mission.paymentStatus as keyof typeof statusColors] || statusColors.PENDING).className}`}>
+                {statusIcons[mission.paymentStatus as keyof typeof statusIcons] || statusIcons.PENDING}
+                <span>{mission.paymentStatus || 'PENDING'}</span>
               </div>
             </div>
 
@@ -88,7 +97,7 @@ const MilestoneView = ({ missions, apiCall }) => {
               </div>
               <div className="mission-detail">
                 <span className="detail-label">Freelancer:</span>
-                <span>{mission.selectedFreelancer.name}</span>
+                <span>{mission.selectedFreelancer?.name}</span>
               </div>
             </div>
 

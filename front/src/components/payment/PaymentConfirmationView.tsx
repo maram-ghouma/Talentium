@@ -1,21 +1,37 @@
-import React, { useState } from 'react';
+import React, { use, useEffect, useState } from 'react';
 import { CheckCircle, AlertCircle } from 'lucide-react';
 import './PaymentForm.css';
+import { MissionLight } from '../../types';
+import { paymentService } from '../../services/paymentService';
+import { getClientName, getUser } from '../../services/userService';
 
 type PaymentStatus = { type: 'success' | 'error'; message: string } | null;
 
-type Mission = {
-  id: number;
-  title: string;
-  price: number;
-  client: { name: string; id?: number };
-  selectedFreelancer: { name: string };
-  paymentStatus: string;
-};
-
-const PaymentConfirmationView = ({ missions, apiCall }: { missions: Mission[]; apiCall: any }) => {
-  const [selectedMission, setSelectedMission] = useState<Mission | null>(null);
+const PaymentConfirmationView = ({ missions }: { missions: MissionLight[]; }) => {
+  const [selectedMission, setSelectedMission] = useState<MissionLight | null>(null);
   const [loading, setLoading] = useState(false);
+  const [clientId, setClientId] = useState<number | null>(null);
+  const [companyName, setCompanyName] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchCompanyName = async () => {
+      const name = await getClientName();
+      setCompanyName(name);
+    };
+
+    fetchCompanyName();
+  }
+  , []);
+
+  useEffect(() => {
+    const fetchClientId = async () => {
+      const id = await getUser().then(user => user.id);
+      setClientId(id);
+    };
+
+    fetchClientId();
+  }, []);
+
   const [paymentStatus, setPaymentStatus] = useState<PaymentStatus>(null);
   const [cardDetails, setCardDetails] = useState({
     number: '',
@@ -24,14 +40,14 @@ const PaymentConfirmationView = ({ missions, apiCall }: { missions: Mission[]; a
     name: ''
   });
 
-  const handleCardInputChange = (field, value) => {
+  const handleCardInputChange = (field: string, value: string) => {
     setCardDetails(prev => ({
       ...prev,
       [field]: value
     }));
   };
 
-  const handleSubmit = async (event) => {
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     
     if (!selectedMission) return;
@@ -39,16 +55,17 @@ const PaymentConfirmationView = ({ missions, apiCall }: { missions: Mission[]; a
     setLoading(true);
     
     try {
-      const escrowResponse = await apiCall('/api/payment/create-escrow', {
-        missionId: selectedMission.id,
-        clientId: selectedMission.client.id
-      });
-      
+      const escrowResponse = await paymentService.createEscrowPayment(
+        Number(selectedMission.id),
+        Number(clientId)
+      );
+
+      // Simulate processing time
       await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      setPaymentStatus({ 
-        type: 'success', 
-        message: 'Paiement autorisé et mis en escrow avec succès!' 
+
+      setPaymentStatus({
+        type: 'success',
+        message: 'Paiement autorisé et mis en escrow avec succès!'
       });
       
     } catch (error) {
@@ -80,7 +97,7 @@ const PaymentConfirmationView = ({ missions, apiCall }: { missions: Mission[]; a
               >
                 <div className="mission-info">
                   <h4>{mission.title}</h4>
-                  <p>Client: {mission.client.name}</p>
+                  <p>Client: {companyName}</p>
                 </div>
                 <span className="mission-price">{mission.price}€</span>
               </div>

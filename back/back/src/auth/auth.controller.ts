@@ -5,11 +5,13 @@ import { CreateUserDto } from '../user/dto/create-user.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { CurrentUser } from './decorators/current-user.decorator';
 import { UserService } from 'src/user/user.service';
+import { ClientProfileService } from 'src/client-profile/client-profile.service';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService ,
-    private readonly userService: UserService
+    private readonly userService: UserService,
+    private readonly clientService: ClientProfileService
   ) {}
 
   @Post('register')
@@ -34,6 +36,13 @@ export class AuthController {
       person.imageUrl = person.imageUrl ? `${baseUrl}${person.imageUrl}` : '';
 
       return person;
+    }
+    @UseGuards(AuthGuard('jwt'))
+    @Get('getClientName')
+    async getClientName(@CurrentUser() user: any) {
+      
+      const clientProfile = await this.clientService.findByUserId(user.userId);
+      return clientProfile ? clientProfile.companyName : 'Client not found';
     }
 
 }

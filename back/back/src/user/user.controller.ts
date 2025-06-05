@@ -5,10 +5,13 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
 import { AuthGuard } from '@nestjs/passport';
 import { User } from './entities/user.entity';
+import { ClientProfileService } from 'src/client-profile/client-profile.service';
 
 @Controller('user')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(private readonly userService: UserService,
+    private readonly ClientService: ClientProfileService
+  ) {}
 
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
@@ -35,5 +38,15 @@ export class UserController {
     return this.userService.remove(+id);
   }
 
+  
+  
+
+   @UseGuards(AuthGuard('jwt'))
+    @Get('getClientName')
+    async getClientName(@CurrentUser() user: any) {
+      console.log('User passed to getClientName:', user);
+      const clientProfile = await this.ClientService.findByUserId(user.userId);
+      return clientProfile ? clientProfile.companyName : 'Client not found';
+    }
   
 }
