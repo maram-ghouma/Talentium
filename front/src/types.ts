@@ -168,9 +168,10 @@ export interface ClientProfileType {
   bio?: string;
   user: User;
 }
+
 export interface FreelancerProfileType {
   id: number;
-  skills: string[];
+  skills?: string[];
   hourlyRate?: number;
   phoneNumber?: string;
   country?: string;
@@ -202,4 +203,13 @@ export interface FreelancerProfileType {
   phone: string;
   linkedin: string;
   avatar: string;
+}
+export interface Review {
+  id: string;
+  reviewer: User;
+  reviewee: User;
+  stars: number;
+  comment: string;
+  date: string;
+  
 }

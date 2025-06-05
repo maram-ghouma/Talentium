@@ -1,13 +1,14 @@
-// freelancer-profile/freelancer-profile.entity.ts
-import { Field, ID, ObjectType } from '@nestjs/graphql';
+
 import { Application } from 'src/application/entities/application.entity';
+import { ObjectType, Field, Int, Float } from '@nestjs/graphql';
 import { Mission } from 'src/mission/entities/mission.entity';
 import { User } from 'src/user/entities/user.entity';
 import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn, OneToMany } from 'typeorm';
+
 @ObjectType()
 @Entity()
 export class FreelancerProfile {
-  @Field(()=>ID)
+  @Field(() => Int)
   @PrimaryGeneratedColumn()
   id: number;
   @Field(()=>User)
@@ -15,23 +16,27 @@ export class FreelancerProfile {
   @JoinColumn()
   user: User;
 
-@Field(() => [String], { nullable: true })
-@Column('simple-array', { nullable: true })
-skills: string[];
+  @Field(() => [String], { nullable: true })
+  @Column('simple-array', { nullable: true })
+  skills: string[];
 
-
+  @Field()
   @Column()
   phoneNumber: string;
 
+  @Field()
   @Column()
-  country : string;
+  country: string;
 
-   @Column({ nullable: true })
+  @Field({ nullable: true })
+  @Column({ nullable: true })
   linkedIn: string;
 
-   @Column({ nullable: true })
+  @Field({ nullable: true })
+  @Column({ nullable: true })
   github: string;
 
+  @Field(() => Float, { nullable: true })
   @Column({ nullable: true })
   hourlyRate: number;
 
@@ -39,16 +44,19 @@ skills: string[];
   @Column({ nullable: true })
   bio: string;
 
-  @Field(()=>[Mission])
+  @Field(() => [Mission], { nullable: true })
   @OneToMany(() => Mission, (mission) => mission.selectedFreelancer)
   selectedMissions: Mission[];
+
 
   @Field(() => [Application], { nullable: true })
   @OneToMany(() => Application, application => application.freelancer)
   applications?: Application[];
 
-   @Column({ nullable: true })
-   
-  stripeAccountId: string; 
+ 
+  
 
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  stripeAccountId: string;
 }

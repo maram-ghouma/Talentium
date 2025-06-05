@@ -5,11 +5,14 @@ import { Mission } from 'src/mission/entities/mission.entity';
 import { User } from 'src/user/entities/user.entity';
 import { PaymentService } from './payment.service';
 import { Invoice } from 'src/invoice/entities/invoice.entity';
+import { PaymentResolver } from './payment.resolver';
+import { FreelancerProfile } from 'src/freelancer-profile/entities/freelancer-profile.entity';
 
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Mission, User, Dispute,Invoice])],
-    providers: [PaymentService],
+  imports: [TypeOrmModule.forFeature([Mission, User, Dispute,Invoice,FreelancerProfile])],
+    providers: [PaymentService, PaymentResolver],
+  exports: [PaymentService, PaymentResolver],
   
 })
 export class PaymentModule {}
