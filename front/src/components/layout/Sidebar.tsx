@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import '../../Styles/sidebar.css';
 import { report } from 'process';
+import { signOut } from '../../services/userService';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -39,6 +40,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 }) => {
   // Admin menu items
   const ClientMenuItems = [
+    { icon: User, label: 'Profile', path: "/client/editProfile" },
     { icon: Bell, label: 'Notifications', badge: 3, path: "" },
     { icon: CalendarCheck, label: 'Schedule', path: "" },
     { icon: MessageSquare, label: 'Chat', badge: 2 , path: ""},
@@ -54,7 +56,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   ];
   const FreelancerMenuItems = [
-    { icon: User, label: 'Profile', path: "/Freelancer/profile" },
+    { icon: User, label: 'Profile', path: "/Freelancer/editProfile" },
     { icon: Bell, label: 'Notifications', badge: 3, path: "/Freelancer" },
     { icon: MessageSquare, label: 'Chat', badge: 2, path: "/Freelancer/chat" },
     { icon: History, label: 'Work History', path: "/Freelancer/history" },
@@ -166,7 +168,7 @@ const toggleUserDropdown = () => setUserDropdownOpen(prev => !prev);
         {/* Admin specific footer items */}
         {userType === 'admin' && (
           <>
-            <button key="sign-out" className="sidebar-button">
+            <button key="sign-out" className="sidebar-button" onClick={signOut}>
               <div className="icon-container">
                 <LogOut size={20} />
               </div>
@@ -184,7 +186,7 @@ const toggleUserDropdown = () => setUserDropdownOpen(prev => !prev);
             </div>
             {isOpen && <span className="button-label">Switch Profile</span>}
           </button>
-          <button key="sign-out" className="sidebar-button">
+          <button key="sign-out" className="sidebar-button" onClick={signOut}>
           <div className="icon-container">
             <LogOut size={20} />
           </div>

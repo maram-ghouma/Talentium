@@ -33,43 +33,42 @@ interface ProfileProps {
       fetchProfile();
   
     }, []);
+    const [Reviews, setReviews] = useState<any>(null);
+      useEffect(() => {
+        const fetchReviews = async () => {
+          try {
+            const data = await getFreelancerReviews();
+            setReviews(data);
+          } catch (err) {
+            setError('Failed to load reviews');
+          } finally {
+            setLoading(false);
+          }
+        };
     
+        fetchReviews();
+    
+      }, []);
 
     const handleSearch = (query: string) => {
       console.log('Search query:', query);
     };
+   useEffect(() => {
+      const fetchMissions = async () => {
+        try {
+          const data = await getFreelancerMissions();
+          setMission(data);
+        } catch (err) {
+          setError('Failed to load missions');
+        } finally {
+          setLoading(false);
+        }
+      };
   
-  useEffect(() => {
-    const fetchMissions = async () => {
-      try {
-        const data = await getFreelancerMissions();
-        setMission(data);
-      } catch (err) {
-        setError('Failed to load missions');
-      } finally {
-        setLoading(false);
-      }
-    };
+      fetchMissions();
+  
+    }, []);
 
-    fetchMissions();
-
-  }, []);
-  const [Reviews, setReviews] = useState<any>(null);
-  useEffect(() => {
-    const fetchReviews = async () => {
-      try {
-        const data = await getFreelancerReviews();
-        setReviews(data);
-      } catch (err) {
-        setError('Failed to load reviews');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchReviews();
-
-  }, []);
 
 
 
@@ -84,12 +83,10 @@ interface ProfileProps {
          profileName="Freelancer"
          profileRole=""
        >
-        <Profile reviews={Reviews} missions={mission} profile={profile} isEditable={false} />
+        <Profile reviews={Reviews} missions={mission} profile={profile} isEditable={true} />
 
     </MainLayout>
   );
 };
 
 export default FreelancerProfile;
-
-

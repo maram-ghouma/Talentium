@@ -90,7 +90,7 @@ const SignInForm: React.FC = () => {
 
         <div className="sign-up-prompt">
           <p>
-            Don't have an account? <a href="#">Sign Up</a>
+            Don't have an account? <a href="/signup">Sign Up</a>
           </p>
         </div>
       </form>
