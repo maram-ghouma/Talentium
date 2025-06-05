@@ -26,7 +26,7 @@ export class User {
   @Column({ default: false })
   isAdmin: boolean;
   
-  @Field()
+  @Field({ nullable: true })
   @Column({ nullable: true })
   imageUrl: string;
 

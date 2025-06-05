@@ -1,8 +1,8 @@
 
-import { Resolver, Query, Mutation, Args, Context } from '@nestjs/graphql';
+import { Resolver, Query, Mutation, Args, Context, ID } from '@nestjs/graphql';
 import { UseGuards, UseInterceptors, UploadedFile } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { Application } from './entities/application.entity';
+import { Application, ApplicationStatus } from './entities/application.entity';
 import { ApplicationService } from './application.service';
 import { CreateApplicationInput } from './dto/create-application.input';
 import { GqlCurrentUser } from 'src/auth/decorators/gql-current-user.decorator';
@@ -31,6 +31,11 @@ export class ApplicationResolver {
   findByMission(@Args('missionId') missionId: string): Promise<Application[]> {
     return this.applicationService.findByMission(missionId);
   }
+  @Query(() => [Application], { name: 'myApplicationsByMission' })
+  @UseGuards(GqlAuthGuard)
+  findMineByMission(@Args('missionId') missionId: string,@GqlCurrentUser() user:any): Promise<Application[]> {
+    return this.applicationService.findMineByMission(missionId,user);
+  }
 
   @Query(() => [Application], { name: 'applicationsByFreelancer' })
 @UseGuards(GqlAuthGuard)
@@ -57,5 +62,12 @@ export class ApplicationResolver {
   @UseGuards(GqlAuthGuard)
   removeApplication(@Args('id') id: string): Promise<boolean> {
     return this.applicationService.remove(id);
+  }
+  @Mutation(() => Application)
+  async updateApplicationStatus(
+    @Args('applicationId', { type: () => ID }) applicationId: string,
+    @Args('newStatus', { type: () => ApplicationStatus }) newStatus: ApplicationStatus,
+  ): Promise<Application> {
+    return this.applicationService.updateApplicationStatus(applicationId, newStatus);
   }
 }

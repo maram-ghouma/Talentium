@@ -22,6 +22,19 @@
       
       priority?: 'Low' | 'Medium' | 'High';
       progress?: number;
+      selectedFreelancer?:{
+        id: string;
+        user:{
+          name:string;
+          imageUrl:string;
+        }
+        skills
+        bio
+        selectedMissions: {
+          id: string;
+        }[];
+        
+      }
       tasks: {
         total: number;
         completed: number;
@@ -31,6 +44,7 @@
     export type MissionStatus = 'not_assigned' | 'in_progress' | 'assigned' | 'completed';
     
    
+
   export type MissionLight = {
   id: number;
   title: string;
@@ -42,6 +56,14 @@
   clientId?: number;
   clientName?: string;
 };
+
+
+  export enum ApplicationStatus {
+  PENDING = 'pending',
+  PRE_SELECTED = 'pre-selected',
+  ACCEPTED = 'accepted',
+  REJECTED = 'rejected'
+}
 
     export interface Notification {
       id: string;

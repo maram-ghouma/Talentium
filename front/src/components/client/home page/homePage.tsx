@@ -100,8 +100,9 @@ const [showModify, setShowModify] = useState(false);
         mission={{
           id: selectedMission.id,
           price:selectedMission.price,
+          selectedFreelancer: selectedMission.selectedFreelancer,
           clientId: '1',
-          clientName:'john Client',
+          clientName:'john Client',////////////////////////////////////////////////////////////////////
           tasks: {
         total: 2,
         completed: 0

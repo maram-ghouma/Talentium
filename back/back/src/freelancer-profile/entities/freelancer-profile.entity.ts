@@ -11,8 +11,7 @@ export class FreelancerProfile {
   @Field(() => Int)
   @PrimaryGeneratedColumn()
   id: number;
-
-  @Field(() => User)
+  @Field(()=>User)
   @OneToOne(() => User)
   @JoinColumn()
   user: User;
@@ -41,7 +40,7 @@ export class FreelancerProfile {
   @Column({ nullable: true })
   hourlyRate: number;
 
-  @Field({ nullable: true })
+  @Field({nullable: true})
   @Column({ nullable: true })
   bio: string;
 
@@ -51,8 +50,8 @@ export class FreelancerProfile {
 
 
   @Field(() => [Application], { nullable: true })
-@OneToMany(() => Application, application => application.freelancer)
-applications?: Application[];
+  @OneToMany(() => Application, application => application.freelancer)
+  applications?: Application[];
 
  
   
