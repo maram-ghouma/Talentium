@@ -83,11 +83,21 @@ async remove(id: number): Promise<boolean> {
   return (result.affected ?? 0) > 0;
 }
    async getClientMissions(userId: number): Promise<Mission[]> {
-    return this.missionRepository.find({
-      where: { client: { id: userId } },
-      relations: ['client', ],
-      take: 2,
-    });
+      const clientProfile = await this.clientProfileRepository
+      .createQueryBuilder('profile')
+      .leftJoinAndSelect('profile.user', 'user')
+      .where('user.id = :clientId', { clientId: userId })
+      .getOne();
+      console.log(clientProfile);
+
+      if (!clientProfile) {
+        return []; 
+      }
+      return this.missionRepository.find({
+        where: { client: { id: clientProfile.id } },
+        relations: ['client'],
+        take: 2,
+      });
   }
 
  async getFreelancerMissions(userId: number): Promise<Mission[]> {
@@ -98,7 +108,7 @@ async remove(id: number): Promise<boolean> {
   .where('user.id = :freelancerId', { freelancerId: userId })
   .getOne();
   if (!freelancerProfile) {
-    return []; // or throw an error
+    return []; 
   }
 
   return this.missionRepository.find({
@@ -109,6 +119,7 @@ async remove(id: number): Promise<boolean> {
     take: 2,
   });
 }
+
 
 
 }

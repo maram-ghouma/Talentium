@@ -33,8 +33,9 @@ async getReviewsClient(userId: number): Promise<Review[]> {
     .leftJoinAndSelect('review.reviewer', 'reviewer')
     .leftJoinAndSelect('review.mission', 'mission')
     .leftJoinAndSelect('mission.client', 'client')
-    .where('reviewedUser.id = :userId', { userId })
-    .andWhere('mission.client.id = :userId', { userId })
+    .leftJoinAndSelect('client.user', 'clientUser')
+    .where('clientUser.id = :userId', { userId })
+    .andWhere('reviewedUser.id = :userId', { userId })
     .orderBy('review.date', 'DESC')
     .limit(3)
     .getMany(); 

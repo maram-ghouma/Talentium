@@ -52,5 +52,10 @@ profile.user.imageUrl = profile.user.imageUrl ? `${baseUrl}${profile.user.imageU
       imageUrl: imagePath, 
     });
   }
+    @UseGuards(AuthGuard('jwt'))
+    @Get('stats')
+  async getStats(@CurrentUser() user: any) {
+    return this.clientProfileService.getClientStats(user.userId);
+  }
 
 }

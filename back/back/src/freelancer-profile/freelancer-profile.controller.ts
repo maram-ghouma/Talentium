@@ -49,4 +49,10 @@ export class FreelancerProfileController {
         imageUrl: imagePath, 
       });
     }
+
+    @UseGuards(AuthGuard('jwt'))
+    @Get('stats')
+  async getStats(@CurrentUser() user: any) {
+    return this.freelancerProfileService.getFreelancerStats(user.userId);
+  }
 }

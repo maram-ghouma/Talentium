@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Profile as ProfileType } from '../../types';
 import { MainLayout } from '../../components/layout/MainLayout';
 import Profile from '../../components/Freelancer/Profile';
-import { getFreelancerMissions, getFreelancerProfile, getFreelancerReviews } from '../../services/userService';
+import { getFreelancerMissions, getFreelancerProfile, getFreelancerReviews, getFreelancerStats } from '../../services/userService';
 
 
 interface ProfileProps {
@@ -16,8 +16,9 @@ interface ProfileProps {
   const [profile, setProfile] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const[mission, setMission] = useState<any>(null);
-  
+    const [mission, setMission] = useState<any>(null);
+    const [Stats, setStats] = useState<any>(null);
+
     useEffect(() => {
       const fetchProfile = async () => {
         try {
@@ -71,7 +72,21 @@ interface ProfileProps {
 
   }, []);
 
-
+useEffect(() => {
+          const fetchStats = async () => {
+            try {
+              const data = await getFreelancerStats();
+              setStats(data);
+            } catch (err) {
+              setError('Failed to load Stats');
+            } finally {
+              setLoading(false);
+            }
+          };
+    
+          fetchStats();
+    
+        }, []);
 
   return (
    <MainLayout
@@ -81,10 +96,10 @@ interface ProfileProps {
          toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
          onSearch={handleSearch}
          usertype="freelancer"
-         profileName="Freelancer"
-         profileRole=""
+        profileName={profile.user.username}
+        profileRole="Freelancer"
        >
-        <Profile reviews={Reviews} missions={mission} profile={profile} isEditable={false} />
+        <Profile stats={Stats} reviews={Reviews} missions={mission} profile={profile} isEditable={false} />
 
     </MainLayout>
   );

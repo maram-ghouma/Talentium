@@ -72,7 +72,7 @@ export class Mission {
   progress: number;
 
   @Field(() => TaskStats)
-@Column('json',  { nullable: true })
+  @Column('json',  { nullable: true })
   tasks: {
     total: number;
     completed: number;

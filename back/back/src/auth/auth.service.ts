@@ -76,6 +76,7 @@ export class AuthService {
     const newUser = await this.userService.create({
       ...registerDto,
       password: hashedPassword,
+      imageUrl: "/uploads/image.png"
     });
     await this.clientProfilesService.createProfileForUser(newUser, {
   phoneNumber: registerDto.phoneNumber,

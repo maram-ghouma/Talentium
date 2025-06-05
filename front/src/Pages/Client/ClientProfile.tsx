@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { MainLayout } from '../../components/layout/MainLayout'; // Ensure MainLayout is correctly imported
 import ClientProfile from '../../components/client/profile/ClientProfile';
-import { getClientMissions, getClientProfile, getClientReviews } from '../../services/userService';
+import { getClientMissions, getClientProfile, getClientReviews, getClientStats } from '../../services/userService';
 
 
 const ClientProfilePage: React.FC = () => {
@@ -15,7 +15,7 @@ const ClientProfilePage: React.FC = () => {
    const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
+  const [Stats, setStats] = useState<any>(null);
   useEffect(() => {
     const fetchProfile = async () => {
       try {
@@ -62,6 +62,21 @@ const ClientProfilePage: React.FC = () => {
         fetchReviews();
     
       }, []);
+      useEffect(() => {
+      const fetchStats = async () => {
+        try {
+          const data = await getClientStats();
+          setStats(data);
+        } catch (err) {
+          setError('Failed to load Stats');
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      fetchStats();
+
+    }, []);
 
 
   if (loading) return <p>Loading...</p>;
@@ -78,7 +93,7 @@ const ClientProfilePage: React.FC = () => {
       profileRole="Client"
     >
       {/* Pass darkMode state to the ClientProfile component */}
-      <ClientProfile reviews={Reviews} missions={mission} profile={profile} darkMode={isDarkMode} />
+      <ClientProfile stats={Stats} reviews={Reviews} missions={mission} profile={profile} darkMode={isDarkMode} />
     </MainLayout>
   );
 };

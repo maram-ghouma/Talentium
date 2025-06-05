@@ -195,3 +195,18 @@ export interface Review {
   date: string;
   
 }
+
+export interface FreelancerStats {
+  averageRating: number;
+  totalMissions: number;
+  missionsInProgress: number;
+  completedMissions: number;
+
+}
+export interface ClientStats {
+  averageRating: number;
+  totalMissions: number;
+  missionsInProgress: number;
+  hiredFreelancers: number;
+
+}

@@ -71,3 +71,12 @@ export const signOut = () => {
   localStorage.removeItem('authToken'); 
   window.location.href = '/';
 };
+
+export const getFreelancerStats = async () => {
+  const response = await api.get('/freelancer-profile/stats');
+  return response.data;
+};
+export const getClientStats = async () => {
+  const response = await api.get('/client-profile/stats');
+  return response.data;
+};
