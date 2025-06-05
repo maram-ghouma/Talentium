@@ -18,7 +18,8 @@
       budget?: string;
       createdAt?: Date;
       clientName: string;
-      paymentStatus?: 'Paid' | 'Unpaid' | 'Partial';
+      paymentStatus?: 'PENDING' | 'ESCROWED' | 'RELEASED' | 'REFUNDED';
+      
       priority?: 'Low' | 'Medium' | 'High';
       progress?: number;
       selectedFreelancer?:{
@@ -43,12 +44,27 @@
     export type MissionStatus = 'not_assigned' | 'in_progress' | 'assigned' | 'completed';
     
    
+
+  export type MissionLight = {
+  id: number;
+  title: string;
+  price: number;
+  paymentStatus?: 'PENDING' | 'ESCROWED' | 'RELEASED' | 'REFUNDED';
+  selectedFreelancer?: {
+    name: string;
+  };
+  clientId?: number;
+  clientName?: string;
+};
+
+
   export enum ApplicationStatus {
   PENDING = 'pending',
   PRE_SELECTED = 'pre-selected',
   ACCEPTED = 'accepted',
   REJECTED = 'rejected'
 }
+
     export interface Notification {
       id: string;
       message: string;

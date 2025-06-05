@@ -71,3 +71,9 @@ export const signOut = () => {
   localStorage.removeItem('authToken'); 
   window.location.href = '/';
 };
+
+export const getClientName = async (): Promise<string | null> => {
+    const response = await api.get(`/auth/getClientName`);
+    console.log('Client name response:', response.data);
+    return response.data || 'error';
+  }

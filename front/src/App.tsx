@@ -20,7 +20,6 @@ import ClientInterviewSchedule from './Pages/Client/ClientInterviews';
 import ClientProfilePage from './Pages/Client/ClientProfile';
 
 import Profile from './components/Freelancer/Profile';
-import {chatConversations, messages, missions, profile, workHistory} from './Data/mockData';
 import MissionDetails from './components/Freelancer/mission';
 import Chat from './components/Freelancer/chat';
 import History from './components/Freelancer/History';
@@ -50,9 +49,9 @@ function App() {
 
   <Route path="/Freelancer/profile" element={<FreelancerProfile />} />
   <Route path="/Freelancer/editProfile" element={<FreelancerEditProfile />} />
-  <Route path="/Freelancer/mission/:id" element={<MissionDetails mission={missions[0]} />} />
+  {/*<Route path="/Freelancer/mission/:id" element={<MissionDetails mission={missions[0]} />} />*/}
   <Route path="/Freelancer/chat" element={<FreelancerChat />} />
-  <Route path="/Freelancer/history" element={<FreelancerHistory historyItems={workHistory} />} />
+  {/*<Route path="/Freelancer/history" element={<FreelancerHistory historyItems={workHistory} />} />*/}
   <Route path="/Freelancer/dashboard" element={<FreelancerDashboard />} />
   <Route path="/freelancer/interviews" element ={<ClientInterviewSchedule/>}/>
   <Route path="/Freelancer" element={<FreelancerFeed />} />
