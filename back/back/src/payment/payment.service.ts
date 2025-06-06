@@ -230,6 +230,7 @@ import { Mission, PaymentStatus } from '../mission/entities/mission.entity';
 import { User } from '../user/entities/user.entity';
 import { Invoice } from '../invoice/entities/invoice.entity';
 import { FreelancerProfile } from '../freelancer-profile/entities/freelancer-profile.entity';
+import { CreateEscrowResponse ,PaymentResponse} from './payment.types';
 
 @Injectable()
 export class PaymentService {
@@ -502,4 +503,36 @@ async createEscrowPayment(missionId: number, clientId: number) {
       order: { date: 'DESC' }
     });
   }
+  async confirmPaymentIntent(paymentIntentId: string): Promise<PaymentResponse> {
+  try {
+    const paymentIntent = await this.stripe.paymentIntents.confirm(paymentIntentId);
+    return {
+      success: true,
+      message: 'Payment confirmed successfully',
+      paymentIntentId: paymentIntent.id
+    };
+  } catch (error) {
+    throw new Error(`Failed to confirm payment: ${error.message}`);
+  }
+}
+
+async retryPaymentSetup(missionId: number): Promise<CreateEscrowResponse> {
+  // Find the mission and create a new payment intent if needed
+  const mission = await this.missionRepository.findOne({ where: { id: missionId } });
+  if (!mission) {
+    throw new Error('Mission not found');
+  }
+  
+  // Cancel the old payment intent if it exists and create a new one
+  if (mission.paymentIntentId) {
+    try {
+      await this.stripe.paymentIntents.cancel(mission.paymentIntentId);
+    } catch (error) {
+      console.warn('Could not cancel old payment intent:', error.message);
+    }
+  }
+  
+  // Create new escrow payment
+  return this.createEscrowPayment(missionId, mission.client.id);
+}
 }

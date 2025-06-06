@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import MilestoneView from '../../components/payment/MilestoneView';
+
 import Jalons from '../../components/payment/Jalons';
 
 

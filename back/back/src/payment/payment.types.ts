@@ -17,7 +17,13 @@ export class ReleaseMilestoneResponse {
   @Field(() => Number)
   amountReleased: number;
 }
-
+// In your types file or at the top of your service
+export interface PaymentResponse {
+  success: boolean;
+  message?: string;
+  paymentIntentId?: string;
+  status?: string; // Add this line
+}
 @ObjectType()
 export class RefundResponse {
   @Field(() => Boolean)
