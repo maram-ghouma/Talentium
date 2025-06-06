@@ -3,6 +3,8 @@ import { PaymentService } from './payment.service';
 import { Mission, PaymentStatus } from '../mission/entities/mission.entity';
 import { Invoice } from '../invoice/entities/invoice.entity';
 import { PaymentResponse } from './payment.types';
+import { handleStripeError } from '../common/helpers/stripe.helper';
+
 
 // DTOs for request bodies
 export class CreateEscrowPaymentDto {
@@ -63,7 +65,8 @@ export class PaymentController {
       createEscrowDto.clientId
     );} catch (error) {
       console.error('Error creating escrow payment:', error);
-      throw error; // Re-throw the error to be handled by global exception filter
+      handleStripeError(error);
+
     }
   }
 
@@ -80,14 +83,16 @@ export class PaymentController {
       };
     } catch (error) {
       console.error('Error releasing milestone payment:', error);
-      throw error;
+      handleStripeError(error);
+
     }
   }
 
   @Post('milestone/release-batch')
   async releaseBatchMilestones(@Body() releaseBatchDto: ReleaseBatchMilestonesDto): Promise<ReleaseMilestoneResponse[]> {
     const results: ReleaseMilestoneResponse[] = [];
-    for (const milestone of releaseBatchDto.milestones) {
+    try{
+      for (const milestone of releaseBatchDto.milestones) {
       const result = await this.paymentService.releaseMilestonePayment(
         releaseBatchDto.missionId, 
         milestone
@@ -97,7 +102,11 @@ export class PaymentController {
         milestone
       });
     }
-    return results;
+    return results;} catch (error) {
+      console.error('Error releasing batch milestones:', error);
+      handleStripeError(error);
+      
+    }
   }
 
   @Post('refund')
@@ -125,28 +134,50 @@ export class PaymentController {
 
   @Get('status/:paymentIntentId')
   async getPaymentStatus(@Param('paymentIntentId') paymentIntentId: string): Promise<PaymentStatusResponse> {
+    try {
     return await this.paymentService.getPaymentIntentStatus(paymentIntentId);
+
+  } catch (error) {
+    console.error('Error getting payment status:', error);
+    handleStripeError(error);
   }
+}
 
   @Get('milestones/available/:missionId')
   async getAvailableMilestones(@Param('missionId', ParseIntPipe) missionId: number) {
-    // This should return available milestone percentages for a mission
-    // You'll need to implement this logic based on your business rules
+   try{
+
+   
     return {
       missionId,
       availableMilestones: [25, 50, 75, 100],
       releasedMilestones: [] // Track which milestones have been released
     };
+    } catch (error) {
+      console.error('Error getting available milestones:', error);
+      handleStripeError(error);
+    }
   }
 
   // In your PaymentController
 @Post('confirm')
 async confirmPayment(@Body() body: { paymentIntentId: string }): Promise<PaymentResponse> {
-  return await this.paymentService.confirmPaymentIntent(body.paymentIntentId);
+  try{
+    return await this.paymentService.confirmPaymentIntent(body.paymentIntentId);
+  } catch (error) {
+    console.error('Error confirming payment:', error);
+    handleStripeError(error);
+  }
 }
 
 @Post('retry-setup')
 async retryPaymentSetup(@Body() body: { missionId: number }): Promise<CreateEscrowResponse> {
+  try{
+
   return await this.paymentService.retryPaymentSetup(body.missionId);
+} catch (error) {
+  console.error('Error retrying payment setup:', error);
+  handleStripeError(error);
+}
 }
 }

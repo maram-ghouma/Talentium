@@ -53,9 +53,9 @@ const MilestoneView = ({ missions }: { missions: MissionLight[]; }) => {
             try {
               const paymentDetails = await paymentService.getPaymentStatus(mission.paymentIntentId);
               return { ...mission, paymentDetails };
-            } catch (error) {
-              console.warn(`Failed to get payment status for mission ${mission.id}:`, error);
-              return mission;
+            } catch (error:any) {
+              const message = error.response?.data?.message || 'Une erreur inattendue est survenue.';
+              alert(message);
             }
           }
           return mission;
@@ -95,9 +95,11 @@ const MilestoneView = ({ missions }: { missions: MissionLight[]; }) => {
         showMessage('Erreur lors de la libération du paiement', true);
       }
     } catch (error: any) {
-      console.error('Erreur libération jalon:', error);
+      /*console.error('Erreur libération jalon:', error);
       const errorMsg = error.message || error.response?.data?.message || 'Erreur lors de la libération du paiement';
-      showMessage(errorMsg, true);
+      showMessage(errorMsg, true);*/
+      const message = error.response?.data?.message || 'Une erreur inattendue est survenue.';
+      alert(message);
     } finally {
       setLoading(false);
     }
@@ -120,9 +122,11 @@ const MilestoneView = ({ missions }: { missions: MissionLight[]; }) => {
         showMessage('Erreur lors du remboursement', true);
       }
     } catch (error: any) {
-      console.error('Erreur remboursement:', error);
+      /*console.error('Erreur remboursement:', error);
       const errorMsg = error.response?.data?.message || error.message || 'Erreur lors du remboursement';
-      showMessage(errorMsg, true);
+      showMessage(errorMsg, true);*/
+      const message = error.response?.data?.message || 'Une erreur inattendue est survenue.';
+  alert(message);
     } finally {
       setLoading(false);
     }
@@ -139,9 +143,11 @@ const MilestoneView = ({ missions }: { missions: MissionLight[]; }) => {
       }
       await loadPaymentStatuses();
     } catch (error: any) {
-      console.error('Erreur retry setup:', error);
+      /*console.error('Erreur retry setup:', error);
       const errorMsg = error.response?.data?.message || error.message || 'Erreur lors de la reconfiguration';
-      showMessage(errorMsg, true);
+      showMessage(errorMsg, true);*/
+      const message = error.response?.data?.message || 'Une erreur inattendue est survenue.';
+  alert(message);
     } finally {
       setLoading(false);
     }
@@ -270,7 +276,7 @@ const MilestoneView = ({ missions }: { missions: MissionLight[]; }) => {
               <div className="milestone-actions">
                 <h4>Libérer par jalons:</h4>
                 <div className="milestone-grid">
-                  {[25, 50, 75].map((percentage) => (
+                  {/*[25, 50, 75].map((percentage) => (
                     <button
                       key={percentage}
                       onClick={() => handleMilestoneRelease(mission.id, percentage)}
@@ -279,7 +285,15 @@ const MilestoneView = ({ missions }: { missions: MissionLight[]; }) => {
                     >
                       {loading ? '...' : `${percentage}%`}
                     </button>
-                  ))}
+                  ))*/}
+                  <button
+                      key={100}
+                      onClick={() => handleMilestoneRelease(mission.id, 100)}
+                      disabled={loading}
+                      className="milestone-button"
+                    >
+                      {loading ? '...' : '100%'}
+                    </button>
                 </div>
                 
                 <div className="action-buttons">
@@ -305,7 +319,7 @@ const MilestoneView = ({ missions }: { missions: MissionLight[]; }) => {
             {!canReleaseMilestone(mission) && mission.paymentStatus === 'ESCROWED' && (
               <div className="disabled-actions">
                 <p className="disabled-message">
-                  Paiement non prêt pour libération. Status: {mission.paymentDetails?.status || 'inconnu'}
+                   Status: {mission.paymentDetails?.status || 'inconnu'}
                 </p>
                 {['ESCROWED', 'PENDING'].includes(mission.paymentStatus) && (
                   <button

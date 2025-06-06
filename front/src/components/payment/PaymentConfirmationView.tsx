@@ -68,11 +68,13 @@ const PaymentConfirmationView = ({ missions }: { missions: MissionLight[]; }) =>
         message: 'Paiement autorisé et mis en escrow avec succès!'
       });
       
-    } catch (error) {
+    } catch (error:any) {
       setPaymentStatus({ 
         type: 'error', 
         message: 'Erreur lors du paiement: ' + (error && typeof error === 'object' && 'message' in error ? (error as any).message : String(error))
       });
+      const message = error.response?.data?.message || 'Une erreur inattendue est survenue.';
+      alert(message);
     } finally {
       setLoading(false);
     }
