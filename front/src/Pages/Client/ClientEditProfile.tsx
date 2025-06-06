@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { MainLayout } from '../../components/layout/MainLayout'; // Ensure MainLayout is correctly imported
 import ClientProfile from '../../components/client/profile/ClientProfile';
-import { getClientMissions, getClientProfile, getClientReviews } from '../../services/userService';
+import { getClientMissions, getClientProfile, getClientReviews, getClientStats } from '../../services/userService';
+import { useNavigate } from 'react-router-dom';
 
 
 const ClientProfilePage: React.FC = () => {
@@ -14,8 +15,30 @@ const ClientProfilePage: React.FC = () => {
    const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [Reviews, setReviews] = useState<any>(null);
+  const [Stats, setStats] = useState<any>(null);
+const navigate = useNavigate();
+    useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const data = await getClientProfile();
+        setProfile(data);
+      } catch (err: any) {
+        if (err.response && err.response.status === 404) {
+          navigate('/404', { replace: true });
+          return;
+        }
+        setError('Failed to load profile');
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  useEffect(() => {
+    fetchProfile();
+
+  }, []);
+    useEffect(() => {
+
       const fetchMissions = async () => {
         try {
           const data = await getClientMissions();
@@ -30,22 +53,7 @@ const ClientProfilePage: React.FC = () => {
       fetchMissions();
   
     }, []);
-  useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const data = await getClientProfile();
-        setProfile(data);
-      } catch (err) {
-        setError('Failed to load profile');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProfile();
-
-  }, []);
-  const [Reviews, setReviews] = useState<any>(null);
+  
     useEffect(() => {
       const fetchReviews = async () => {
         try {
@@ -61,6 +69,21 @@ const ClientProfilePage: React.FC = () => {
       fetchReviews();
   
     }, []);
+    useEffect(() => {
+      const fetchStats = async () => {
+        try {
+          const data = await getClientStats();
+          setStats(data);
+        } catch (err) {
+          setError('Failed to load Stats');
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      fetchStats();
+
+    }, []);
 if (!profile || !profile.user) {
   return <div>Loading profile...</div>; 
 }
@@ -75,11 +98,10 @@ if (!profile || !profile.user) {
       toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
       onSearch={handleSearch}
       usertype="client"
-      profileName={profile.user.username}
-      profileRole="Client"
+     
     >
       {/* Pass darkMode state to the ClientProfile component */}
-      <ClientProfile reviews={Reviews} missions={mission} profile={profile} isEditable={true} darkMode={isDarkMode}  />
+      <ClientProfile stats={Stats} reviews={Reviews} missions={mission} profile={profile} isEditable={true} darkMode={isDarkMode}  />
     </MainLayout>
   );
 };

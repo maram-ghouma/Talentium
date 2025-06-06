@@ -14,8 +14,7 @@ interface MainLayoutProps {
   hideSearchBar?: boolean;
   onSearch?: (query: string) => void;
   usertype:  'admin' | 'client' | 'freelancer';
-  profileName;
-  profileRole 
+
 }
 
 export const MainLayout: React.FC<MainLayoutProps> = ({
@@ -25,8 +24,6 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
   isSidebarOpen,
   toggleSidebar,
   pageTitle,
-  profileName ,
-  profileRole ,
   hideSearchBar = false,
   onSearch = (query) => console.log(query),
   usertype,
@@ -59,8 +56,9 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
         toggleSidebar={toggleSidebar} 
         isDarkMode={isDarkMode} 
         userType= {usertype}
-        profileName= {profileName}
-        profileRole={profileRole}
+        profileName= {user?.username || ''} 
+        profileRole={user?.currentRole || ''}
+        onRoleChange={(newRole) => setUser((prev) => ({ ...prev, currentRole: newRole }))}
       />
 
       <main style={{ 

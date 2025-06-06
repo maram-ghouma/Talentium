@@ -135,25 +135,19 @@
       linkTo?: string;
     };
   
+   
+
     export type WorkHistoryItem = {
-      id: string;
-      title: string;
-      client: string;
-      date: string;//date
-      clientLogo?: string;
-      description: string;
-      skills: string[];
-      endDate: string | null;
-/*
-      feedback?: string;
-      rating?: number;
-      */
-      testimonial?: {
-        text: string;
-        author: string;
-        rating: number;
-      };
-    };
+      id: string
+  title: string
+  client: ClientProfileType
+  date: string
+  description: string
+  deadline?: string
+  requiredSkills: string[]
+  review?: Review;
+}
+
     export interface Profile {
       id: string;
       name: string;
@@ -228,4 +222,24 @@ export interface Review {
   comment: string;
   date: string;
   
+}
+
+export interface FreelancerStats {
+  averageRating: number;
+  totalMissions: number;
+  missionsInProgress: number;
+  completedMissions: number;
+
+}
+export interface ClientStats {
+  averageRating: number;
+  totalMissions: number;
+  missionsInProgress: number;
+  hiredFreelancers: number;
+
+}
+export interface AdminStats {
+  totalUsers: number;
+  selectedFreelancers: number;
+  completedMissions: number;
 }

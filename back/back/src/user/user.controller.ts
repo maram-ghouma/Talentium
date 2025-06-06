@@ -5,6 +5,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
 import { AuthGuard } from '@nestjs/passport';
 import { User } from './entities/user.entity';
+import { SwitchRoleDto } from './dto/switch-role.sto';
 import { ClientProfileService } from 'src/client-profile/client-profile.service';
 
 @Controller('user')
@@ -37,6 +38,10 @@ export class UserController {
   remove(@Param('id') id: string) {
     return this.userService.remove(+id);
   }
+
+  
+
+  
 
   
   

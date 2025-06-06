@@ -4,9 +4,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from 'src/user/entities/user.entity';
 import { FreelancerProfile } from './entities/freelancer-profile.entity';
-
 import { UpdateFreelancerProfileDto } from './dto/update-freelancer-profile.dto';
-
+import { Mission } from 'src/mission/entities/mission.entity';
+import { Review } from 'src/review/entities/review.entity';
 
 @Injectable()
 export class FreelancerProfileService {
@@ -15,6 +15,10 @@ export class FreelancerProfileService {
     private readonly freelancerProfileRepository: Repository<FreelancerProfile>,
     @InjectRepository(User)
     private userRepo: Repository<User>,
+     @InjectRepository(Mission)
+    private missionRepo: Repository<Mission>,
+    @InjectRepository(Review)
+    private reviewRepo: Repository<Review>,
   ) {
     
   }
@@ -75,5 +79,59 @@ async updateFreelancerProfile(freelancerId: number, updateDto: UpdateFreelancerP
     profile.skills = updateDto.skills ?? profile.skills;
     return await this.freelancerProfileRepository.save(profile);
   }
+
+  async getFreelancerStats(userId: number) {
+  const freelancerProfile = await this.freelancerProfileRepository
+    .createQueryBuilder('profile')
+    .leftJoinAndSelect('profile.user', 'user')
+    .where('user.id = :userId', { userId })
+    .getOne();
+
+  if (!freelancerProfile) {
+    throw new NotFoundException('Freelancer profile not found');
+  }
+
+  const totalMissions = await this.missionRepo.count({
+    where: { selectedFreelancer: { id: freelancerProfile.id } },
+  });
+
+  const missionsInProgress = await this.missionRepo.count({
+    where: {
+      selectedFreelancer: { id: freelancerProfile.id },
+      status: 'in_progress',
+    },
+  });
+
+  const completedMissions = await this.missionRepo.count({
+    where: {
+      selectedFreelancer: { id: freelancerProfile.id },
+      status: 'completed',
+    },
+  });
+
+  const avgRating = await this.reviewRepo
+    .createQueryBuilder('review')
+    .select('AVG(review.stars)', 'average')
+    .innerJoin('review.mission', 'mission')
+  .innerJoin('mission.selectedFreelancer', 'freelancer')
+  .innerJoin('freelancer.user', 'freelancerUser')
+  .where('freelancerUser.id = :userId', { userId })
+  .andWhere('review.reviewedUser = :userId', { userId })
+    .getRawOne();
+
+  return {
+    averageRating: parseFloat(avgRating.average) || 0,
+    totalMissions,
+    missionsInProgress,
+    completedMissions,
+  };
+}
+async getAllFreelancers(): Promise<FreelancerProfile[]> {
+    return this.freelancerProfileRepository.find({
+      relations: ['user'], // eager load the user relation
+    });
+  }
+
+
 
 }

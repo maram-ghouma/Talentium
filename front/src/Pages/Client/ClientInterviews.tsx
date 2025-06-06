@@ -27,8 +27,7 @@ const ClientInterviewSchedule = () => {
       toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
       onSearch={handleSearch}
       usertype="client"
-      profileName="Alex Morgan"
-      profileRole="UI/UX Designer"
+      
     >
       <InterviewScheduleContainer isDarkMode={isDarkMode} />
     </MainLayout>
