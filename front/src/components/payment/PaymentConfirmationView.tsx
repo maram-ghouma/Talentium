@@ -68,11 +68,13 @@ const PaymentConfirmationView = ({ missions }: { missions: MissionLight[]; }) =>
         message: 'Paiement autorisé et mis en escrow avec succès!'
       });
       
-    } catch (error) {
+    } catch (error:any) {
       setPaymentStatus({ 
         type: 'error', 
         message: 'Erreur lors du paiement: ' + (error && typeof error === 'object' && 'message' in error ? (error as any).message : String(error))
       });
+      const message = error.response?.data?.message || 'Une erreur inattendue est survenue.';
+      alert(message);
     } finally {
       setLoading(false);
     }
@@ -87,13 +89,14 @@ const PaymentConfirmationView = ({ missions }: { missions: MissionLight[]; }) =>
 
       <div className="form-card">
         {!selectedMission ? (
-          <div className="mission-selection">
+          <div className="mission-selection" >
             <h3 className="form-label">Sélectionnez la mission</h3>
             {missions.map((mission) => (
               <div 
                 key={mission.id}
                 onClick={() => setSelectedMission(mission)}
                 className="mission-selector"
+                style={{border: '1px solid #ccc', padding: '20px', borderRadius: '8px'}}
               >
                 <div className="mission-info">
                   <h4>{mission.title}</h4>

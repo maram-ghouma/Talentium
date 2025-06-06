@@ -36,8 +36,7 @@ const ClientHome = () => {
       onFilter={handleFilter}
       onSort={handleSort}
       usertype='client'
-      profileName="Alex Morgan"
-      profileRole="UI/UX Designer"
+   
     >
       <HomePage 
         isDarkMode={isDarkMode}

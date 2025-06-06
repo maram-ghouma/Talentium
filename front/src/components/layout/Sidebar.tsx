@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 import {
   Bell,
@@ -19,7 +20,8 @@ import {
 } from 'lucide-react';
 import '../../Styles/sidebar.css';
 import { report } from 'process';
-import { signOut } from '../../services/userService';
+import { signOut, SwitchProfile } from '../../services/userService';
+import { on } from 'events';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -27,7 +29,8 @@ interface SidebarProps {
   isDarkMode: boolean;
   profileName?: string;
   profileRole?: string;
-  userType: 'admin' | 'client' | 'freelancer'; // Add userType prop to determine sidebar type
+  userType: 'admin' | 'client' | 'freelancer'; 
+  onRoleChange: (newRole: string) => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({ 
@@ -36,7 +39,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
   isDarkMode,
   profileName ,
   profileRole ,
-  userType // Receive the userType (admin or client) prop
+  userType, 
+  onRoleChange,
 }) => {
   // Admin menu items
   const ClientMenuItems = [
@@ -66,12 +70,28 @@ export const Sidebar: React.FC<SidebarProps> = ({
 const toggleUserDropdown = () => setUserDropdownOpen(prev => !prev);
 
   // Determine which menu to render based on userType
-  const menuItems = userType === 'admin' 
+  const menuItems = profileRole === 'admin' 
   ? AdminMenuItems 
-  : userType === 'client' 
+  : profileRole === 'client' 
   ? ClientMenuItems 
   : FreelancerMenuItems;
 
+  const [loading, setLoading] = useState(false);
+
+  const handleSwitch = async () => {
+    const newRole = profileRole === 'client' ? 'freelancer' : 'client';
+    try {
+      setLoading(true);
+      const updatedUser = await SwitchProfile(newRole);
+      toast.success(`Switched to ${newRole} successfully!`);
+      onRoleChange(updatedUser.currentRole); 
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to switch profile');
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
     <div className={`sidebar ${isOpen ? 'open' : 'closed'} ${isDarkMode ? 'dark-mode' : ''}`}>
       <div className="sidebar-content">
@@ -126,7 +146,7 @@ const toggleUserDropdown = () => setUserDropdownOpen(prev => !prev);
             </Link>
           ))}
             {/* Admin-specific "Users" dropdown */}
-  {userType === 'admin' && (
+  {profileRole === 'admin' && (
     <div className="sidebar-dropdown">
       <button onClick={toggleUserDropdown} className="sidebar-button">
         <div className="icon-container">
@@ -166,7 +186,7 @@ const toggleUserDropdown = () => setUserDropdownOpen(prev => !prev);
 
       <div className="footer-menu">
         {/* Admin specific footer items */}
-        {userType === 'admin' && (
+        {profileRole === 'admin' && (
           <>
             <button key="sign-out" className="sidebar-button" onClick={signOut}>
               <div className="icon-container">
@@ -178,13 +198,13 @@ const toggleUserDropdown = () => setUserDropdownOpen(prev => !prev);
         )}
 
         {/* Client specific footer items */}
-        {(userType === 'client' || userType === 'freelancer') && (
+        {(profileRole === 'client' || profileRole === 'freelancer') && (
           <>
-          <button key="sign-out" className="sidebar-button">
+          <button key="sign-out" className="sidebar-button" onClick={handleSwitch} disabled={loading}>
             <div className="icon-container">
               <SwitchCamera size={20} />
             </div>
-            {isOpen && <span className="button-label">Switch Profile</span>}
+            {isOpen && <span className="button-label">Switch to {profileRole === 'client' ? 'Freelancer' : 'Client'}</span>}
           </button>
           <button key="sign-out" className="sidebar-button" onClick={signOut}>
           <div className="icon-container">

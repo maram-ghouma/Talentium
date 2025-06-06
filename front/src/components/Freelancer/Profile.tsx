@@ -3,7 +3,7 @@ import { useRef } from 'react';
 import { Container, Card, Button, Badge, Row, Col, Form } from 'react-bootstrap';
 import { Star, Building, Globe, MapPin, Users, Briefcase, Award, Clock, Mail, Linkedin, Phone, Edit, Save, X, Circle, DollarSign, Github } from 'lucide-react';
 import '../../Styles/Freelancer/profile.css';
-import { FreelancerProfileType, Mission, Review } from '../../types';
+import { FreelancerProfileType, FreelancerStats, Mission, Review } from '../../types';
 import { updateClientProfile, updateFreelancerProfile } from '../../services/userService';
 import MissionDetailsModal from '../client/home page/MissionDetailsModal';
 import { CreateMission } from '../client/home page/CreateMission';
@@ -14,6 +14,7 @@ interface ClientProfileProps {
   isEditable?: boolean; 
   missions?: Mission[]; 
   reviews?: Review[]; 
+  stats?: FreelancerStats;
 }
 
 
@@ -27,7 +28,7 @@ const clientData = {
   
 };
 
-const ClientProfile: React.FC<ClientProfileProps> = ({ darkMode = false , profile,isEditable ,missions,reviews}) => {
+const ClientProfile: React.FC<ClientProfileProps> = ({ darkMode = false , profile,isEditable ,missions,reviews,stats}) => {
   const [selectedMission, setSelectedMission] = useState<Mission | null>(null);
   const [showCreateMission, setShowCreateMission] = useState(false);
   const [isEditingPersonal, setIsEditingPersonal] = useState(false);
@@ -571,7 +572,7 @@ const handleSavePersonal = async () => {
                 <div className="stat-icon" style={{ backgroundColor: 'rgba(13, 110, 253, 0.1)' }}>
                   <Briefcase size={24} color="#0d6efd" />
                 </div>
-                <div className="stat-value">{clientData.stats.totalMissions}</div>
+                <div className="stat-value">{stats?.totalMissions}</div>
                 <div className="stat-label" style={{paddingTop:'10px'}}>Total Missions</div>
               </Card.Body>
             </Card>
@@ -582,7 +583,7 @@ const handleSavePersonal = async () => {
                 <div className="stat-icon" style={{ backgroundColor: 'rgba(255, 193, 7, 0.1)' }}>
                   <Clock size={24} color="#ffc107" />
                 </div>
-                <div className="stat-value">{clientData.stats.activeMissions}</div>
+                <div className="stat-value">{stats?.completedMissions}</div>
                 <div className="stat-label" style={{paddingTop:'10px'}}>Active Missions</div>
               </Card.Body>
             </Card>
@@ -593,8 +594,8 @@ const handleSavePersonal = async () => {
                 <div className="stat-icon" style={{ backgroundColor: 'rgba(25, 135, 84, 0.1)' }}>
                   <Users size={24} color="#198754" />
                 </div>
-                <div className="stat-value">{clientData.stats.developersHired}</div>
-                <div className="stat-label" style={{paddingTop:'10px'}}>Developers Hired</div>
+                <div className="stat-value">{stats?.completedMissions}</div>
+                <div className="stat-label" style={{paddingTop:'10px'}}>Completed Missions</div>
               </Card.Body>
             </Card>
           </Col>
@@ -604,7 +605,7 @@ const handleSavePersonal = async () => {
                 <div className="stat-icon" style={{ backgroundColor: 'rgba(13, 202, 240, 0.1)' }}>
                   <Award size={24} color="#0dcaf0" />
                 </div>
-                <div className="stat-value">average</div>
+                <div className="stat-value">{stats?.averageRating}</div>
                 <div className="stat-label" style={{paddingTop:'10px'}}>Average Rating</div>
               </Card.Body>
             </Card>

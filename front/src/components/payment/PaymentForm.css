@@ -159,7 +159,7 @@
   padding: 24px;
   height: 325px;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  border: 1px solid #C5D8E5;
+  border: 1px solid #161f24;
   transition: all 0.3s;
 }
 
@@ -207,7 +207,7 @@
 }
 
 /* Button styles */
-.button-primary {
+.button-primary,.refresh-button {
   width: 100%;
   padding: 12px 24px;
   border-radius: 12px;

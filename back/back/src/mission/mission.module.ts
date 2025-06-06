@@ -8,9 +8,10 @@ import { MissionController } from './mission.controller';
 import { FreelancerProfile } from 'src/freelancer-profile/entities/freelancer-profile.entity';
 import { ClientProfile } from 'src/client-profile/entities/client-profile.entity';
 import { Dispute } from 'src/dispute/entities/dispute.entity';
+import { Review } from 'src/review/entities/review.entity';
 
 @Module({
-  imports : [TypeOrmModule.forFeature([Mission, User,FreelancerProfile,Dispute,ClientProfile])],
+  imports : [TypeOrmModule.forFeature([Mission, User,FreelancerProfile,Dispute,ClientProfile,Review])],
   controllers: [MissionController],
   providers: [MissionResolver, MissionService],
   exports: [MissionService, TypeOrmModule], 

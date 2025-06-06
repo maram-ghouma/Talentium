@@ -10,7 +10,8 @@ const FreelancerDashboard = () => {
   const handleSearch = (query: string) => {
     console.log('Search query:', query);
   };
-const missions = [];// Mock data for missions, replace with actual data fetching logic
+  const missions = [];
+
   return (
     <MainLayout
       isDarkMode={isDarkMode}
@@ -19,8 +20,7 @@ const missions = [];// Mock data for missions, replace with actual data fetching
       toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
       onSearch={handleSearch}
       usertype="freelancer"
-      profileName="Freelancer"
-      profileRole=""
+  
     >
        <FreelancerHomePage 
                 freelancerName="John Doe" 

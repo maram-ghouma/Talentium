@@ -5,6 +5,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
 import { AuthGuard } from '@nestjs/passport';
 import { User } from './entities/user.entity';
+import { SwitchRoleDto } from './dto/switch-role.sto';
 import { ClientProfileService } from 'src/client-profile/client-profile.service';
 
 @Controller('user')
@@ -39,14 +40,12 @@ export class UserController {
   }
 
   
+
   
 
-   @UseGuards(AuthGuard('jwt'))
-    @Get('getClientName')
-    async getClientName(@CurrentUser() user: any) {
-      console.log('User passed to getClientName:', user);
-      const clientProfile = await this.ClientService.findByUserId(user.userId);
-      return clientProfile ? clientProfile.companyName : 'Client not found';
-    }
+  
+  
+
+   
   
 }

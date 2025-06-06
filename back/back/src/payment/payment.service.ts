@@ -222,7 +222,7 @@ export class PaymentService {
     });
   }
 }*/
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, IsNull } from 'typeorm';
 import Stripe from 'stripe';
@@ -230,6 +230,7 @@ import { Mission, PaymentStatus } from '../mission/entities/mission.entity';
 import { User } from '../user/entities/user.entity';
 import { Invoice } from '../invoice/entities/invoice.entity';
 import { FreelancerProfile } from '../freelancer-profile/entities/freelancer-profile.entity';
+import { CreateEscrowResponse ,PaymentResponse} from './payment.types';
 
 @Injectable()
 export class PaymentService {
@@ -251,7 +252,7 @@ export class PaymentService {
   }
 async createEscrowPayment(missionId: number, clientId: number) {
   const mission = await this.missionRepository.findOne({
-    where: { id: missionId },
+    where: { id: missionId  },
     relations: ['client', 'selectedFreelancer', 'selectedFreelancer.user']
   });
 
@@ -362,12 +363,14 @@ async createEscrowPayment(missionId: number, clientId: number) {
       await this.stripe.transfers.create({
         amount: releaseAmount,
         currency: 'eur',
-        destination: mission.selectedFreelancer.stripeAccountId,
+        //destination: mission.selectedFreelancer.stripeAccountId,
+        destination: 'acct_1RWz0BRBiMgVeRzi', // Test account for now
         metadata: {
           missionId: missionId.toString(),
           milestone: milestonePercentage.toString()
         }
       });
+      
 
       // Generate invoice
       await this.generateInvoice(
@@ -385,8 +388,39 @@ async createEscrowPayment(missionId: number, clientId: number) {
 
       return { success: true, amountReleased: releaseAmount / 100 };
     } catch (error) {
-      throw new Error(`Erreur lors de la libération du paiement: ${error.message}`);
+      console.error('Stripe error:', error);
+
+      if (error.type === 'StripeInvalidRequestError') {
+        // Invalid parameters or configuration
+        throw new HttpException(
+          {
+            message: 'Invalid request to Stripe. Please contact support.',
+          },
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      if (error.type === 'StripeCardError' || error.code === 'balance_insufficient') {
+        // Not enough funds in test mode or real
+        throw new HttpException(
+          {
+            message: 'Payment failed due to insufficient Stripe account funds. Please try again later.',
+          },
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      // Generic fallback for unknown Stripe errors
+      throw new HttpException(
+        {
+          message: 'An unexpected Stripe error occurred. Please try again.',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
+      //throw new Error(`Erreur lors de la libération du paiement: ${error.message}`);
+      
+    
   }
 
   // Add method to check payment status
@@ -495,6 +529,18 @@ async createEscrowPayment(missionId: number, clientId: number) {
     return missions;
   }
 
+  async getMissionById(missionId: number): Promise<Mission> {
+    const mission = await this.missionRepository.findOne({
+      where: { id: missionId },
+      relations: ['client', 'selectedFreelancer', 'selectedFreelancer.user']
+    });
+
+    if (!mission) {
+      throw new Error('Mission non trouvée');
+    }
+
+    return mission;
+  }
   async getPaymentHistory(missionId: number): Promise<Invoice[]> {
     return await this.invoiceRepository.find({
       where: { missionId },
@@ -502,4 +548,36 @@ async createEscrowPayment(missionId: number, clientId: number) {
       order: { date: 'DESC' }
     });
   }
+  async confirmPaymentIntent(paymentIntentId: string): Promise<PaymentResponse> {
+  try {
+    const paymentIntent = await this.stripe.paymentIntents.confirm(paymentIntentId);
+    return {
+      success: true,
+      message: 'Payment confirmed successfully',
+      paymentIntentId: paymentIntent.id
+    };
+  } catch (error) {
+    throw new Error(`Failed to confirm payment: ${error.message}`);
+  }
+}
+
+async retryPaymentSetup(missionId: number): Promise<CreateEscrowResponse> {
+  // Find the mission and create a new payment intent if needed
+  const mission = await this.missionRepository.findOne({ where: { id: missionId } });
+  if (!mission) {
+    throw new Error('Mission not found');
+  }
+  
+  // Cancel the old payment intent if it exists and create a new one
+  if (mission.paymentIntentId) {
+    try {
+      await this.stripe.paymentIntents.cancel(mission.paymentIntentId);
+    } catch (error) {
+      console.warn('Could not cancel old payment intent:', error.message);
+    }
+  }
+  
+  // Create new escrow payment
+  return this.createEscrowPayment(missionId, mission.client.user.id);
+}
 }

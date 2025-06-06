@@ -36,8 +36,7 @@ const FreelancerFeed = () => {
       onFilter={handleFilter}
       onSort={handleSort}
       usertype='client'
-      profileName = "Alex Morgan"
-      profileRole = "UI/UX Designer"
+ 
     >
       <Feed
         isDarkMode={isDarkMode}

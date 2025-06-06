@@ -47,8 +47,7 @@ const ClientInterviewSchedule = () => {
       onFilter={handleFilter}
       onSort={handleSort}
       usertype="client"
-      profileName="Alex Morgan"
-      profileRole="UI/UX Designer"
+      
     >
       <InterviewScheduleContainer isDarkMode={isDarkMode} searchQuery={searchQuery}
         filters={filters}

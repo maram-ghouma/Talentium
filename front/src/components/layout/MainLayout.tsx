@@ -13,11 +13,10 @@ interface MainLayoutProps {
   pageTitle?: string;
   hideSearchBar?: boolean;
   onSearch?: (query: string) => void;
-  onFilter?: (filters: any) => void; // Add this
-  onSort?: (sortOption: string) => void; // Add this
+  onFilter?: (filters: any) => void; 
+  onSort?: (sortOption: string) => void; 
   usertype: 'admin' | 'client' | 'freelancer';
-  profileName: string;
-  profileRole: string;
+
 }
 
 export const MainLayout: React.FC<MainLayoutProps> = ({
@@ -27,8 +26,6 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
   isSidebarOpen,
   toggleSidebar,
   pageTitle,
-  profileName ,
-  profileRole ,
   hideSearchBar = false,
   onSearch = (query) => console.log(query),
   usertype,
@@ -63,8 +60,9 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
         toggleSidebar={toggleSidebar} 
         isDarkMode={isDarkMode} 
         userType= {usertype}
-        profileName= {profileName}
-        profileRole={profileRole}
+        profileName= {user?.username || ''} 
+        profileRole={user?.currentRole || ''}
+        onRoleChange={(newRole) => setUser((prev) => ({ ...prev, currentRole: newRole }))}
       />
 
       <main style={{ 
