@@ -15,9 +15,27 @@ const ClientInterviewSchedule = () => {
     }
   }, [isDarkMode]);
 
-  const handleSearch = (query: string) => {
-    console.log('Search query:', query);
+  const [searchQuery, setSearchQuery] = useState(''); 
+  const [filters, setFilters] = useState({
+    status: '',
+    dateRange: ''
+  });
+  const [sortOption, setSortOption] = useState('');
+  const handleFilter = (newFilters: {status: string, dateRange: string}) => {
+    setFilters(newFilters);
+    console.log("Filter options:", newFilters);
   };
+
+  const handleSort = (option: string) => {
+    setSortOption(option);
+    console.log("Sort option:", option);
+  };
+  
+  const handleSearch = (query: string) => {
+    setSearchQuery(query); 
+  }
+
+
 
   return (
     <MainLayout
@@ -26,11 +44,15 @@ const ClientInterviewSchedule = () => {
       isSidebarOpen={isSidebarOpen}
       toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
       onSearch={handleSearch}
+      onFilter={handleFilter}
+      onSort={handleSort}
       usertype="client"
       profileName="Alex Morgan"
       profileRole="UI/UX Designer"
     >
-      <InterviewScheduleContainer isDarkMode={isDarkMode} />
+      <InterviewScheduleContainer isDarkMode={isDarkMode} searchQuery={searchQuery}
+        filters={filters}
+        sortOption={sortOption}/>
     </MainLayout>
   );
 };
