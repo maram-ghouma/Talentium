@@ -10,6 +10,8 @@ import { extname } from 'path';
 import { diskStorage } from 'multer';
 import { Express } from 'express';
 import { ClientProfile } from './entities/client-profile.entity';
+import { Roles } from 'src/auth/decorators/role.decorator';
+import { RolesGuard } from 'src/auth/guards/RoleGuard';
 
 
 @Controller('client-profile')
@@ -19,6 +21,7 @@ export class ClientProfileController {
   @UseGuards(AuthGuard('jwt'))
   @Get('me')
   async getMyProfile(@CurrentUser() user: any, @Query('id') id?: number) {
+    console.log('User in the controller ', user);
     const userId = id ?? user.userId;
     const profile = await this.clientProfileService.findByUserId(userId);
     const baseUrl = 'http://localhost:3000'; 
@@ -29,7 +32,9 @@ profile.user.imageUrl = profile.user.imageUrl ? `${baseUrl}${profile.user.imageU
 
     return profile;
   }
-  @UseGuards(AuthGuard('jwt'))
+  
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles('client')
   @Put('update')
   @UseInterceptors(FileInterceptor('imageUrl', {
   storage: diskStorage({
@@ -54,12 +59,13 @@ profile.user.imageUrl = profile.user.imageUrl ? `${baseUrl}${profile.user.imageU
       imageUrl: imagePath, 
     });
   }
-    @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'))
     @Get('stats')
   async getStats(@CurrentUser() user: any, @Query('id') id?: number) {
     return this.clientProfileService.getClientStats(id ?? user.userId);
   }
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles('admin')
   @Get('AllClients')
   async getAllClients(): Promise<ClientProfile[]> {
     return this.clientProfileService.getAllClients();
