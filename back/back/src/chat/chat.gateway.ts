@@ -9,6 +9,8 @@ import { JwtService } from '@nestjs/jwt';
 import { Conversation } from 'src/conversation/entities/conversation.entity';
 import { ConfigService } from '@nestjs/config';
 import { Logger } from '@nestjs/common';
+import { NotificationService } from 'src/notification/notification.service';
+import { NotificationGateway } from 'src/notification/notification.gateway';
 
 @WebSocketGateway({
   cors: { origin: 'http://localhost:4200', credentials: true },
@@ -26,6 +28,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     private readonly configService: ConfigService,
     @InjectRepository(User) private userRepo: Repository<User>,
     @InjectRepository(Conversation) private conversationRepo: Repository<Conversation>,
+    private readonly notificationService: NotificationService,
+    private readonly notificationGateway: NotificationGateway,
   ) {
     console.log('[ChatGateway][INIT] Gateway initialized');
   }
@@ -124,6 +128,23 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       };
       console.log('[ChatGateway][EVENT] Emitting newMessage to:', `conversation-${conversationId}`);
       this.server.to(`conversation-${conversationId}`).emit('newMessage', newMessage);
+
+      const conversation = await this.conversationRepo.findOne({
+        where: { id: conversationId },
+        relations: ['participants'],
+      });
+
+      for (const participant of conversation!.participants) {
+        if (participant.id !== userId) {
+          const notification = await this.notificationService.createNotification({
+            type: 'notification',
+            content: 'notification',
+            userId: participant.id,
+          });
+          await this.notificationGateway.emitNotification(notification);
+        }
+      }
+      
     } catch (error) {
       console.error('[ChatGateway][EVENT] sendMessage error:', error.message);
       client.emit('error', { message: 'Failed to send message', error: error.message });

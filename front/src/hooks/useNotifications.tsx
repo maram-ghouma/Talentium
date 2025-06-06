@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { NotificationProps } from '../components/relatime_notification/notification';
+import { NotificationProps } from '../components/realtime_notification/notification';
 
 export interface NotificationInput {
   title: string;

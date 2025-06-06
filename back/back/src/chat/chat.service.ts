@@ -123,7 +123,7 @@ export class ChatService {
     .getRawMany()
     .then(results => results.map(result => result.conversation_id));
 
-  console.log(`[ConversationService] Found conversation IDs for user ${userId}:`, conversationIds);
+  //console.log(`[ConversationService] Found conversation IDs for user ${userId}:`, conversationIds);
 
   if (!conversationIds.length) {
     return [];
@@ -140,11 +140,11 @@ export class ChatService {
     .orderBy('messages.timestamp', 'DESC') // Sort messages by timestamp
     .getMany();
 
-  console.log(`[ConversationService] Found ${conversations.length} conversations for user ${userId}`);
-  console.log('[ConversationService] Raw conversations:', JSON.stringify(conversations, (key, value) => 
-    key === 'password' ? '***' : value, 2)); // Exclude sensitive fields
-  console.log('[ConversationService] Raw participants:', conversations.map(c => c.participants.map(p => ({ id: p.id, username: p.username }))));
-  console.log('[ConversationService] Raw messages:', conversations.map(c => (c.messages || []).map(m => ({ id: m.id, content: m.content, senderId: m.sender?.id }))));
+  //console.log(`[ConversationService] Found ${conversations.length} conversations for user ${userId}`);
+  //console.log('[ConversationService] Raw conversations:', JSON.stringify(conversations, (key, value) => 
+  //  key === 'password' ? '***' : value, 2)); // Exclude sensitive fields
+  //console.log('[ConversationService] Raw participants:', conversations.map(c => c.participants.map(p => ({ id: p.id, username: p.username }))));
+  //console.log('[ConversationService] Raw messages:', conversations.map(c => (c.messages || []).map(m => ({ id: m.id, content: m.content, senderId: m.sender?.id }))));
 
   return conversations.map((conversation) => ({
     id: conversation.id || 0, // Fallback

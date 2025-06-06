@@ -1,6 +1,8 @@
+// src/services/notification.service.ts
 import { EventEmitter } from 'events';
 import {Socket, io} from 'socket.io-client';
 import api from '../axiosConfig';
+import { NotificationProps } from '../../components/realtime_notification/notification';
 
 export interface Notification {
   id: number;
@@ -14,7 +16,7 @@ export interface Notification {
 export class NotificationService {
   private socket: Socket;
   private notificationsEmitter = new EventEmitter();
-  private notifications: Notification[] = [];
+  private notifications: NotificationProps[] = [];
 
   constructor(userId: number) {
     this.socket = io('http://localhost:3000/notifications', {
@@ -25,47 +27,68 @@ export class NotificationService {
 
   private setupSocketListeners() {
     this.socket.on('connect', () => {
-      console.log('[NotificationService] Connected to notifications socket');
+      console.log('[NotificationService] Connected to notifications');
       this.socket.emit('getNotifications');
     });
 
     this.socket.on('notification', (notification: Notification) => {
       console.log('[NotificationService] Received notification:', notification);
-      this.notifications.push({ ...notification, timestamp: new Date(notification.timestamp) });
+      const mappedNotification: NotificationProps = {
+        id: notification.id.toString(),
+        title: notification.type,
+        content: notification.content,
+        type: 'default',
+        onDismiss: this.handleDismiss.bind(this),
+        autoHide: true,
+        duration: 5000,
+      };
+      this.notifications.push(mappedNotification);
       this.notificationsEmitter.emit('update', [...this.notifications]);
     });
 
     this.socket.on('notifications', (notifications: Notification[]) => {
       console.log('[NotificationService] Received notifications:', notifications);
       this.notifications = notifications.map(n => ({
-        ...n,
-        timestamp: new Date(n.timestamp),
+        id: n.id.toString(),
+        title: n.type,
+        content: n.content,
+        type: 'default',
+        onDismiss: this.handleDismiss.bind(this),
+        autoHide: true,
+        duration: 5000,
       }));
       this.notificationsEmitter.emit('update', [...this.notifications]);
     });
   }
 
-  onNotificationsUpdate(callback: (notifications: Notification[]) => void) {
+  private handleDismiss(id: string) {
+    this.notifications = this.notifications.filter(n => n.id !== id);
+    this.notificationsEmitter.emit('update', [...this.notifications]);
+    // Mark as read on server
+    api.post(`/notifications/${id}/read`).catch(err => {
+      console.error('[NotificationService] Error marking notification as read:', err);
+    });
+  }
+
+  onNotificationsUpdate(callback: (notifications: NotificationProps[]) => void) {
     this.notificationsEmitter.on('update', callback);
     return () => this.notificationsEmitter.off('update', callback);
   }
 
-  async getUnreadNotifications(): Promise<Notification[]> {
+  async getUnreadNotifications(): Promise<NotificationProps[]> {
     const response = await api.get<Notification[]>('/notifications');
     this.notifications = response.data.map(n => ({
-      ...n,
-      timestamp: new Date(n.timestamp),
+      id: n.id.toString(),
+      title: n.type,
+      content: n.content,
+      type: 'default',
+      onDismiss: this.handleDismiss.bind(this),
+      autoHide: true,
+      duration: 5000,
     }));
     this.notificationsEmitter.emit('update', [...this.notifications]);
-    return response.data;
-  }
-
-  async markNotificationAsRead(notificationId: number): Promise<void> {
-    await api.post(`/notifications/${notificationId}/read`);
-    this.notifications = this.notifications.map(n =>
-      n.id === notificationId ? { ...n, isRead: true } : n,
-    );
-    this.notificationsEmitter.emit('update', [...this.notifications]);
+    console.log('[NotificationService] Fetched unread notifications:', this.notifications);
+    return this.notifications;
   }
 
   disconnect() {

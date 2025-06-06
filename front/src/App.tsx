@@ -22,13 +22,15 @@ import FreelancerDashboard from './Pages/Freelancer/FreelancerDashboard';
 import FreelancerProfile from './Pages/Freelancer/FreelancerProfile';
 import FreelancerHistory from './Pages/Freelancer/FreelancerHistory';
 import FreelancerChat from './Pages/Freelancer/FreelancerChat';
+import ClientChat from './Pages/Client/ClientChat';
 import MissionDetails from './components/Freelancer/mission';
 import MissionKanbanPage from './Pages/mission/MissionKanbanPage';
+
 
 import GuestHome from './Pages/GuestHome';
 import { missions, profile, workHistory } from './Data/mockData';
 
-import NotificationContainer from './components/relatime_notification/NotificationContainer';
+import NotificationContainer from './components/realtime_notification/NotificationContainer';
 import { useNotifications } from './hooks/useNotifications';
 
 function App() {
@@ -56,6 +58,7 @@ function App() {
           <Route path="/client/editProfile" element={<ClientEditProfile />} />
           <Route path="/client/interviews" element={<ClientInterviewSchedule />} />
           <Route path="/client/profile" element={<ClientProfilePage />} />
+          <Route path="/client/chat" element={<ClientChat />} />
 
           <Route path="/signup" element={<SignUpPage />} />
           <Route path="/signin" element={<SignInPage />} />

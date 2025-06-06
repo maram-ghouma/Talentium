@@ -20,6 +20,8 @@ import { User } from './user/entities/user.entity';
 import { Conversation } from './conversation/entities/conversation.entity';
 import { Message } from './conversation/entities/message.entity'; // Import Message entity
 import { NotificationModule } from './notification/notification.module';
+import { NotificationService } from './notification/notification.service';
+import { NotificationGateway } from './notification/notification.gateway';
 
 @Module({
   imports: [

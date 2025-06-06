@@ -41,10 +41,12 @@ export class NotificationService {
   }
 
   async getUnreadNotifications(userId: number): Promise<Notification[]> {
+    console.log('[NotificationService] Fetching unread notifications for user:', userId);
     return this.notificationRepo.find({
       where: { userId, isRead: false },
       order: { timestamp: 'DESC' },
     });
+    
   }
 
   async markNotificationAsRead(notificationId: number, userId: number): Promise<void> {
