@@ -8,10 +8,9 @@ import { getFreelancerMissionsWithReviews } from '../../services/userService';
 import { useNavigate } from 'react-router-dom';
 
 interface HistoryProps {
-  historyItems: WorkHistoryItem[];
 }
 
-const FreelancerHistory: React.FC<HistoryProps> = ({ historyItems }) => {
+const FreelancerHistory: React.FC<HistoryProps> = () => {
   const formatDate = (dateString: string | null) => {
     if (!dateString) return 'Present';
     
