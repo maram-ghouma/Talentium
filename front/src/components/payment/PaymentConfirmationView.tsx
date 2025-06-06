@@ -87,13 +87,14 @@ const PaymentConfirmationView = ({ missions }: { missions: MissionLight[]; }) =>
 
       <div className="form-card">
         {!selectedMission ? (
-          <div className="mission-selection">
+          <div className="mission-selection" >
             <h3 className="form-label">Sélectionnez la mission</h3>
             {missions.map((mission) => (
               <div 
                 key={mission.id}
                 onClick={() => setSelectedMission(mission)}
                 className="mission-selector"
+                style={{border: '1px solid #ccc', padding: '20px', borderRadius: '8px'}}
               >
                 <div className="mission-info">
                   <h4>{mission.title}</h4>

@@ -46,6 +46,7 @@
    
 
   export type MissionLight = {
+  paymentIntentId: string;
   id: number;
   title: string;
   price: number;

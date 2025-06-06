@@ -1,6 +1,7 @@
 import { Field, ID, ObjectType } from '@nestjs/graphql';
+import { Badge } from 'src/badge/entities/badge.entity';
 import { Review } from 'src/review/entities/review.entity';
-import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn, ManyToMany } from 'typeorm';
 
 export enum UserRole {
   CLIENT = 'client',
@@ -26,7 +27,7 @@ export class User {
   @Column({ default: false })
   isAdmin: boolean;
   
-  @Field({ nullable: true })
+  @Field()
   @Column({ nullable: true })
   imageUrl: string;
 
@@ -38,5 +39,8 @@ export class User {
   @OneToOne(() => Review, (review) => review.reviewer, { eager: true })
   reviews: Review[];
 
-  
+
+  @ManyToMany(() => Badge, (badge) => badge.users, { eager: true })
+  badges: Badge[];
+
 }

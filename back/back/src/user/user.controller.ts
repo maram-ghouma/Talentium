@@ -41,12 +41,6 @@ export class UserController {
   
   
 
-   @UseGuards(AuthGuard('jwt'))
-    @Get('getClientName')
-    async getClientName(@CurrentUser() user: any) {
-      console.log('User passed to getClientName:', user);
-      const clientProfile = await this.ClientService.findByUserId(user.userId);
-      return clientProfile ? clientProfile.companyName : 'Client not found';
-    }
+   
   
 }
