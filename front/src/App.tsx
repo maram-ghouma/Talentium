@@ -17,6 +17,8 @@ import ClientHome from './Pages/Client/ClientHomePage';
 import ClientEditProfile from './Pages/Client/ClientEditProfile';
 import ClientInterviewSchedule from './Pages/Client/ClientInterviews';
 import ClientProfilePage from './Pages/Client/ClientProfile';
+import ClientKanban from './Pages/Client/ClientKanban';
+
 
 import FreelancerDashboard from './Pages/Freelancer/FreelancerDashboard';
 import FreelancerProfile from './Pages/Freelancer/FreelancerProfile';
@@ -24,14 +26,14 @@ import FreelancerHistory from './Pages/Freelancer/FreelancerHistory';
 import FreelancerChat from './Pages/Freelancer/FreelancerChat';
 import ClientChat from './Pages/Client/ClientChat';
 import MissionDetails from './components/Freelancer/mission';
-import MissionKanbanPage from './Pages/mission/MissionKanbanPage';
-
+import FreelancerClient from './Pages/Freelancer/FreelancerKanban';
 
 import GuestHome from './Pages/GuestHome';
 import { missions, profile, workHistory } from './Data/mockData';
 
 import NotificationContainer from './components/realtime_notification/NotificationContainer';
 import { useNotifications } from './hooks/useNotifications';
+import FreelancerKanban from './Pages/Freelancer/FreelancerKanban';
 
 function App() {
   const { notifications, removeNotification, addNotification } = useNotifications();
@@ -53,18 +55,20 @@ function App() {
           <Route path="/Freelancer/chat" element={<FreelancerChat />} />
           <Route path="/Freelancer/history" element={<FreelancerHistory historyItems={workHistory} />} />
           <Route path="/Freelancer" element={<FreelancerDashboard />} />
+          <Route path="/Freelancer/missions/:id/kanban" element={<FreelancerKanban />} />
 
           <Route path="/client" element={<ClientHome />} />
           <Route path="/client/editProfile" element={<ClientEditProfile />} />
           <Route path="/client/interviews" element={<ClientInterviewSchedule />} />
           <Route path="/client/profile" element={<ClientProfilePage />} />
           <Route path="/client/chat" element={<ClientChat />} />
+          <Route path="/client/missions/:id/kanban" element={<ClientKanban />} />
+
 
           <Route path="/signup" element={<SignUpPage />} />
           <Route path="/signin" element={<SignInPage />} />
           <Route path="/payment" element={<PaymentPage />} />
           <Route path="/notifications" element={<NotificationsPage />} />
-          <Route path="/missions/:id/kanban" element={<MissionKanbanPage />} />
 
           <Route path="/" element={<GuestHome />} />
         </Routes>
