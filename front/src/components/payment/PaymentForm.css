@@ -207,7 +207,7 @@
 }
 
 /* Button styles */
-.button-primary,.refresh-button {
+.button-primary,.refresh-button,.invoice-btn {
   width: 100%;
   padding: 12px 24px;
   border-radius: 12px;

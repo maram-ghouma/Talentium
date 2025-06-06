@@ -216,5 +216,12 @@ export const paymentService = {
       'requires_action': 'Additional action required'
     };
     return statusMessages[status] || `Payment status: ${status}`;
+  },
+  generateInvoice(missionId: number, amount:number, description: string): Promise<Invoice> {
+    return api.post('/payment/invoice', {
+      missionId,
+      amount,
+      description
+    });
   }
 };
