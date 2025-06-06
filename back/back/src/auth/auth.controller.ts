@@ -7,11 +7,13 @@ import { CurrentUser } from './decorators/current-user.decorator';
 import { UserService } from 'src/user/user.service';
 import { SwitchRoleDto } from 'src/user/dto/switch-role.sto';
 import { User } from 'src/user/entities/user.entity';
+import { ClientProfileService } from 'src/client-profile/client-profile.service';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService ,
-    private readonly userService: UserService
+    private readonly userService: UserService,
+    private readonly clientService: ClientProfileService
   ) {}
 
   @Post('register')
@@ -46,5 +48,12 @@ export class AuthController {
   ): Promise<User> {
     return this.userService.switchUserRole(user.userId, switchDto);
   }
+    @UseGuards(AuthGuard('jwt'))
+    @Get('getClientName')
+    async getClientName(@CurrentUser() user: any) {
+      
+      const clientProfile = await this.clientService.findByUserId(user.userId);
+      return clientProfile ? clientProfile.companyName : 'Client not found';
+    }
 
 }

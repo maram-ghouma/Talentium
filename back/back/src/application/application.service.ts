@@ -1,7 +1,7 @@
 
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import * as fs from 'fs';
 import * as path from 'path';
 import { Application, ApplicationStatus } from './entities/application.entity';
@@ -10,6 +10,7 @@ import { UpdateApplicationInput } from './dto/update-application.input';
 import { User } from 'src/user/entities/user.entity';
 import { FreelancerProfile } from 'src/freelancer-profile/entities/freelancer-profile.entity';
 import { FileUpload } from 'graphql-upload-ts';
+import { Mission } from 'src/mission/entities/mission.entity';
 
 @Injectable()
 export class ApplicationService {
@@ -20,6 +21,8 @@ export class ApplicationService {
     private userRepository: Repository<User>,
         @InjectRepository(FreelancerProfile)
     private freelancerProfileRepository: Repository<FreelancerProfile>,
+    @InjectRepository(Mission)
+    private missionRepository: Repository<Mission>,
   ) {}
 
   async create(createApplicationInput: CreateApplicationInput,  user:any): Promise<Application> {
@@ -62,10 +65,21 @@ export class ApplicationService {
   async findByMission(missionId: string): Promise<Application[]> {
     return await this.applicationRepository.find({
       where: { missionId },
-      relations: ['freelancer'],
+      relations: ['freelancer','freelancer.user'],
       order: { createdAt: 'DESC' }
     });
   }
+async findMineByMission(missionId: string, user: any): Promise<Application[]> {
+  return this.applicationRepository
+    .createQueryBuilder('application')
+    .leftJoinAndSelect('application.mission', 'mission')
+    .leftJoinAndSelect('application.freelancer', 'freelancer')
+    .leftJoinAndSelect('freelancer.user', 'freelancerUser')
+    .where('mission.id = :missionId', { missionId })
+    .andWhere('freelancerUser.id = :userId', { userId: user.userId })
+    .getMany();
+}
+
 
   async findByFreelancer(freelancerId: string): Promise<Application[]> {
     return await this.applicationRepository.find({
@@ -136,4 +150,89 @@ export class ApplicationService {
       filename: path.basename(application.resumePath)
     };
   }
+
+  async updateApplicationStatus(
+    applicationId: string,
+    newStatus: ApplicationStatus,
+  ): Promise<Application> {
+    const application = await this.applicationRepository.findOne({
+      where: { id: applicationId },
+      relations: ['mission', 'freelancer'],
+    });
+
+    if (!application) {
+      throw new NotFoundException('Application not found');
+    }
+
+    const mission = await this.missionRepository.findOne({
+      where: { id: application.mission.id },
+      relations: ['preselectedFreelancers', 'selectedFreelancer', 'applications'],
+    });
+
+    if (!mission) {
+      throw new NotFoundException('Mission not found');
+    }
+
+    application.status = newStatus;
+
+    if (newStatus === ApplicationStatus.PRE_SELECTED) {
+      const alreadyPreselected = mission.preselectedFreelancers.some(
+        f => f.id === application.freelancer.id,
+      );
+      if (!alreadyPreselected) {
+        mission.preselectedFreelancers.push(application.freelancer);
+      }
+      await this.missionRepository.save(mission);
+     
+
+    } else if (newStatus === ApplicationStatus.ACCEPTED) {
+      mission.selectedFreelancer = application.freelancer;
+
+      mission.preselectedFreelancers = mission.preselectedFreelancers.filter(
+        f => f.id === application.freelancer.id,
+      );
+       const applications = mission.applications ?? [];
+      for (const app of applications) {
+        if (app.id !== application.id && app.status === ApplicationStatus.PRE_SELECTED) {
+          app.status = ApplicationStatus.REJECTED;
+          await this.applicationRepository.save(app);
+              await this.missionRepository
+              .createQueryBuilder()
+              .relation(Mission, "preselectedFreelancers")
+              .of(app.missionId)
+              .remove(app.freelancerId); 
+        }
+      }
+      mission.status='in_progress';
+      await this.missionRepository.save(mission);
+    }
+ 
+
+    await this.applicationRepository.save(application);
+
+    return application;
+  }
+
+  async getFreelancersByClient(userId: string): Promise<FreelancerProfile[]> {
+  const missions = await this.missionRepository.find({
+    where: { client: { user: { id: +userId } } },
+    relations: ['client', 'client.user'],
+  });
+
+  if (!missions.length) return [];
+
+  const missionIds = missions.map(m => m.id);
+
+  const applications = await this.applicationRepository.find({
+    where: { mission: { id: In(missionIds) } },
+    relations: ['freelancer', 'freelancer.user'], 
+  });
+
+  const freelancers = applications.map(app => app.freelancer);
+
+  const uniqueFreelancers = Array.from(new Map(freelancers.map(f => [f.id, f])).values());
+
+  return uniqueFreelancers;
+}
+
 }

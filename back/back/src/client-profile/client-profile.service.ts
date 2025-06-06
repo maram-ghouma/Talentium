@@ -28,11 +28,12 @@ export class ClientProfileService {
     relations: ['user'],
   });
 }
-async createProfileForUser(user: User,clientData: { phoneNumber?: string; country?: string }) {
+async createProfileForUser(user: User,clientData: { phoneNumber?: string; country?: string,  stripeAccountId: string }) {
   const profile = this.clientProfileRepository.create({
     user: user,
     phoneNumber: clientData.phoneNumber ?? undefined,
     country: clientData.country ?? undefined,
+    stripeAccountId: clientData.stripeAccountId,
   });
 
   return this.clientProfileRepository.save(profile);

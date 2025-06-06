@@ -7,12 +7,14 @@ import { PaymentService } from './payment.service';
 import { Invoice } from 'src/invoice/entities/invoice.entity';
 import { PaymentResolver } from './payment.resolver';
 import { FreelancerProfile } from 'src/freelancer-profile/entities/freelancer-profile.entity';
+import { PaymentController } from './payment.controller';
 
 
 @Module({
   imports: [TypeOrmModule.forFeature([Mission, User, Dispute,Invoice,FreelancerProfile])],
     providers: [PaymentService, PaymentResolver],
   exports: [PaymentService, PaymentResolver],
+  controllers: [PaymentController],
   
 })
 export class PaymentModule {}

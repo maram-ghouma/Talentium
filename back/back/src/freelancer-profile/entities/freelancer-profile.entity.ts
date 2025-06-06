@@ -4,6 +4,7 @@ import { ObjectType, Field, Int, Float } from '@nestjs/graphql';
 import { Mission } from 'src/mission/entities/mission.entity';
 import { User } from 'src/user/entities/user.entity';
 import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn, OneToMany } from 'typeorm';
+import { Interview } from 'src/interview/entities/interview.entity';
 
 @ObjectType()
 @Entity()
@@ -11,8 +12,7 @@ export class FreelancerProfile {
   @Field(() => Int)
   @PrimaryGeneratedColumn()
   id: number;
-
-  @Field(() => User)
+  @Field(()=>User)
   @OneToOne(() => User)
   @JoinColumn()
   user: User;
@@ -41,7 +41,7 @@ export class FreelancerProfile {
   @Column({ nullable: true })
   hourlyRate: number;
 
-  @Field({ nullable: true })
+  @Field({nullable: true})
   @Column({ nullable: true })
   bio: string;
 
@@ -51,8 +51,8 @@ export class FreelancerProfile {
 
 
   @Field(() => [Application], { nullable: true })
-@OneToMany(() => Application, application => application.freelancer)
-applications?: Application[];
+  @OneToMany(() => Application, application => application.freelancer)
+  applications?: Application[];
 
  
   
@@ -60,4 +60,8 @@ applications?: Application[];
   @Field({ nullable: true })
   @Column({ nullable: true })
   stripeAccountId: string;
+
+    @Field(() => [Interview], { nullable: true })
+  @OneToMany(() => Interview, (interview) =>interview.freelancer)
+  interviews: Interview[];
 }

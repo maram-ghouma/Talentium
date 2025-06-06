@@ -42,6 +42,18 @@ export const GET_MISSIONS = gql`
         total
         completed
       }
+      selectedFreelancer{
+          id
+          user{
+            username
+            imageUrl
+          }
+          skills
+          bio
+          selectedMissions {
+            id
+          }     
+      }
     
     }
   }

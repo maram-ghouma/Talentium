@@ -104,3 +104,8 @@ export const getFreelancerMissionsWithReviews = async () => {
   const response = await api.get('mission/my-missions-with-reviews');
   return response.data;
 };
+export const getClientName = async (): Promise<string | null> => {
+    const response = await api.get(`/auth/getClientName`);
+    console.log('Client name response:', response.data);
+    return response.data || 'error';
+  }

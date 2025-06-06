@@ -12,10 +12,12 @@ import { UserRole } from '../user/entities/user.entity';
 import { JwtAuthResponse } from './dto/jwt-auth-response.dto';
 import { ClientProfileService } from 'src/client-profile/client-profile.service';
 import { FreelancerProfileService } from 'src/freelancer-profile/freelancer-profile.service';
+import { PaymentService } from 'src/payment/payment.service';
 
 @Injectable()
 export class AuthService {
   constructor(
+    private readonly paymentService:PaymentService,
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
      private readonly clientProfilesService: ClientProfileService,
@@ -78,14 +80,20 @@ export class AuthService {
       password: hashedPassword,
       imageUrl: "/uploads/image.png"
     });
+    const customer = await this.paymentService.stripe.customers.create({
+  email: registerDto.email,
+  name: registerDto.username,
+});
     await this.clientProfilesService.createProfileForUser(newUser, {
   phoneNumber: registerDto.phoneNumber,
   country: registerDto.country,
+  stripeAccountId: customer.id,
 });
 
     await this.freelancerProfilesService.createProfileForUser(newUser, {
   phoneNumber: registerDto.phoneNumber,
   country: registerDto.country,
+  stripeAccountId: customer.id,
 });
 
     const { password, ...result } = newUser;

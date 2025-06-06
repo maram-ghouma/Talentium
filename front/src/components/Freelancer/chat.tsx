@@ -2,10 +2,12 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Search, Send, Paperclip, Image, Smile, MoreVertical, Phone, Video } from 'lucide-react';
 import { Message, ChatConversation } from '../../types';
 import '../../Styles/Freelancer/chat.css';
-import { chatConversations, messages } from '../../Data/mockData';
+
 import { MainLayout } from '../layout/MainLayout';
 
 const Chat: React.FC = () => {
+  const messages: Message[] = [];
+  const chatConversations: ChatConversation[] = [];// Mock data for conversations, replace with actual data fetching logic
   const [inputValue, setInputValue] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [isTyping, setIsTyping] = useState(false);
