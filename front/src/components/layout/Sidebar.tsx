@@ -17,6 +17,8 @@ import {
   Handshake,
   Shield,
   SwitchCamera,
+  DollarSign,
+  Home,
 } from 'lucide-react';
 import '../../Styles/sidebar.css';
 import { report } from 'process';
@@ -42,29 +44,31 @@ export const Sidebar: React.FC<SidebarProps> = ({
   userType, 
   onRoleChange,
 }) => {
-  // Admin menu items
+  // Client menu items
   const ClientMenuItems = [
+    { icon: Home, label: 'Home', path: "/client" },
     { icon: User, label: 'Profile', path: "/client/editProfile" },
-    { icon: Bell, label: 'Notifications', badge: 3, path: "" },
-    { icon: CalendarCheck, label: 'Schedule', path: "" },
-    { icon: MessageSquare, label: 'Chat', badge: 2 , path: ""},
-    { icon: History, label: 'History',path: "" },
+    { icon: Bell, label: 'Notifications', badge: 3, path: "/notifications" },
+    { icon: CalendarCheck, label: 'Schedule', path: "/client/interviews" },
+    { icon: MessageSquare, label: 'Chat', badge: 2 , path: "/client/chat" },
 
   ];
 
-  // Client menu items
+  // Admin menu items
   const AdminMenuItems = [
     { icon: Briefcase, label: 'Dashboard' ,path: "/admin"}, 
-    { icon: Bell, label: 'Notifications', badge: 3,path: "" },
+    { icon: Bell, label: 'Notifications', badge: 3,path: "notifications" },
     { icon: Shield, label: 'Reports',path: "/admin/reports" },
+    { icon: DollarSign, label: 'Payment',path: "/jalons" },
+
 
   ];
   const FreelancerMenuItems = [
+    { icon: Home, label: 'Home', path: "/Freelancer" },
     { icon: User, label: 'Profile', path: "/Freelancer/editProfile" },
     { icon: Bell, label: 'Notifications', badge: 3, path: "/Freelancer" },
     { icon: MessageSquare, label: 'Chat', badge: 2, path: "/Freelancer/chat" },
     { icon: History, label: 'Work History', path: "/Freelancer/history" },
-    { icon: Briefcase, label: 'Missions', path: "/Freelancer" },
   ];
   const [userDropdownOpen, setUserDropdownOpen] = React.useState(false);
 const toggleUserDropdown = () => setUserDropdownOpen(prev => !prev);
