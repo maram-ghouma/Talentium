@@ -1,9 +1,11 @@
-import React, { JSX, useState } from 'react';
+import React, { JSX, useEffect, useState } from 'react';
 import { Star, Calendar } from 'lucide-react';
 import { WorkHistoryItem } from '../../types';
 
 import History from '../../components/Freelancer/History';
 import { MainLayout } from '../../components/layout/MainLayout';
+import { getFreelancerMissionsWithReviews } from '../../services/userService';
+import { useNavigate } from 'react-router-dom';
 
 interface HistoryProps {
   historyItems: WorkHistoryItem[];
@@ -44,7 +46,31 @@ const FreelancerHistory: React.FC<HistoryProps> = ({ historyItems }) => {
     const handleSearch = (query: string) => {
       console.log('Search query:', query);
     };
-  
+    const [loading, setLoading] = useState(true);
+        const [error, setError] = useState<string | null>(null);
+        const navigate = useNavigate();
+    const [data, setData] = useState<any[]>([]);
+    useEffect(() => {
+          const fetchProfile = async () => {
+            try {
+              const data = await getFreelancerMissionsWithReviews();
+              setData(data);
+
+
+            } catch (err: any) {
+            if (err.response && err.response.status === 404) {
+              navigate('/404', { replace: true });
+              return;
+            }
+            setError('Failed to load profile');
+            } finally {
+              setLoading(false);
+            }
+          };
+      
+          fetchProfile();
+      
+        }, []);
     return (
       <MainLayout
         isDarkMode={isDarkMode}
@@ -55,7 +81,7 @@ const FreelancerHistory: React.FC<HistoryProps> = ({ historyItems }) => {
         usertype="freelancer"
 
       >
-    <History historyItems={historyItems} />
+    <History historyItems={data} />
   </MainLayout>
   );
 };

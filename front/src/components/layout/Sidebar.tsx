@@ -70,9 +70,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
 const toggleUserDropdown = () => setUserDropdownOpen(prev => !prev);
 
   // Determine which menu to render based on userType
-  const menuItems = userType === 'admin' 
+  const menuItems = profileRole === 'admin' 
   ? AdminMenuItems 
-  : userType === 'client' 
+  : profileRole === 'client' 
   ? ClientMenuItems 
   : FreelancerMenuItems;
 
@@ -146,7 +146,7 @@ const toggleUserDropdown = () => setUserDropdownOpen(prev => !prev);
             </Link>
           ))}
             {/* Admin-specific "Users" dropdown */}
-  {userType === 'admin' && (
+  {profileRole === 'admin' && (
     <div className="sidebar-dropdown">
       <button onClick={toggleUserDropdown} className="sidebar-button">
         <div className="icon-container">
@@ -186,7 +186,7 @@ const toggleUserDropdown = () => setUserDropdownOpen(prev => !prev);
 
       <div className="footer-menu">
         {/* Admin specific footer items */}
-        {userType === 'admin' && (
+        {profileRole === 'admin' && (
           <>
             <button key="sign-out" className="sidebar-button" onClick={signOut}>
               <div className="icon-container">
@@ -198,7 +198,7 @@ const toggleUserDropdown = () => setUserDropdownOpen(prev => !prev);
         )}
 
         {/* Client specific footer items */}
-        {(userType === 'client' || userType === 'freelancer') && (
+        {(profileRole === 'client' || profileRole === 'freelancer') && (
           <>
           <button key="sign-out" className="sidebar-button" onClick={handleSwitch} disabled={loading}>
             <div className="icon-container">

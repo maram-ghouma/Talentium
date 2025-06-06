@@ -225,45 +225,43 @@ export const workHistory: WorkHistoryItem[] = [
   {
     id: "work-1",
     title: "Brand Identity Design",
-    client: "Green Earth Foods",
     date: "Feb 2024",
     description: "Created a comprehensive brand identity including logo, color scheme, and typography for an organic food company.",
-    skills: ["Branding", "Logo Design", "Typography"],
-    endDate: "Feb 2024",
-    testimonial: {
-      text: "Alex delivered exceptional work! The brand identity perfectly captures our company values.",
-      author: "Green Earth Foods",
-      rating: 5.0
-    }
+    review: {
+      comment: "Alex delivered exceptional work! The brand identity perfectly captures our company values.",
+      reviewer: {
+        id: "client-3",
+        username: "Green Earth Foods",
+        role: "Client",
+        email: "client3@example.com"
+      },
+      stars: 5.0,
+      date: "2024-02-28",
+      id: "review-1",
+      reviewee: {
+        id: "user-1",
+        username: "Alex Morgan",
+        role: "Freelancer",
+        email: "alex.morgan@example.com"
+      }
+    },
+    client: {
+      id: 3,
+      user: {
+        id: "client-3",
+        username: "Green Earth Foods",
+        role: "Client",
+        email: "client3@example.com"
+      },
+      industry: "Food & Beverage",
+      linkedIn: "https://linkedin.com/company/green-earth-foods",
+      phoneNumber: "+1 (555) 987-6543",
+      country: "USA",
+      bio: "We are committed to providing organic and sustainable food options."
+    },
+    requiredSkills: ["Branding", "Logo Design", "Typography"],
   },
-  {
-    id: "work-2",
-    title: "E-commerce Website Redesign",
-    client: "FashionHub",
-    date: "Jan 2024",
-    description: "Complete redesign of e-commerce website with focus on improving user experience and increasing conversion rates.",
-    skills: ["UI Design", "UX Research", "Wireframing", "Prototyping"],
-    endDate: "Jan 2024",
-    testimonial: {
-      text: "Great work on our website redesign. Sales increased by 25% after implementation.",
-      author: "FashionHub",
-      rating: 4.8
-    }
-  },
-  {
-    id: "work-3",
-    title: "Mobile App UI Design",
-    client: "HealthTrack",
-    date: "Dec 2023",
-    description: "Designed the user interface for a health tracking mobile application for iOS and Android platforms.",
-    skills: ["Mobile Design", "UI Design", "Figma", "Prototyping"],
-    endDate: "Dec 2023",
-    testimonial: {
-      text: "Alex was professional and delivered on time. Good communication throughout the project.",
-      author: "HealthTrack",
-      rating: 4.7
-    }
-  }
+ 
 ]
 
 // Creating user profile

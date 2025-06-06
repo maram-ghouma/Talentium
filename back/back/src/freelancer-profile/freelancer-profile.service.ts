@@ -125,6 +125,11 @@ async updateFreelancerProfile(freelancerId: number, updateDto: UpdateFreelancerP
     completedMissions,
   };
 }
+async getAllFreelancers(): Promise<FreelancerProfile[]> {
+    return this.freelancerProfileRepository.find({
+      relations: ['user'], // eager load the user relation
+    });
+  }
 
 
 

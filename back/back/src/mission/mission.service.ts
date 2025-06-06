@@ -7,6 +7,7 @@ import { UpdateMissionInput } from './dto/update-mission.input';
 import { User } from 'src/user/entities/user.entity';
 import {FreelancerProfile } from 'src/freelancer-profile/entities/freelancer-profile.entity';
 import { ClientProfile } from 'src/client-profile/entities/client-profile.entity';
+import { Review } from 'src/review/entities/review.entity';
 
 
 @Injectable()
@@ -22,8 +23,10 @@ export class MissionService {
     private freelancerProfileRepository: Repository<FreelancerProfile>,
 
     @InjectRepository(ClientProfile)
-    private clientProfileRepository: Repository<ClientProfile>
+    private clientProfileRepository: Repository<ClientProfile>,
 
+    @InjectRepository(Review)
+    private reviewRepository: Repository<Review>,
   ) {}
 
 async create(createMissionInput: CreateMissionInput, user: any): Promise<Mission> {
@@ -119,6 +122,61 @@ async remove(id: number): Promise<boolean> {
     take: 2,
   });
 }
+async getAdminStats() {
+    const totalUsers = await this.userRepository.count();
+
+    const selectedFreelancers = await this.missionRepository
+      .createQueryBuilder('mission')
+      .where('mission.selectedFreelancerId IS NOT NULL')
+      .getCount();
+
+    const completedMissions = await this.missionRepository.count({
+      where: { status: 'completed' },
+    });
+
+    return {
+      totalUsers,
+      selectedFreelancers,
+      completedMissions,
+    };
+  }
+  async getFreelancerMissionsWithReviews(userId: number) {
+  const freelancerProfile = await this.freelancerProfileRepository
+  .createQueryBuilder('profile')
+  .leftJoinAndSelect('profile.user', 'user')
+  .where('user.id = :freelancerId', { freelancerId: userId })
+  .getOne();
+  if (!freelancerProfile) {
+    return []; 
+  }
+
+  const missions = await this.missionRepository.find({
+    where: {
+      selectedFreelancer: { id: freelancerProfile.id },
+    },
+    relations: ['client'],
+  });
+
+  const result = await Promise.all(
+    missions.map(async (mission) => {
+      const review = await this.reviewRepository.findOne({
+        where: {
+          mission: { id: mission.id },
+          reviewedUser: { id: userId },
+        },
+        relations: ['reviewer'],
+      });
+
+      return {
+        ...mission,
+        review: review || null,
+      };
+    })
+  );
+
+  return result;
+}
+
 
 
 

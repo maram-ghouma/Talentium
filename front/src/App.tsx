@@ -49,6 +49,7 @@ function App() {
   <Route path="/admin/freelancers" element={<FreelancersList />} />
 
   <Route path="/Freelancer/profile" element={<FreelancerProfile />} />
+  <Route path="/Freelancer/profile/:id" element={<FreelancerProfile />} />
   <Route path="/Freelancer/editProfile" element={<FreelancerEditProfile />} />
   <Route path="/Freelancer/mission/:id" element={<MissionDetails mission={missions[0]} />} />
   <Route path="/Freelancer/chat" element={<FreelancerChat />} />
@@ -62,6 +63,7 @@ function App() {
     <Route path="/client/editProfile" element ={<ClientEditProfile/>}/>
   <Route path="/client/interviews" element ={<ClientInterviewSchedule/>}/>
   <Route path="/client/profile" element ={<ClientProfilePage/>}/>
+  <Route path="/client/profile/:id" element ={<ClientProfilePage/>}/>
   <Route path="/jalons" element ={<JalonsPage/>}/>
 
   <Route path="/signup" element={<SignUpPage />} />

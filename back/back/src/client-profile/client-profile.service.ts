@@ -115,5 +115,10 @@ async updateClientProfile(clientId: number, updateDto: UpdateClientProfileDto) {
     hiredFreelancers: parseInt(hiredFreelancers.count) || 0,
   };
 }
+async getAllClients(): Promise<ClientProfile[]> {
+    return this.clientProfileRepository.find({
+      relations: ['user'], 
+    });
+  }
 
 }

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { MainLayout } from '../../components/layout/MainLayout'; // Ensure MainLayout is correctly imported
 import ClientProfile from '../../components/client/profile/ClientProfile';
 import { getClientMissions, getClientProfile, getClientReviews, getClientStats } from '../../services/userService';
+import { useNavigate } from 'react-router-dom';
 
 
 const ClientProfilePage: React.FC = () => {
@@ -16,8 +17,28 @@ const ClientProfilePage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [Reviews, setReviews] = useState<any>(null);
   const [Stats, setStats] = useState<any>(null);
+const navigate = useNavigate();
+    useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const data = await getClientProfile();
+        setProfile(data);
+      } catch (err: any) {
+        if (err.response && err.response.status === 404) {
+          navigate('/404', { replace: true });
+          return;
+        }
+        setError('Failed to load profile');
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  useEffect(() => {
+    fetchProfile();
+
+  }, []);
+    useEffect(() => {
+
       const fetchMissions = async () => {
         try {
           const data = await getClientMissions();
@@ -32,21 +53,7 @@ const ClientProfilePage: React.FC = () => {
       fetchMissions();
   
     }, []);
-  useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const data = await getClientProfile();
-        setProfile(data);
-      } catch (err) {
-        setError('Failed to load profile');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProfile();
-
-  }, []);
+  
     useEffect(() => {
       const fetchReviews = async () => {
         try {
