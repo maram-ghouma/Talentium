@@ -477,7 +477,7 @@ async createEscrowPayment(missionId: number, clientId: number) {
   private async generateInvoicePDF(invoice: Invoice) {
   const load = await this.invoiceRepository.findOne({
     where: { id: invoice.id },
-    relations: ['client', 'freelancer', 'mission'],
+    relations: ['client', 'freelancer', 'mission','freelancer.user'],
   });
 
   if (!load) {
