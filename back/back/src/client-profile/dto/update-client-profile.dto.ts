@@ -40,4 +40,8 @@ export class UpdateClientProfileDto {
   @IsOptional()
   @IsString()
   linkedIn?: string;
+
+  @IsOptional()
+  @IsString() 
+  stripeAccountId?: string;
 }

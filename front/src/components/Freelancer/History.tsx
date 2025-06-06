@@ -48,7 +48,8 @@ const History: React.FC<HistoryProps> = ({ historyItems }) => {
      
     <div className="history-container">
       <div className="timeline">
-        {historyItems?.map((item) => (
+      {historyItems && historyItems.length > 0 ? (
+          historyItems.map((item) => (
           <div key={item.id} className="timeline-item">
             <div className="timeline-marker"></div>
             <div className="timeline-date">
@@ -86,7 +87,10 @@ const History: React.FC<HistoryProps> = ({ historyItems }) => {
               )}
             </div>
           </div>
-        ))}
+            ))
+        ) : (
+          <div className="no-missions-message" style={{ margin: '100px 0 200px ', padding: '10px', textAlign: 'center', backgroundColor: 'var(--rose)', color: 'var(--navy-primary)', fontWeight: 'bold' }}>No missions yet</div>
+        )}
       </div>
     </div>
   

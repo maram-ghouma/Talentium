@@ -6,6 +6,7 @@ export const getClientProfile = async (id?: number | null) => {
   return response.data;
 };
 
+
 export const getUser = async () => {
   const response = await api.get('/auth/getUser');
   return response.data;

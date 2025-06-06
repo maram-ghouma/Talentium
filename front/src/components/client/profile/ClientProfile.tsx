@@ -44,7 +44,7 @@ const ClientProfile: React.FC<ClientProfileProps> = ({ darkMode = false , profil
   phone: profile.phoneNumber ,
   linkedin: profile.linkedIn ,
   avatar: profile.user?.imageUrl ,
-
+  stripeAccountId: profile.stripeAccountId ,
   });
   console.log(formData)
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -107,7 +107,8 @@ const handleSavePersonal = async () => {
       email: formData.email,
       phoneNumber: formData.phone,
       linkedIn: formData.linkedin,
-      bio: formData.tagline, 
+      bio: formData.tagline,
+      stripeAccountId: formData.stripeAccountId,
     };
 
     const result = await updateClientProfile(updatedInfoData);
@@ -360,6 +361,21 @@ const handleSavePersonal = async () => {
                 type="text"
                 name="linkedin"
                 value={formData.linkedin}
+                onChange={handleInputChange}
+              />
+            </Form.Group>
+          </Col>
+          <Col md={6} className="mb-3">
+            <Form.Group>
+              <Form.Label className="d-flex align-items-center info-label">
+                <MapPin size={18} className="me-2" />
+                <span>Stripe Account ID</span>
+              </Form.Label>
+              <Form.Control
+                type="password"
+                placeholder="Enter your Stripe Account ID"
+                name="stripeAccountId"
+                value={formData.stripeAccountId}
                 onChange={handleInputChange}
               />
             </Form.Group>

@@ -45,6 +45,7 @@ const ClientProfile: React.FC<ClientProfileProps> = ({ darkMode = false , profil
   linkedin: '',
   avatar: '',
   skills: [] as string[],
+  stripeAccountId: '',
 });
 
 useEffect(() => {
@@ -60,6 +61,7 @@ useEffect(() => {
       linkedin: profile.linkedIn ?? '',
       avatar: profile.user.imageUrl ?? '',
       skills: profile.skills ?? [],
+      stripeAccountId: profile.stripeAccountId ?? '',
     });
   }
 }, [profile]);
@@ -124,6 +126,7 @@ const handleSavePersonal = async () => {
       email: formData.email,
       phoneNumber: formData.phone,
       linkedIn: formData.linkedin,
+      stripeAccountId: formData.stripeAccountId,
     };
 
     const result = await updateFreelancerProfile(updatedInfoData);
@@ -411,6 +414,21 @@ const handleSavePersonal = async () => {
               />
             </Form.Group>
           </Col>
+          <Col md={6} className="mb-3">
+                      <Form.Group>
+                        <Form.Label className="d-flex align-items-center info-label">
+                          <MapPin size={18} className="me-2" />
+                          <span>Stripe Account ID</span>
+                        </Form.Label>
+                        <Form.Control
+                          type="password"
+                          placeholder="Enter your Stripe Account ID"
+                          name="stripeAccountId"
+                          value={formData.stripeAccountId}
+                          onChange={handleInputChange}
+                        />
+                      </Form.Group>
+                    </Col>
         </Row>
       </Form>
     ) : (
@@ -610,6 +628,7 @@ const handleSavePersonal = async () => {
               </Card.Body>
             </Card>
           </Col>
+          
         </Row>
 
         {/* Recent Missions */}

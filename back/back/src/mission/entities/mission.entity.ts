@@ -132,9 +132,9 @@ export class Mission {
 
 @ObjectType()
 class TaskStats {
-  @Field(() => Int)
+  @Field(() => Int,{nullable: true})
   total: number;
 
-  @Field(() => Int)
+  @Field(() => Int, {nullable: true})
   completed: number;
 }
