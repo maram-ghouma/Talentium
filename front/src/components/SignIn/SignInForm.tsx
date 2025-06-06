@@ -6,7 +6,6 @@ import './SignInForm.css';
 import { loginUser } from '../../services/authService';
 import { useNavigate } from 'react-router-dom';
 
-
 const SignInForm: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -23,8 +22,9 @@ const SignInForm: React.FC = () => {
       const response = await loginUser({ email, password });
       if (response.accessToken) {
         localStorage.setItem('authToken', response.accessToken);
-        console.log('Login successful:', response);
-  const role = response.user.currentRole;
+        console.log('Login successful:', response); // Debug response
+        console.log('Stored authToken:', localStorage.getItem('authToken')); // Debug token
+        const role = response.user?.currentRole;
 
         // Redirect based on role
         if (role === 'freelancer') {
@@ -34,14 +34,16 @@ const SignInForm: React.FC = () => {
         } else if (role === 'admin') {
           navigate('/admin');
         } else {
-          // Default redirect if role unknown
-          navigate('/');
+          console.log('Unknown role:', role); // Debug
+          setError('Invalid user role');
+          localStorage.removeItem('authToken'); // Clear invalid token
+          navigate('/signin'); // Stay on signin
         }
       } else {
         setError('Login failed: No token received');
       }
     } catch (err: any) {
-      // Handle error from API call
+      console.error('Login error:', err); // Debug
       setError(err.response?.data?.message || 'Login failed');
     } finally {
       setLoading(false);

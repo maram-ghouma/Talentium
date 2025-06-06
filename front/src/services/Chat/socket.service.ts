@@ -2,18 +2,23 @@
 import { io, Socket } from 'socket.io-client';
 import { Observable } from 'rxjs';
 
-const SOCKET_URL = 'http://localhost:3000'; // Replace with your actual backend URL
+const SOCKET_URL = 'http://localhost:3000/chat'; 
 
 export class SocketService {
   private socket: Socket;
 
   constructor() {
     console.log('SocketService: Connecting to', SOCKET_URL);
-    this.socket = io(SOCKET_URL, {
-      autoConnect: true,
-      withCredentials: true,
-      transports: ['websocket', 'polling'],
-    });
+    const token = localStorage.getItem('authToken');
+console.log('[SocketService] Token being sent:', token);
+
+this.socket = io(SOCKET_URL, {
+  autoConnect: true,
+  transports: ['websocket', 'polling'],
+  auth: {
+    token,
+  },
+});
 
     this.socket.on('connect', () => {
       console.log('SocketService: Successfully connected. Socket ID:', this.socket.id);

@@ -1,9 +1,11 @@
-// src/services/chat.service.ts
-import axios from 'axios';
-import socketService from './socket.service';
-import { Observable } from 'rxjs';
+// ChatService.ts
 
-export interface Message {
+import api from '../axiosConfig';
+import { SocketService } from './socket.service';
+import { EventEmitter } from 'events';
+import { AxiosError } from 'axios';
+
+export interface ChatMessage {
   id: number;
   contactId: number;
   text: string;
@@ -14,8 +16,8 @@ export interface Message {
 
 export interface Contact {
   id: number;
-  //name: string;
-  //avatar: string;
+  name: string;
+  avatar?: string;
   unreadCount: number;
   lastMessage?: {
     text: string;
@@ -24,266 +26,247 @@ export interface Contact {
   isActive: boolean;
 }
 
-export interface ConversationMessage {
-  id: number;
-  conversation: { id: number };
-  content: string;
-  timestamp: string;
-  senderId: number;
-  isRead: boolean;
-}
+export class ChatService {
+  private apiUrl = '/chat';
 
-export interface Conversation {
-  id: number;
-  messages: ConversationMessage[];
-  isActive: boolean;
-  participants: number[];
-}
-
-export interface GetConversationsResponse {
-  userId: number;
-  conversations: Conversation[];
-}
-
-class ChatService {
-  private apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:3000/chat';
   private contacts: Contact[] = [];
-  private messagesMap = new Map<number, Message[]>();
+  private messagesMap = new Map<number, ChatMessage[]>();
+  private loadedContacts = new Set<number>();
+
+  private contactsEmitter = new EventEmitter();
+  private currentContactEmitter = new EventEmitter();
+  private currentMessagesEmitter = new EventEmitter();
+
   private currentContact: Contact | null = null;
-  private currentMessages: Message[] = [];
-  private currentUserId: number | null = null;
+  private currentMessages: ChatMessage[] = [];
 
-  async initialize(): Promise<void> {
-    try {
-      const { data } = await axios.get<GetConversationsResponse>(`${this.apiUrl}/conversations`);
-      this.currentUserId = data.userId;
+  private currentUserId: number | null = null; // Replace with actual user ID from auth context
 
-      const newMap = new Map<number, Message[]>();
-
-      this.contacts = data.conversations.map((convo) => {
-        const messages: Message[] = convo.messages
-          .map((msg) => ({
-            id: msg.id,
-            contactId: convo.id,
-            text: msg.content,
-            sent: msg.senderId === this.currentUserId,
-            date: new Date(msg.timestamp),
-            isRead: msg.isRead,
-          }))
-          .sort((a, b) => a.date.getTime() - b.date.getTime());
-
-        newMap.set(convo.id, messages);
-        
-
-        return {
-          id: convo.id,
-          /*name: convo.participants[0] === this.currentUserId ? convo.participants[1].name : convo.participants[0].name, // will improve the logic later
-          avatar: encodeURIComponent(
-            convo.participants[0] === this.currentUserId
-              ? convo.participants[1].avatar
-              : convo.participants[0].avatar  // will improve the logic later
-          ),*/
-          unreadCount: messages.filter((msg) => !msg.isRead && !msg.sent).length,
-          lastMessage: messages.length
-            ? {
-                text: messages[messages.length - 1].text,
-                date: messages[messages.length - 1].date,
-              }
-            : {
-                text: 'no messages yet',
-                date: new Date(),
-              },
-          isActive: convo.isActive,
-        };
-      });
-
-      this.messagesMap = newMap;
-
-      socketService.listen<ConversationMessage>('newMessage').subscribe((message) => {
-        this.handleIncomingMessage(message);
-      });
-    } catch (error) {
-      console.error('Error initializing chat:', error);
-    }
+  constructor(private socketService: SocketService) {
+    this.loadContacts();
+    this.listenForIncomingMessages();
   }
 
-  getContacts(): Contact[] {
+  async loadContacts() {
+  try {
+    const response = await api.get<{ userId: number; conversations: any[] }>(`${this.apiUrl}/conversations`);
+    this.currentUserId = response.data.userId;
+    console.log('[ChatService][LOAD] Raw API response:', JSON.stringify(response.data, null, 2));
+
+    const contacts = (response.data.conversations || []).map((convo) => {
+      console.log('[ChatService][LOAD] Processing convo:', convo?.id || 'undefined');
+      const messages = (convo.messages || []).map((msg: any) => ({
+        id: msg?.id || 0, // Safe access
+        contactId: convo?.id || 0,
+        text: msg?.content || '',
+        sent: this.currentUserId === (msg?.senderId ?? 0),
+        date: new Date(msg?.timestamp || Date.now()),
+        isRead: msg?.isRead ?? false,
+      })).sort((a, b) => a.date.getTime() - b.date.getTime());
+
+      this.messagesMap.set(convo?.id || 0, messages);
+
+      const unreadCount = messages.filter(msg => !msg.isRead && !msg.sent).length;
+      const otherUser = (convo.participants || []).find(p => p?.id !== this.currentUserId) || {};
+
+      return {
+        id: convo?.id || 0,
+        name: otherUser?.name || 'Unknown',
+        avatar: otherUser?.imageUrl || '',
+        unreadCount,
+        isActive: convo?.isActive ?? true,
+        lastMessage: (convo.messages || []).length
+          ? {
+              text: convo.messages[0]?.content || 'No content',
+              date: new Date(convo.messages[0]?.timestamp || Date.now()),
+            }
+          : {
+              text: 'no messages yet',
+              date: new Date(),
+            },
+      };
+    });
+
+    console.log('[ChatService][LOAD] Mapped contacts:', contacts);
+    this.contacts = contacts;
+    this.contactsEmitter.emit('update', contacts);
+  } catch (err: AxiosError | any) {
+    console.error('[ChatService][LOAD] Error loading contacts:', {
+      message: err.message,
+      status: (err.response as any)?.status,
+      data: (err.response as any)?.data,
+      headers: (err.config as any)?.headers,
+      token: localStorage.getItem('authToken')?.slice(0, 20) + '...',
+    });
+    this.contacts = [];
+    this.contactsEmitter.emit('update', []);
+  }
+}
+
+  getContacts() {
     return this.contacts;
   }
 
-  getCurrentContact(): Contact | null {
-    return this.currentContact;
+  onContactsUpdate(callback: (contacts: Contact[]) => void) {
+    this.contactsEmitter.on('update', callback);
   }
 
-  getCurrentMessages(): Message[] {
-    return this.currentMessages;
+  onCurrentContactUpdate(callback: (contact: Contact | null) => void) {
+    this.currentContactEmitter.on('update', callback);
   }
 
-  selectContact(contactId: number): void {
-    const contact = this.contacts.find((c) => c.id === contactId);
+  onCurrentMessagesUpdate(callback: (messages: ChatMessage[]) => void) {
+    this.currentMessagesEmitter.on('update', callback);
+  }
+
+  setCurrentContact(contactId: number) {
+    const contact = this.contacts.find(c => c.id === contactId);
+    this.socketService.emit('joinRoom', contactId);
+
+    if (contact) {
+      this.socketService.emit('markAsRead', { conversationId: contactId });
+      contact.unreadCount = 0;
+      this.currentContact = contact;
+      this.currentContactEmitter.emit('update', contact);
+
+      const messages = (this.messagesMap.get(contactId) || []).map(msg => ({
+        ...msg,
+        isRead: msg.sent ? msg.isRead : true,
+      }));
+
+      this.currentMessages = messages;
+      this.currentMessagesEmitter.emit('update', []);
+
+      setTimeout(() => {
+        this.currentMessagesEmitter.emit('update', messages);
+        this.contactsEmitter.emit('update', [...this.contacts]);
+      }, 1000);
+    }
+  }
+
+  sendMessage(contactId: number, message: string) {
+    const contact = this.contacts.find(c => c.id === contactId);
     if (!contact) return;
+    console.log('Sending message:', message, 'to contact ID:', contactId);
+    this.socketService.emit('sendMessage', {
+      conversationId: contactId,
+      senderId: this.currentUserId,
+      content: message,
+    });
+    console.log('Message sent:', message);
 
-    socketService.emit('joinRoom', contactId);
-    socketService.emit('markAsRead', { conversationId: contactId });
-
-    const updatedMessages = (this.messagesMap.get(contactId) || []).map((msg) => ({
-      ...msg,
-      isRead: !msg.sent ? true : msg.isRead,
-    }));
-
-    this.currentContact = contact;
-    this.currentMessages = [];
-
-    // Simulate loading delay (1s) to match Angular
-    setTimeout(() => {
-      this.currentMessages = updatedMessages;
-      this.contacts = this.contacts.map((c) =>
-        c.id === contactId ? { ...c, unreadCount: 0 } : c
-      );
-      this.messagesMap.set(contactId, updatedMessages);
-    }, 1000);
-  }
-
-  sendMessage(contactId: number, text: string): void {
     const messages = this.messagesMap.get(contactId) || [];
-    const newMessage: Message = {
-      id: messages.length + 1, // Match Angular's ID generation
+    const newMessage: ChatMessage = {
+      id: messages.length + 1,
       contactId,
-      text,
+      text: message,
       sent: true,
       date: new Date(),
       isRead: false,
     };
-
-    socketService.emit('sendMessage', {
-      conversationId: contactId,
-      content: text,
-    });
-
-    const updatedMessages = [...messages, newMessage].sort((a, b) => a.date.getTime() - b.date.getTime());
-    this.messagesMap.set(contactId, updatedMessages);
+    messages.push(newMessage);
+    this.messagesMap.set(contactId, messages);
 
     if (this.currentContact?.id === contactId) {
-      this.currentMessages = updatedMessages;
+      this.currentMessagesEmitter.emit('update', [...messages]);
     }
 
-    this.contacts = this.contacts.map((c) =>
-      c.id === contactId
-        ? { ...c, lastMessage: { text, date: newMessage.date } }
-        : c
-    );
-  }
-
-  private handleIncomingMessage(message: ConversationMessage): void {
-    const prevMsgs = this.messagesMap.get(message.conversation.id) || [];
-    const newMsg: Message = {
-      id: message.id,
-      contactId: message.conversation.id,
-      text: message.content,
-      sent: this.currentUserId === message.senderId,
-      date: new Date(message.timestamp),
-      isRead: false,
+    contact.lastMessage = {
+      text: message,
+      date: newMessage.date,
     };
 
-    // Check for duplicates using id
-    if (!prevMsgs.some((m) => m.id === newMsg.id)) {
-      const updatedMessages = [...prevMsgs, newMsg].sort((a, b) => a.date.getTime() - b.date.getTime());
-      this.messagesMap.set(newMsg.contactId, updatedMessages);
-
-      // Update unread count
-      this.contacts = this.contacts.map((c) =>
-        c.id === newMsg.contactId && !newMsg.isRead && !newMsg.sent
-          ? { ...c, unreadCount: c.unreadCount + 1 }
-          : c
-      );
-
-      if (this.currentContact?.id === newMsg.contactId) {
-        this.currentMessages = updatedMessages;
-      }
-
-      // Update lastMessage
-      this.contacts = this.contacts.map((c) =>
-        c.id === newMsg.contactId
-          ? { ...c, lastMessage: { text: newMsg.text, date: newMsg.date } }
-          : c
-      );
-    }
+    this.contactsEmitter.emit('update', [...this.contacts]);
   }
 
-  searchMessages(contactId: number, query: string): Message[] {
-    if (!query.trim()) {
-      return this.messagesMap.get(contactId) || [];
-    }
+  listenForIncomingMessages() {
+    this.socketService.listen<any>('newMessage').subscribe((message) => {
+      (async () => {
+        const currentMessages = [...(this.messagesMap.get(message.conversation.id) || [])];
+      
+        const exists = currentMessages.some(msg =>
+          msg.text === message.content &&
+          Math.abs(new Date(msg.date).getTime() - new Date(msg.date).getTime()) < 1000
+        );
+        if (exists) return;
+      
+        const response = await api.get<{ userId: number; conversations: any[] }>(`${this.apiUrl}/conversations`);
+        const currentUserId = response.data.userId;
+      
+        const newMessage: ChatMessage = {
+          id: message.id,
+          contactId: message.conversation.id,
+          text: message.content,
+          sent: currentUserId === message.sender.id,
+          date: new Date(message.timestamp),
+          isRead: false,
+        };
+      
+        currentMessages.push(newMessage);
+        currentMessages.sort((a, b) => a.date.getTime() - b.date.getTime());
+      
+        this.messagesMap.set(message.conversation.id, currentMessages);
+      
+        if (this.currentContact?.id === message.conversation.id) {
+          this.currentMessagesEmitter.emit('update', currentMessages);
+        }
+      })();
+    });
+}
 
+  searchMessages(contactId: number, query: string): ChatMessage[] {
     const messages = this.messagesMap.get(contactId) || [];
-    return messages.filter((message) =>
-      message.text.toLowerCase().includes(query.toLowerCase())
-    );
+    return query.trim()
+      ? messages.filter(m => m.text.toLowerCase().includes(query.toLowerCase()))
+      : messages;
   }
 
   searchContacts(query: string): Contact[] {
-    if (!query.trim()) {
-      return this.contacts;
-    }
-
-    return this.contacts.filter((contact) =>
-      contact.id.toString().includes(query)
-      //contact.name.toLowerCase().includes(query.toLowerCase())
-    );
+    return query.trim()
+      ? this.contacts.filter(c => c.name.toLowerCase().includes(query.toLowerCase()))
+      : this.contacts;
   }
 
   async refreshContacts(): Promise<void> {
     try {
-      const { data } = await axios.get<GetConversationsResponse>(`${this.apiUrl}/conversations`);
-      if (!data) {
-        throw new Error('Failed to fetch conversations: response is undefined');
-      }
+      const response = await api.get<{ userId: number; conversations: any[] }>(`${this.apiUrl}/conversations`);
+      const currentUserId = response.data.userId;
 
-      this.currentUserId = data.userId;
-      const newMap = new Map<number, Message[]>();
 
-      this.contacts = data.conversations.map((convo) => {
-        const messages: Message[] = convo.messages
-          .map((msg) => ({
-            id: msg.id,
-            contactId: convo.id,
-            text: msg.content,
-            sent: this.currentUserId === msg.senderId,
-            date: new Date(msg.timestamp),
-            isRead: msg.isRead,
-          }))
-          .sort((a, b) => a.date.getTime() - b.date.getTime());
+      const contacts = response.data.conversations.map((convo) => {
+        const messages = convo.messages.map((msg: any) => ({
+          id: msg.id,
+          contactId: convo.id,
+          text: msg.content,
+          sent: currentUserId === msg.sender.id,
+          date: new Date(msg.timestamp),
+          isRead: msg.isRead,
+        })).sort((a, b) => b.date.getTime() - a.date.getTime());
 
-        newMap.set(convo.id, messages);
+        this.messagesMap.set(convo.id, [...messages].reverse());
+
+
+        const otherUser = convo.participants.find(p => p.id !== currentUserId);
 
         return {
           id: convo.id,
-          /*name: convo.participants[0] === this.currentUserId ? convo.participants[1].name : convo.participants[0].name, // will improve the logic later
-          avatar: encodeURIComponent(
-            convo.participants[0] === this.currentUserId ? convo.participants[1].avatar : convo.participants[0].avatar  // will improve the logic later 
-          ),*/
-          unreadCount: messages.filter((msg) => !msg.isRead && !msg.sent).length,
+          name: otherUser?.name || 'Unknown',
+          avatar: otherUser?.imageUrl || '', // or use a fallback image URL
           isActive: convo.isActive,
-          lastMessage: messages.length
+          unreadCount: convo.messages.filter((msg: any) => !msg.isRead && !(currentUserId === msg.sender.id)).length,
+          lastMessage: convo.messages.length
             ? {
-                text: messages[messages.length - 1].text,
-                date: messages[messages.length - 1].date,
+                text: convo.messages[0].content,
+                date: convo.messages[0].timestamp,
               }
             : undefined,
         };
       });
 
-      this.messagesMap = newMap;
-
-      // Update current messages if a contact is selected
-      if (this.currentContact) {
-        this.currentMessages = this.messagesMap.get(this.currentContact.id) || [];
-      }
-    } catch (error) {
-      console.error('Error refreshing contacts:', error);
+      this.contacts = contacts;
+      this.contactsEmitter.emit('update', contacts);
+    } catch (err) {
+      console.error('Error refreshing contacts:', err);
     }
   }
 }
-
-const chatService = new ChatService();
-export default chatService;

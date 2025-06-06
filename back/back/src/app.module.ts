@@ -19,6 +19,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { User } from './user/entities/user.entity';
 import { Conversation } from './conversation/entities/conversation.entity';
 import { Message } from './conversation/entities/message.entity'; // Import Message entity
+import { NotificationModule } from './notification/notification.module';
 
 @Module({
   imports: [
@@ -61,6 +62,7 @@ import { Message } from './conversation/entities/message.entity'; // Import Mess
       installSubscriptionHandlers: true,
     }),
     ConversationModule,
+    NotificationModule,
   ],
   controllers: [AppController, ChatController],
   providers: [AppService, ChatGateway, ChatService],
