@@ -222,7 +222,7 @@ export class PaymentService {
     });
   }
 }*/
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, IsNull } from 'typeorm';
 import Stripe from 'stripe';
@@ -252,7 +252,7 @@ export class PaymentService {
   }
 async createEscrowPayment(missionId: number, clientId: number) {
   const mission = await this.missionRepository.findOne({
-    where: { id: missionId },
+    where: { id: missionId  },
     relations: ['client', 'selectedFreelancer', 'selectedFreelancer.user']
   });
 
@@ -363,12 +363,14 @@ async createEscrowPayment(missionId: number, clientId: number) {
       await this.stripe.transfers.create({
         amount: releaseAmount,
         currency: 'eur',
-        destination: mission.selectedFreelancer.stripeAccountId,
+        //destination: mission.selectedFreelancer.stripeAccountId,
+        destination: 'acct_1RWz0BRBiMgVeRzi', // Test account for now
         metadata: {
           missionId: missionId.toString(),
           milestone: milestonePercentage.toString()
         }
       });
+      
 
       // Generate invoice
       await this.generateInvoice(
@@ -386,8 +388,39 @@ async createEscrowPayment(missionId: number, clientId: number) {
 
       return { success: true, amountReleased: releaseAmount / 100 };
     } catch (error) {
-      throw new Error(`Erreur lors de la libération du paiement: ${error.message}`);
+      console.error('Stripe error:', error);
+
+      if (error.type === 'StripeInvalidRequestError') {
+        // Invalid parameters or configuration
+        throw new HttpException(
+          {
+            message: 'Invalid request to Stripe. Please contact support.',
+          },
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      if (error.type === 'StripeCardError' || error.code === 'balance_insufficient') {
+        // Not enough funds in test mode or real
+        throw new HttpException(
+          {
+            message: 'Payment failed due to insufficient Stripe account funds. Please try again later.',
+          },
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      // Generic fallback for unknown Stripe errors
+      throw new HttpException(
+        {
+          message: 'An unexpected Stripe error occurred. Please try again.',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
+      //throw new Error(`Erreur lors de la libération du paiement: ${error.message}`);
+      
+    
   }
 
   // Add method to check payment status
@@ -496,6 +529,18 @@ async createEscrowPayment(missionId: number, clientId: number) {
     return missions;
   }
 
+  async getMissionById(missionId: number): Promise<Mission> {
+    const mission = await this.missionRepository.findOne({
+      where: { id: missionId },
+      relations: ['client', 'selectedFreelancer', 'selectedFreelancer.user']
+    });
+
+    if (!mission) {
+      throw new Error('Mission non trouvée');
+    }
+
+    return mission;
+  }
   async getPaymentHistory(missionId: number): Promise<Invoice[]> {
     return await this.invoiceRepository.find({
       where: { missionId },
@@ -533,6 +578,6 @@ async retryPaymentSetup(missionId: number): Promise<CreateEscrowResponse> {
   }
   
   // Create new escrow payment
-  return this.createEscrowPayment(missionId, mission.client.id);
+  return this.createEscrowPayment(missionId, mission.client.user.id);
 }
 }
