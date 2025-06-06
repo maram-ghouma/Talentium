@@ -12,6 +12,11 @@ export interface ChatMessage {
   sent: boolean;
   date: Date;
   isRead: boolean;
+  file?: {
+    fileName: string; // Unique filename stored on the server
+    originalName: string; // Original name of the uploaded file
+    path: string; // Path to access the file
+  };
 }
 
 export interface Contact {
@@ -45,63 +50,69 @@ export class ChatService {
   constructor(private socketService: SocketService) {
     this.loadContacts();
     this.listenForIncomingMessages();
+    this.listenForIncomingFiles(); // Add listener for file uploads
   }
 
   async loadContacts() {
-  try {
-    const response = await api.get<{ userId: number; conversations: any[] }>(`${this.apiUrl}/conversations`);
-    this.currentUserId = response.data.userId;
-    console.log('[ChatService][LOAD] Raw API response:', JSON.stringify(response.data, null, 2));
+    try {
+      const response = await api.get<{ userId: number; conversations: any[] }>(`${this.apiUrl}/conversations`);
+      this.currentUserId = response.data.userId;
+      console.log('[ChatService][LOAD] Raw API response:', JSON.stringify(response.data, null, 2));
 
-    const contacts = (response.data.conversations || []).map((convo) => {
-      console.log('[ChatService][LOAD] Processing convo:', convo?.id || 'undefined');
-      const messages = (convo.messages || []).map((msg: any) => ({
-        id: msg?.id || 0, // Safe access
-        contactId: convo?.id || 0,
-        text: msg?.content || '',
-        sent: this.currentUserId === (msg?.senderId ?? 0),
-        date: new Date(msg?.timestamp || Date.now()),
-        isRead: msg?.isRead ?? false,
-      })).sort((a, b) => a.date.getTime() - b.date.getTime());
+      const contacts = (response.data.conversations || []).map((convo) => {
+        console.log('[ChatService][LOAD] Processing convo:', convo?.id || 'undefined');
+        const messages = (convo.messages || []).map((msg: any) => ({
+          id: msg?.id || 0,
+          contactId: convo?.id || 0,
+          text: msg?.content || '',
+          sent: this.currentUserId === (msg?.senderId ?? 0),
+          date: new Date(msg?.timestamp || Date.now()),
+          isRead: msg?.isRead ?? false,
+          file: msg?.file ? {
+            fileName: msg.file.fileName,
+            originalName: msg.file.originalName,
+            path: msg.file.path,
+          } : undefined,
+        })).sort((a, b) => a.date.getTime() - b.date.getTime());
 
-      this.messagesMap.set(convo?.id || 0, messages);
+        this.messagesMap.set(convo?.id || 0, messages);
 
-      const unreadCount = messages.filter(msg => !msg.isRead && !msg.sent).length;
-      const otherUser = (convo.participants || []).find(p => p?.id !== this.currentUserId) || {};
+        const unreadCount = messages.filter(msg => !msg.isRead && !msg.sent).length;
+        const otherUser = (convo.participants || []).find(p => p?.id !== this.currentUserId) || {};
 
-      return {
-        id: convo?.id || 0,
-        name: otherUser?.name || 'Unknown',
-        avatar: otherUser?.imageUrl || '',
-        unreadCount,
-        isActive: convo?.isActive ?? true,
-        lastMessage: (convo.messages || []).length
-          ? {
-              text: convo.messages[0]?.content || 'No content',
-              date: new Date(convo.messages[0]?.timestamp || Date.now()),
-            }
-          : {
-              text: 'no messages yet',
-              date: new Date(),
-            },
-      };
-    });
+        return {
+          id: convo?.id || 0,
+          name: otherUser?.name || 'Unknown',
+          avatar: otherUser?.imageUrl || '',
+          unreadCount,
+          isActive: convo?.isActive ?? true,
+          lastMessage: (convo.messages || []).length
+            ? {
+                text: convo.messages[0]?.content || 'No content',
+                date: new Date(convo.messages[0]?.timestamp || Date.now()),
+              }
+            : {
+                text: 'no messages yet',
+                date: new Date(),
+              },
+        };
+      });
 
-    console.log('[ChatService][LOAD] Mapped contacts:', contacts);
-    this.contacts = contacts;
-    this.contactsEmitter.emit('update', contacts);
-  } catch (err: AxiosError | any) {
-    console.error('[ChatService][LOAD] Error loading contacts:', {
-      message: err.message,
-      status: (err.response as any)?.status,
-      data: (err.response as any)?.data,
-      headers: (err.config as any)?.headers,
-      token: localStorage.getItem('authToken')?.slice(0, 20) + '...',
-    });
-    this.contacts = [];
-    this.contactsEmitter.emit('update', []);
+      console.log('[ChatService][LOAD] Mapped contacts:', contacts);
+      this.contacts = contacts;
+      this.contactsEmitter.emit('update', contacts);
+    } catch (err: AxiosError | any) {
+      console.error('[ChatService][LOAD] Error loading contacts:', {
+        message: err.message,
+        status: (err.response as any)?.status,
+        data: (err.response as any)?.data,
+        headers: (err.config as any)?.headers,
+        token: localStorage.getItem('authToken')?.slice(0, 20) + '...',
+      });
+      this.contacts = [];
+      this.contactsEmitter.emit('update', []);
+    }
   }
-}
 
   getContacts() {
     return this.contacts;
@@ -179,6 +190,76 @@ export class ChatService {
     this.contactsEmitter.emit('update', [...this.contacts]);
   }
 
+  async uploadFile(contactId: number, file: File): Promise<void> {
+    const contact = this.contacts.find(c => c.id === contactId);
+    if (!contact) {
+      console.error('[ChatService][uploadFile] Contact not found for ID:', contactId);
+      throw new Error('Contact not found');
+    }
+
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('conversationId', contactId.toString());
+      formData.append('senderId', this.currentUserId?.toString() || '');
+
+      const response = await api.post(`${this.apiUrl}/upload`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      console.log('[ChatService][uploadFile] File uploaded successfully:', response.data);
+
+      const messages = this.messagesMap.get(contactId) || [];
+      const newMessage: ChatMessage = {
+        id: response.data.id || messages.length + 1, // Use server-provided ID if available
+        contactId,
+        text: `File: ${file.name}`, // Placeholder text, adjust as needed
+        sent: true,
+        date: new Date(),
+        isRead: false,
+        file: {
+          fileName: response.data.fileName,
+          originalName: response.data.originalName,
+          path: response.data.path,
+        },
+      };
+
+      messages.push(newMessage);
+      this.messagesMap.set(contactId, messages);
+
+      if (this.currentContact?.id === contactId) {
+        this.currentMessagesEmitter.emit('update', [...messages]);
+      }
+
+      contact.lastMessage = {
+        text: `File: ${file.name}`,
+        date: newMessage.date,
+      };
+
+      this.contactsEmitter.emit('update', [...this.contacts]);
+
+      // Emit via socket for real-time update to other users
+      this.socketService.emit('fileUploaded', {
+        conversationId: contactId,
+        senderId: this.currentUserId,
+        file: {
+          fileName: response.data.fileName,
+          originalName: response.data.originalName,
+          path: response.data.path,
+        },
+      });
+    } catch (err: AxiosError | any) {
+      console.error('[ChatService][uploadFile] Error uploading file:', {
+        message: err.message,
+        status: (err.response as any)?.status,
+        data: (err.response as any)?.data,
+      });
+      throw err; // Let the component handle the error
+    }
+  }
+
   listenForIncomingMessages() {
     this.socketService.listen<any>('newMessage').subscribe((message) => {
       (async () => {
@@ -212,12 +293,67 @@ export class ChatService {
         }
       })();
     });
-}
+  }
+
+  listenForIncomingFiles() {
+    this.socketService.listen<any>('fileUploaded').subscribe((data) => {
+      (async () => {
+        const currentMessages = [...(this.messagesMap.get(data.conversationId) || [])];
+      
+        const exists = currentMessages.some(msg =>
+          msg.file?.fileName === data.file.fileName &&
+          Math.abs(new Date(msg.date).getTime() - new Date().getTime()) < 1000
+        );
+        if (exists) return;
+      
+        const response = await api.get<{ userId: number; conversations: any[] }>(`${this.apiUrl}/conversations`);
+        const currentUserId = response.data.userId;
+      
+        const newMessage: ChatMessage = {
+          id: currentMessages.length + 1, // Ideally, get ID from server via socket data
+          contactId: data.conversationId,
+          text: `File: ${data.file.originalName}`,
+          sent: currentUserId === data.senderId,
+          date: new Date(),
+          isRead: false,
+          file: {
+            fileName: data.file.fileName,
+            originalName: data.file.originalName,
+            path: data.file.path,
+          },
+        };
+      
+        currentMessages.push(newMessage);
+        currentMessages.sort((a, b) => a.date.getTime() - b.date.getTime());
+      
+        this.messagesMap.set(data.conversationId, currentMessages);
+      
+        const contact = this.contacts.find(c => c.id === data.conversationId);
+        if (contact) {
+          contact.lastMessage = {
+            text: `File: ${data.file.originalName}`,
+            date: newMessage.date,
+          };
+          if (!newMessage.sent && this.currentContact?.id !== data.conversationId) {
+            contact.unreadCount = (contact.unreadCount || 0) + 1;
+          }
+          this.contactsEmitter.emit('update', [...this.contacts]);
+        }
+      
+        if (this.currentContact?.id === data.conversationId) {
+          this.currentMessagesEmitter.emit('update', currentMessages);
+        }
+      })();
+    });
+  }
 
   searchMessages(contactId: number, query: string): ChatMessage[] {
     const messages = this.messagesMap.get(contactId) || [];
     return query.trim()
-      ? messages.filter(m => m.text.toLowerCase().includes(query.toLowerCase()))
+      ? messages.filter(m => 
+          m.text.toLowerCase().includes(query.toLowerCase()) ||
+          m.file?.originalName.toLowerCase().includes(query.toLowerCase())
+        )
       : messages;
   }
 
@@ -232,7 +368,6 @@ export class ChatService {
       const response = await api.get<{ userId: number; conversations: any[] }>(`${this.apiUrl}/conversations`);
       const currentUserId = response.data.userId;
 
-
       const contacts = response.data.conversations.map((convo) => {
         const messages = convo.messages.map((msg: any) => ({
           id: msg.id,
@@ -241,17 +376,21 @@ export class ChatService {
           sent: currentUserId === msg.sender.id,
           date: new Date(msg.timestamp),
           isRead: msg.isRead,
+          file: msg.file ? {
+            fileName: msg.file.fileName,
+            originalName: msg.file.originalName,
+            path: msg.file.path,
+          } : undefined,
         })).sort((a, b) => b.date.getTime() - a.date.getTime());
 
         this.messagesMap.set(convo.id, [...messages].reverse());
-
 
         const otherUser = convo.participants.find(p => p.id !== currentUserId);
 
         return {
           id: convo.id,
           name: otherUser?.name || 'Unknown',
-          avatar: otherUser?.imageUrl || '', // or use a fallback image URL
+          avatar: otherUser?.imageUrl || '',
           isActive: convo.isActive,
           unreadCount: convo.messages.filter((msg: any) => !msg.isRead && !(currentUserId === msg.sender.id)).length,
           lastMessage: convo.messages.length

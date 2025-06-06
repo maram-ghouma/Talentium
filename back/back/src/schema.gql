@@ -18,6 +18,9 @@ type Message {
   timestamp: DateTime!
   sender: User!
   conversation: Conversation!
+  fileName: String
+  originalName: String
+  filePath: String
 }
 
 """

@@ -36,4 +36,16 @@ export class Message {
 
   @Column({ default: false })
   isRead: boolean;
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  fileName?: string; // Unique filename stored on the server
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  originalName?: string; // Original name of the uploaded file
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  filePath?: string; // Path to access the file
 }

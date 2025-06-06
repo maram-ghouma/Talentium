@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Search, Send, Paperclip, Image, Smile, MoreVertical, Phone, Video } from 'lucide-react';
+import { Search, Send, Paperclip, Image, Smile, MoreVertical, Phone, Video, X } from 'lucide-react';
 import '../../Styles/Freelancer/chat.css';
 import { ChatService, Contact, ChatMessage } from '../../services/Chat/chat.service'; 
 import { SocketService } from '../../services/Chat/socket.service'; 
@@ -11,25 +11,24 @@ const Chat: React.FC = () => {
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [currentMessages, setCurrentMessages] = useState<ChatMessage[]>([]);
   const [selectedConversationId, setSelectedConversationId] = useState<number | null>(null);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null); // State for full-screen image
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Initialize SocketService and ChatService
-  const socketService = useRef(new SocketService()); // Ensure SocketService is configured correctly
+  const socketService = useRef(new SocketService());
   const chatService = useRef(new ChatService(socketService.current));
 
   // Fetch initial contacts and set up listeners
   useEffect(() => {
-    // Subscribe to contacts updates
     chatService.current.onContactsUpdate((updatedContacts: Contact[]) => {
       setContacts(updatedContacts);
     });
 
-    // Subscribe to current messages updates
     chatService.current.onCurrentMessagesUpdate((messages: ChatMessage[]) => {
       setCurrentMessages(messages);
     });
 
-    // Subscribe to current contact updates
     chatService.current.onCurrentContactUpdate((contact: Contact | null) => {
       if (contact) {
         setSelectedConversationId(contact.id);
@@ -38,25 +37,21 @@ const Chat: React.FC = () => {
       }
     });
 
-    // Initial load of contacts
-    chatService.current.getContacts(); // This triggers the initial load and emits updates
+    chatService.current.getContacts();
 
-    // Cleanup on unmount
     return () => {
-      // Note: EventEmitter doesn't have a built-in cleanup, you may need to add removeListener in ChatService
+      // Cleanup if needed
     };
   }, []);
 
-  // Auto-scroll to bottom when messages change
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [currentMessages]);
 
-  // Simulate typing indicator (adjust based on backend support)
   useEffect(() => {
     if (selectedConversationId && currentMessages.length > 0) {
       const lastMessage = currentMessages[currentMessages.length - 1];
-      if (!lastMessage.sent) { // Assuming 'sent' indicates current user's message
+      if (!lastMessage.sent) {
         setIsTyping(true);
         const timeout = setTimeout(() => {
           setIsTyping(false);
@@ -66,22 +61,18 @@ const Chat: React.FC = () => {
     }
   }, [currentMessages, selectedConversationId]);
 
-  // Find selected conversation from contacts
   const selectedConversation = contacts.find(
     conv => conv.id === selectedConversationId
   );
 
-  // Filter conversations based on search query
   const filteredConversations = searchQuery.trim()
     ? chatService.current.searchContacts(searchQuery)
     : contacts;
 
-  // Format timestamp to readable time
   const formatMessageTime = (date: Date) => {
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
 
-  // Format date for message dividers
   const formatMessageDate = (date: Date) => {
     const today = new Date();
     const yesterday = new Date(today);
@@ -100,10 +91,8 @@ const Chat: React.FC = () => {
     }
   };
 
-  // Group messages by date
   const groupMessagesByDate = () => {
     const groups: { [key: string]: ChatMessage[] } = {};
-
     currentMessages.forEach(message => {
       const date = message.date.toDateString();
       if (!groups[date]) {
@@ -111,17 +100,14 @@ const Chat: React.FC = () => {
       }
       groups[date].push(message);
     });
-
     return groups;
   };
 
-  // Handle selecting a conversation
   const handleSelectConversation = (conversationId: number) => {
     setSelectedConversationId(conversationId);
-    chatService.current.setCurrentContact(conversationId); // This updates messages and marks as read
+    chatService.current.setCurrentContact(conversationId);
   };
 
-  // Handle sending a message
   const handleSendMessage = () => {
     if (inputValue.trim() && selectedConversationId) {
       chatService.current.sendMessage(selectedConversationId, inputValue);
@@ -129,7 +115,6 @@ const Chat: React.FC = () => {
     }
   };
 
-  // Handle key press (Enter to send)
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
@@ -137,11 +122,73 @@ const Chat: React.FC = () => {
     }
   };
 
+  // Handle file selection and upload
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file && selectedConversationId) {
+      try {
+        await chatService.current.uploadFile(selectedConversationId, file);
+        if (fileInputRef.current) {
+          fileInputRef.current.value = '';
+        }
+      } catch (error) {
+        console.error('File upload failed:', error);
+        alert('Failed to upload file. Please try again.');
+      }
+    }
+  };
+
+  // Trigger file input click
+  const handleAttachClick = () => {
+    if (selectedConversationId) {
+      fileInputRef.current?.click();
+    } else {
+      alert('Please select a conversation to upload a file.');
+    }
+  };
+
+  // Handle file download
+  const handleFileDownload = (filePath: string, originalName: string) => {
+    const downloadUrl = `${process.env.REACT_APP_API_URL || 'http://localhost:3000'}/${filePath}`;
+    const link = document.createElement('a');
+    link.href = downloadUrl;
+    link.download = originalName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  // Check if a file is an image based on extension
+  const isImageFile = (fileName: string | undefined): boolean => {
+    if (!fileName) return false;
+    const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif'];
+    return imageExtensions.some(ext => fileName.toLowerCase().endsWith(ext));
+  };
+
+  // Close the image overlay
+  const handleCloseImage = () => {
+    setSelectedImage(null);
+  };
+
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isDarkMode, setIsDarkMode] = useState(false);
 
   return (
     <div className="chat-container">
+      {/* Full-screen image overlay */}
+      {selectedImage && (
+        <div className="image-overlay" onClick={handleCloseImage}>
+          <button className="image-overlay-close" aria-label="Close image">
+            <X size={24} />
+          </button>
+          <img
+            src={selectedImage}
+            alt="Full-screen image"
+            className="image-overlay-content"
+          />
+        </div>
+      )}
+
       <div className="chat-sidebar">
         <div className="chat-sidebar-header">
           <div className="chat-search">
@@ -164,11 +211,10 @@ const Chat: React.FC = () => {
                 onClick={() => handleSelectConversation(conversation.id)}
               >
                 <img
-                  src={conversation.avatar || 'default-avatar.png'} // Fallback if avatar is undefined
+                  src={conversation.avatar || 'default-avatar.png'}
                   alt={conversation.name}
                   className="conversation-avatar"
                 />
-
                 <div className="conversation-info">
                   <div className="conversation-header">
                     <span className="conversation-name">{conversation.name}</span>
@@ -178,12 +224,10 @@ const Chat: React.FC = () => {
                         : ''}
                     </span>
                   </div>
-
                   <div className="conversation-preview">
                     {conversation.lastMessage?.text || 'No messages yet'}
                   </div>
                 </div>
-
                 {conversation.unreadCount > 0 && (
                   <div className="conversation-badge">{conversation.unreadCount}</div>
                 )}
@@ -208,14 +252,12 @@ const Chat: React.FC = () => {
                 alt={selectedConversation.name}
                 className="chat-header-avatar"
               />
-
               <div className="chat-header-info">
                 <div className="chat-header-name">{selectedConversation.name}</div>
                 <div className="chat-header-status online">
                   {selectedConversation.isActive ? 'Online' : 'Offline'}
                 </div>
               </div>
-
               <div className="chat-header-actions">
                 <button className="chat-header-btn" aria-label="Phone call">
                   <Phone size={16} />
@@ -234,26 +276,50 @@ const Chat: React.FC = () => {
                 <React.Fragment key={date}>
                   <div className="message-date-divider">
                     <span className="message-date-label">
-                      {formatMessageDate(dateMessages[0].date)}
+                      {formatMessageDate(dateMessages[0]?.date || new Date())}
                     </span>
                   </div>
-
-                  {dateMessages.map(message => (
-                    <div
-                      key={message.id}
-                      className={`message ${message.sent ? 'outgoing' : 'incoming'}`}
-                    >
-                      <div className="message-content">
-                        {message.text}
+                  {dateMessages.map((message) => {
+                    const file = message.file;
+                    return (
+                      <div
+                        key={message.id}
+                        className={`message ${message.sent ? 'outgoing' : 'incoming'}`}
+                      >
+                        <div className="message-content">
+                          {file ? (
+                            isImageFile(file.originalName) ? (
+                              <img
+                                src={`${process.env.REACT_APP_API_URL || 'http://localhost:3000'}/${file.path}`}
+                                alt={file.originalName || 'Image'}
+                                className="message-image"
+                                style={{ maxWidth: '200px', borderRadius: '8px', cursor: 'pointer' }}
+                                onClick={() => setSelectedImage(`${process.env.REACT_APP_API_URL || 'http://localhost:3000'}/${file.path}`)}
+                              />
+                            ) : (
+                              <a
+                                href="#"
+                                className="message-file"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  handleFileDownload(file.path, file.originalName || 'unknown');
+                                }}
+                              >
+                                <strong>{file.originalName || 'unknown'}</strong>
+                              </a>
+                            )
+                          ) : (
+                            message.text
+                          )}
+                        </div>
+                        <div className="message-time">
+                          {formatMessageTime(message.date)}
+                        </div>
                       </div>
-                      <div className="message-time">
-                        {formatMessageTime(message.date)}
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </React.Fragment>
               ))}
-
               {isTyping && (
                 <div className="typing-indicator">
                   <div className="typing-dots">
@@ -264,16 +330,25 @@ const Chat: React.FC = () => {
                   <span>typing...</span>
                 </div>
               )}
-
               <div ref={messagesEndRef} />
             </div>
 
             <div className="chat-input-container">
               <div className="chat-input-wrapper">
                 <div className="chat-input-actions">
-                  <button className="chat-input-action-btn" aria-label="Attach file">
+                  <button
+                    className="chat-input-action-btn"
+                    aria-label="Attach file"
+                    onClick={handleAttachClick}
+                  >
                     <Paperclip size={20} />
                   </button>
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    style={{ display: 'none' }}
+                    onChange={handleFileSelect}
+                  />
                   <button className="chat-input-action-btn" aria-label="Attach image">
                     <Image size={20} />
                   </button>
@@ -281,7 +356,6 @@ const Chat: React.FC = () => {
                     <Smile size={20} />
                   </button>
                 </div>
-
                 <textarea
                   className="chat-input"
                   placeholder="Type a message..."
@@ -290,7 +364,6 @@ const Chat: React.FC = () => {
                   onKeyDown={handleKeyPress}
                   rows={1}
                 />
-
                 <button
                   className="chat-send-btn"
                   onClick={handleSendMessage}
