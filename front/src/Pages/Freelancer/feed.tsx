@@ -6,9 +6,26 @@ const FreelancerFeed = () => {
      const [isSidebarOpen, setIsSidebarOpen] = useState(true);
       const [isDarkMode, setIsDarkMode] = useState(false);
       
-      const handleSearch = (query: string) => {
-        console.log("Search query:", query);
-      };
+
+        const [searchQuery, setSearchQuery] = useState(''); 
+  const [filters, setFilters] = useState({
+    status: '',
+    dateRange: ''
+  });
+  const [sortOption, setSortOption] = useState('');
+  const handleFilter = (newFilters: {status: string, dateRange: string}) => {
+    setFilters(newFilters);
+    console.log("Filter options:", newFilters);
+  };
+
+  const handleSort = (option: string) => {
+    setSortOption(option);
+    console.log("Sort option:", option);
+  };
+  
+  const handleSearch = (query: string) => {
+    setSearchQuery(query); 
+  }
   return (
     <MainLayout
       isDarkMode={isDarkMode}
@@ -16,13 +33,18 @@ const FreelancerFeed = () => {
       isSidebarOpen={isSidebarOpen}
       toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
       onSearch={handleSearch}
+      onFilter={handleFilter}
+      onSort={handleSort}
       usertype='client'
  
     >
       <Feed
         isDarkMode={isDarkMode}
         toggleDarkMode={() => setIsDarkMode(!isDarkMode)}
-        isSidebarOpen={isSidebarOpen} 
+        isSidebarOpen={isSidebarOpen}
+        searchQuery={searchQuery}
+        filters={filters}
+        sortOption={sortOption} 
         
       />
     </MainLayout>

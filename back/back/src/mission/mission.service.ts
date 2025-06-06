@@ -183,6 +183,85 @@ async getAdminStats() {
 }
 
 
+async findAllWithAI(user: any): Promise<Mission[]> {
+  const freelancerProfile = await this.freelancerProfileRepository.findOne({
+    where: { user: { id: user.userId } },
+    relations: ['user'],
+  });
+
+  if (!freelancerProfile) {
+    throw new Error('Freelancer profile not found');
+  }
+
+  const missions = await this.findAllNotMine(user);
+
+  const predictionData = await Promise.all(
+    missions.map(async (mission) => {
+      const fullMission = await this.missionRepository.findOne({
+        where: { id: mission.id },
+        relations: ['client', 'preselectedFreelancers', 'applications'],
+      });
+
+      if (!fullMission) {
+        throw new Error('Mission not found');
+      }
+
+      const requiredSkillNames = fullMission.requiredSkills as string[];
+      const freelancerSkillNames = freelancerProfile.skills as string[];
+
+      const skillMatchScore = this.computeSkillMatch(requiredSkillNames, freelancerSkillNames);
+
+      const pastMissions = await this.missionRepository.find({
+        where: {
+          selectedFreelancer: { id: freelancerProfile.id },
+          client: { id: fullMission.client.id },
+        },
+      });
+
+      const hasWorkedBefore = pastMissions.length > 0;
+      const wasPreselected =
+        fullMission.preselectedFreelancers?.some((p) => p.id === freelancerProfile.id) || false;
+
+      return {
+        skill_match_score: skillMatchScore,
+        has_worked_with_client_before: hasWorkedBefore ? 1 : 0,
+        was_preselected: wasPreselected ? 1 : 0,
+        price: fullMission.price,
+        industry: fullMission.client.industry || 'Other',
+        times_worked_with_client: pastMissions.length,
+      };
+    })
+  );
+
+  try {
+    const response = await fetch('http://localhost:8000/predict', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ data: predictionData }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Prediction request failed');
+    }
+
+    const predictions = await response.json();
+
+    const missionsWithPredictions = missions.map((mission, index) => ({
+      ...mission,
+      selectionProbability: predictions[index].prob_1,
+    }));
+    return missionsWithPredictions.sort((a, b) => b.selectionProbability - a.selectionProbability);
+  } catch (error) {
+    console.error('AI prediction error:', error);
+    return missions;
+  }
+}
+
+private computeSkillMatch(required: string[], has: string[]): number {
+  if (!required || required.length === 0) return 0;
+  const intersection = required.filter((skill) => has.includes(skill));
+  return intersection.length / required.length;
+}
 
 
 }
