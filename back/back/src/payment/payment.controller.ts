@@ -57,22 +57,31 @@ export class PaymentController {
 
   @Post('escrow')
   async createEscrowPayment(@Body() createEscrowDto: CreateEscrowPaymentDto): Promise<CreateEscrowResponse> {
+    try {
     return await this.paymentService.createEscrowPayment(
       createEscrowDto.missionId, 
       createEscrowDto.clientId
-    );
+    );} catch (error) {
+      console.error('Error creating escrow payment:', error);
+      throw error; // Re-throw the error to be handled by global exception filter
+    }
   }
 
   @Post('milestone/release')
   async releaseMilestonePayment(@Body() releaseMilestoneDto: ReleaseMilestonePaymentDto): Promise<ReleaseMilestoneResponse> {
-    const result = await this.paymentService.releaseMilestonePayment(
-      releaseMilestoneDto.missionId, 
-      releaseMilestoneDto.milestonePercentage
-    );
-    return {
-      ...result,
-      milestone: releaseMilestoneDto.milestonePercentage
-    };
+    try {
+      const result = await this.paymentService.releaseMilestonePayment(
+        releaseMilestoneDto.missionId,
+        releaseMilestoneDto.milestonePercentage
+      );
+      return {
+        ...result,
+        milestone: releaseMilestoneDto.milestonePercentage
+      };
+    } catch (error) {
+      console.error('Error releasing milestone payment:', error);
+      throw error;
+    }
   }
 
   @Post('milestone/release-batch')
@@ -102,6 +111,11 @@ export class PaymentController {
   @Get('missions/status/:status')
   async getMissionsByPaymentStatus(@Param('status') status: PaymentStatus): Promise<Mission[]> {
     return await this.paymentService.getMissionsByPaymentStatus(status);
+  }
+  @Get('missions/:missionId')
+  async getMissionById(@Param('missionId', ParseIntPipe) missionId: number): Promise<Mission> {
+
+    return await this.paymentService.getMissionById(missionId);
   }
 
   @Get('history/:missionId')

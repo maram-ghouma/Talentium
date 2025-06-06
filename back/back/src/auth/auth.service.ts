@@ -79,20 +79,28 @@ export class AuthService {
       ...registerDto,
       password: hashedPassword,
     });
-    const customer = await this.paymentService.stripe.customers.create({
+    /* const account = await this.paymentService.stripe.accounts.create({
+  type: 'express',
+  country: 'FR',
   email: registerDto.email,
-  name: registerDto.username,
+  capabilities: {
+    transfers: { requested: true },
+  },
 });
-    await this.clientProfilesService.createProfileForUser(newUser, {
+console.log('Stripe account created:', account.id);*/
+
+
+await this.clientProfilesService.createProfileForUser(newUser, {
   phoneNumber: registerDto.phoneNumber,
   country: registerDto.country,
-  stripeAccountId: customer.id,
+  stripeAccountId: 'acct_1RWz0BRBiMgVeRzi'//test account with stripe connect create account stripe and acrivate connect feature to test and get ur account key 
+,
 });
 
-    await this.freelancerProfilesService.createProfileForUser(newUser, {
+await this.freelancerProfilesService.createProfileForUser(newUser, {
   phoneNumber: registerDto.phoneNumber,
   country: registerDto.country,
-  stripeAccountId: customer.id,
+  stripeAccountId: 'acct_1RWz0BRBiMgVeRzi', 
 });
 
     const { password, ...result } = newUser;

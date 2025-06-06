@@ -104,7 +104,7 @@ export const paymentService = {
 
   // Get mission details (you'll need to implement this endpoint)
   getMissionById: async (missionId: number): Promise<MissionLight> => {
-    const response = await api.get(`/missions/${missionId}`);
+    const response = await api.get(`/payment/missions/${missionId}`);
     return response.data;
   },
 

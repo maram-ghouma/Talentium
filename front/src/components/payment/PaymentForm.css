@@ -207,7 +207,7 @@
 }
 
 /* Button styles */
-.button-primary {
+.button-primary,.refresh-button {
   width: 100%;
   padding: 12px 24px;
   border-radius: 12px;

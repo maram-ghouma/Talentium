@@ -252,7 +252,7 @@ export class PaymentService {
   }
 async createEscrowPayment(missionId: number, clientId: number) {
   const mission = await this.missionRepository.findOne({
-    where: { id: missionId },
+    where: { id: missionId , status: "in_progress" },
     relations: ['client', 'selectedFreelancer', 'selectedFreelancer.user']
   });
 
@@ -369,6 +369,7 @@ async createEscrowPayment(missionId: number, clientId: number) {
           milestone: milestonePercentage.toString()
         }
       });
+      console
 
       // Generate invoice
       await this.generateInvoice(
@@ -496,6 +497,18 @@ async createEscrowPayment(missionId: number, clientId: number) {
     return missions;
   }
 
+  async getMissionById(missionId: number): Promise<Mission> {
+    const mission = await this.missionRepository.findOne({
+      where: { id: missionId },
+      relations: ['client', 'selectedFreelancer', 'selectedFreelancer.user']
+    });
+
+    if (!mission) {
+      throw new Error('Mission non trouvée');
+    }
+
+    return mission;
+  }
   async getPaymentHistory(missionId: number): Promise<Invoice[]> {
     return await this.invoiceRepository.find({
       where: { missionId },
@@ -533,6 +546,6 @@ async retryPaymentSetup(missionId: number): Promise<CreateEscrowResponse> {
   }
   
   // Create new escrow payment
-  return this.createEscrowPayment(missionId, mission.client.id);
+  return this.createEscrowPayment(missionId, mission.client.user.id);
 }
 }
