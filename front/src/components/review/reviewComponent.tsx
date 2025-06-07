@@ -22,23 +22,33 @@ const ReviewComponent: React.FC<ReviewComponentProps> = ({ missionId }) => {
     fetchMission();
   }, [missionId]);
 
-  const handleSubmitReview = async () => {
-    if (!selectedMission || !selectedMission.selectedFreelancer || typeof selectedMission.selectedFreelancer.id !== 'number') {
-      console.error("Freelancer information is missing or invalid.");
-      return;
+const handleSubmitReview = async () => {
+    try {
+      if (!selectedMission || !selectedMission.selectedFreelancer || typeof selectedMission.selectedFreelancer.id !== 'number') {
+        console.error("Freelancer information is missing or invalid.");
+        return;
+      }
+
+      const reviewData = {
+        stars: rating,
+        comment,
+        missionId,
+        reviewedUserId: 4,
+        reviewerId: 2,
+        //reviewedUserId: selectedMission.selectedFreelancer.id,
+        //reviewerId: selectedMission.client.id, 
+      };
+
+      console.log('Soumission de l\'avis:', reviewData);
+      await createReview(reviewData);
+      console.log('Avis soumis avec succès');
+      window.location.href = '/client'; 
+
+    } catch (error: any) {
+      if (error.message.includes('mission')) {
+        alert('Vous avez déjà laissé un avis pour cette mission.');
+      }
     }
-
-    const reviewData = {
-      stars: rating,
-      comment,
-      missionId,
-      reviewedUserId: selectedMission.selectedFreelancer.id,
-      reviewerId: selectedMission.client.id, 
-    };
-
-    console.log('Soumission de l\'avis:', reviewData);
-    await createReview(reviewData);
-    console.log('Avis soumis avec succès');
   };
 
   return (

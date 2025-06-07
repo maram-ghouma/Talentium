@@ -43,7 +43,7 @@ export class ReviewService {
     
   ) {}
 
-  async getReviewMissionById(missionId: number, user: any): Promise<reviewMission | null> {
+  async getReviewMissionById(missionId: number): Promise<reviewMission | null> {
   const mission = await this.missionRepository.findOne({
     where: { id: missionId },
     relations: ['selectedFreelancer', 'selectedFreelancer.user', 'client', 'client.user']
@@ -62,13 +62,13 @@ export class ReviewService {
   }
 
   const client: ReviewedUser = {
-    id: clientProfile.user.id, // Return user ID, not profile ID
+    id: clientProfile.id, // Return user ID, not profile ID
     name: clientProfile.user.username || 'Client',
     image: clientProfile.user.imageUrl || '',
   };
 
   const selectedFreelancer: ReviewedUser = {
-    id: freelancerProfile.user.id, // Return user ID, not profile ID
+    id: freelancerProfile.id, // Return user ID, not profile ID
     name: freelancerProfile.user.username || 'Freelancer',
     image: freelancerProfile.user.imageUrl || '',
   };
@@ -190,9 +190,9 @@ async getReviewsClient(userId: number): Promise<Review[]> {
   console.log('createReviewDto:', createReviewDto);
   
   // Get the reviewer user to determine their role and profile
-  const reviewer = await this.userRepository.findOne({ 
+  const reviewer = await this.clientProfileRepository.findOne({ 
     where: { id: createReviewDto.reviewerId },
-    relations: ['clientProfile', 'freelancerProfile']
+    relations: ['user']
   });
 
   if (!reviewer) {
@@ -204,17 +204,17 @@ async getReviewsClient(userId: number): Promise<Review[]> {
   let isFreelancerReviewing = false;
 
   // Check if reviewer is the client (compare user IDs)
-  if (mission.client?.user?.id === reviewer.id) {
+  if (mission.client?.id === reviewer.id) {
     isClientReviewing = true;
   }
 
   // Check if reviewer is the selected freelancer (compare user IDs)
-  if (mission.selectedFreelancer?.user?.id === reviewer.id) {
+  if (mission.selectedFreelancer?.id === reviewer.id) {
     isFreelancerReviewing = true;
   }
 
-  console.log('Mission client user ID:', mission.client?.user?.id);
-  console.log('Mission selectedFreelancer user ID:', mission.selectedFreelancer?.user?.id);
+  console.log('Mission client user ID:', mission.client?.id);
+  console.log('Mission selectedFreelancer user ID:', mission.selectedFreelancer?.id);
   console.log('Reviewer user ID:', reviewer.id);
   console.log('clientReviewing:', isClientReviewing);
   console.log('freelancerReviewing:', isFreelancerReviewing);
@@ -223,7 +223,7 @@ async getReviewsClient(userId: number): Promise<Review[]> {
     throw new Error('Seuls les participants à la mission peuvent laisser un avis');
   }
 
-  // Vérifier qu'il n'y a pas déjà d'avis pour cette mission par ce reviewer
+  
   const existingReview = await this.reviewRepository.findOne({
     where: {
       reviewer: { id: createReviewDto.reviewerId },
@@ -235,8 +235,9 @@ async getReviewsClient(userId: number): Promise<Review[]> {
     throw new Error('Vous avez déjà laissé un avis pour cette mission');
   }
 
-  const reviewedUser = await this.userRepository.findOne({ 
-    where: { id: createReviewDto.reviewedUserId } 
+  const reviewedUser = await this.freelancerProfileRepository.findOne({ 
+    where: { id: createReviewDto.reviewedUserId }, 
+    relations: ['user']
   });
 
   if (!reviewedUser) {
@@ -255,7 +256,7 @@ async getReviewsClient(userId: number): Promise<Review[]> {
   const savedReview = await this.reviewRepository.save(review);
 
   // Après avoir créé l'avis, vérifier et attribuer les badges si c'est un freelancer
-  if (reviewedUser && reviewedUser.currentRole === 'freelancer') {
+  if (reviewedUser && reviewedUser.user.currentRole === 'freelancer') {
     await this.updateFreelancerBadges(reviewedUser.id);
   }
 

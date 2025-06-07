@@ -41,8 +41,7 @@ export class ReviewController {
   }
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Get('mission/:id')
-  async getReviewMissionById(@CurrentUser() user: any, @Query('id') missionId: number) {
-    console.log('User in getReviewMissionById:', user);
-    return this.reviewService.getReviewMissionById(missionId, user);
+  async getReviewMissionById( @Query('id') missionId: number) {
+    return this.reviewService.getReviewMissionById(missionId);
   }
 }
