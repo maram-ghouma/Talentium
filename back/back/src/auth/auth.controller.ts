@@ -1,4 +1,4 @@
-import { Controller, Post, Body, NotFoundException, UseGuards, Get, Patch, BadRequestException } from '@nestjs/common';
+import { Controller, Post, Body, NotFoundException, UseGuards, Get, Patch, BadRequestException, Delete, Param } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { CreateUserDto } from '../user/dto/create-user.dto';
@@ -8,6 +8,7 @@ import { UserService } from 'src/user/user.service';
 import { SwitchRoleDto } from 'src/user/dto/switch-role.sto';
 import { User } from 'src/user/entities/user.entity';
 import { ClientProfileService } from 'src/client-profile/client-profile.service';
+import { Roles } from './decorators/role.decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -55,5 +56,12 @@ export class AuthController {
       const clientProfile = await this.clientService.findByUserId(user.userId);
       return clientProfile ? clientProfile.companyName : 'Client not found';
     }
+    
+    @UseGuards(AuthGuard('jwt'))
+    @Roles('admin')
+@Patch('suspend')
+async suspendUserAndResolveDispute(@Body() body: { userId: number, disputeId: number }) {
+  return this.authService.suspendUserAndResolveDispute(body.userId, body.disputeId);
+}
 
 }

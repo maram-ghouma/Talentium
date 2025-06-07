@@ -1,34 +1,35 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { DisputeService } from './dispute.service';
 import { CreateDisputeDto } from './dto/create-dispute.dto';
 import { UpdateDisputeDto } from './dto/update-dispute.dto';
+import { AuthGuard } from '@nestjs/passport';
+import { RolesGuard } from 'src/auth/guards/RoleGuard';
+import { Roles } from 'src/auth/decorators/role.decorator';
 
 @Controller('dispute')
 export class DisputeController {
   constructor(private readonly disputeService: DisputeService) {}
 
-  @Post()
-  create(@Body() createDisputeDto: CreateDisputeDto) {
-    return this.disputeService.create(createDisputeDto);
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles('admin')
+  @Get('stats')
+  async getDisputeStats() {
+    const stats = await this.disputeService.getDisputeStats();
+    return stats;
   }
-
-  @Get()
-  findAll() {
-    return this.disputeService.findAll();
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles('admin')
+  @Get('opened-disputes')
+  async getOpenDisputesWithProfiles() {
+    return this.disputeService.getOpenDisputesWithProfiles();
   }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.disputeService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateDisputeDto: UpdateDisputeDto) {
-    return this.disputeService.update(+id, updateDisputeDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.disputeService.remove(+id);
+  @Patch('dispute-resolve')
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles('admin')
+  async resolveDispute(
+    @Body('resolution') resolution: string,
+    @Body('disputeId') disputeId: number,
+  ) {
+    return this.disputeService.resolveDispute(+disputeId, resolution);
   }
 }

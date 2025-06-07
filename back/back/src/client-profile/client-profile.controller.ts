@@ -64,7 +64,7 @@ profile.user.imageUrl = profile.user.imageUrl ? `${baseUrl}${profile.user.imageU
   async getStats(@CurrentUser() user: any, @Query('id') id?: number) {
     return this.clientProfileService.getClientStats(id ?? user.userId);
   }
-  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @UseGuards(AuthGuard('jwt'),RolesGuard)
   @Roles('admin')
   @Get('AllClients')
   async getAllClients(): Promise<ClientProfile[]> {
