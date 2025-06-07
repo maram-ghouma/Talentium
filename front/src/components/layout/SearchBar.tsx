@@ -82,7 +82,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   }, []);
 
   return (
-    <div className="search-bar-container">
+    <div className="search-bar-container" data-dark-mode={isDarkMode ? "true" : "false"}>
       <div className="search-input-container">
         <Search size={18} className={isDarkMode ? 'icon-dark' : 'icon-light'} />
         <input
