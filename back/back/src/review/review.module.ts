@@ -8,9 +8,10 @@ import { FreelancerProfile } from 'src/freelancer-profile/entities/freelancer-pr
 import { User } from 'src/user/entities/user.entity';
 import { Mission } from 'src/mission/entities/mission.entity';
 import { Badge } from 'src/badge/entities/badge.entity';
+import { FreelancerProfileModule } from 'src/freelancer-profile/freelancer-profile.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Review,ClientProfile,FreelancerProfile,User, Mission,Badge])],
+  imports: [TypeOrmModule.forFeature([Review,ClientProfile,FreelancerProfile,User, Mission,Badge]),FreelancerProfileModule],
   controllers: [ReviewController],
   providers: [ReviewService],
 })

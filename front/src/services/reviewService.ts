@@ -33,23 +33,41 @@ export interface GetReviewFormDataResponse {
 }
 
 export async function createReview(reviewData: reviewData): Promise<reviewData> {
-  console.log("Submitting review with data:", reviewData);
   try {
     const response = await api.post("/review", reviewData);
     return response.data;
     
   } catch (error) {
-    console.error("Error creating review:", error);
     throw error;
   }
   
 }
 export async function getReviewMissionById(id: number): Promise<reviewMission> {
   try {
-    const response = await api.get(`/review/mission/${id}`);
+
+  const response = await api.get(`/review/mission/${id}`);
     return response.data;
   } catch (error) {
-    console.error("Error fetching mission by ID:", error);
+    throw error;
+  }
+}
+export enum BadgeType {
+  BEGINNER = 'BEGINNER',
+  ADVANCED = 'ADVANCED',
+  CERTIFIED = 'CERTIFIED',
+}
+export interface Badge {
+  id: number;
+  type: BadgeType;
+  description: string;
+}
+
+export async function getBadgesByUserId(userId: number): Promise<Badge[]> {
+  try {
+    const response = await api.get(`/user/badges/${userId}`);
+    return response.data;
+
+  } catch (error) {
     throw error;
   }
 }

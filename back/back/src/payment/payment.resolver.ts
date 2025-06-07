@@ -35,13 +35,13 @@ export class PaymentResolver {
   ): Promise<RefundResponse> {
     return await this.paymentService.refundPayment(missionId, reason);
   }
-
+/*
   @Query(() => [Mission])
   async getMissionsByPaymentStatus(
     @Args('status', { type: () => PaymentStatus }) status: PaymentStatus,
   ): Promise<Mission[]> {
     return await this.paymentService.getMissionsByPaymentStatus(status);
-  }
+  }*/
 
   @Query(() => [Invoice])
   async getPaymentHistory(

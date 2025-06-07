@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query, UseGuards } from '@nestjs/common';
 import { ReviewService } from './review.service';
 import { User } from 'src/user/entities/user.entity';
 import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
@@ -41,7 +41,10 @@ export class ReviewController {
   }
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Get('mission/:id')
-  async getReviewMissionById( @Query('id') missionId: number) {
-    return this.reviewService.getReviewMissionById(missionId);
+  async getReviewMissionById(@Param('id') missionId: number) {
+
+    const review = await this.reviewService.getReviewMissionById(missionId);
+    
+    return review;
   }
 }

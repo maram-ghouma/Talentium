@@ -7,6 +7,7 @@ import { FreelancerProfileType, FreelancerStats, Mission, Review } from '../../t
 import { updateClientProfile, updateFreelancerProfile } from '../../services/userService';
 import MissionDetailsModal from '../client/home page/MissionDetailsModal';
 import { CreateMission } from '../client/home page/CreateMission';
+import BadgeDisplay from './Badge';
 
 interface ClientProfileProps {
   darkMode?: boolean;
@@ -248,6 +249,8 @@ const handleSavePersonal = async () => {
         <div className="profile-header-info">
           <h1 className="prof-name">{formData.name}</h1>
           <h2 className="prof-title" style={{fontSize: 'var(--font-size-sm)'}}>{formData.tagline}</h2>
+          <BadgeDisplay userid={profile?.user?.id} />
+
 
           <div className="profile-meta">
             <div className="profile-meta-item">

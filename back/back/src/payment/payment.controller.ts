@@ -1,9 +1,12 @@
-import { Controller, Post, Get, Body, Param, Query, ParseIntPipe } from '@nestjs/common';
+import { Controller, Post, Get, Body, Param, Query, ParseIntPipe, UseGuards } from '@nestjs/common';
 import { PaymentService } from './payment.service';
 import { Mission, PaymentStatus } from '../mission/entities/mission.entity';
 import { Invoice } from '../invoice/entities/invoice.entity';
 import { PaymentResponse } from './payment.types';
 import { handleStripeError } from '../common/helpers/stripe.helper';
+import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
+import { GqlAuthGuard } from 'src/auth/gql-auth-guard';
+import { AuthGuard } from '@nestjs/passport';
 
 
 // DTOs for request bodies
@@ -116,6 +119,12 @@ export class PaymentController {
       refundDto.missionId, 
       refundDto.reason
     );
+  }
+  @UseGuards(AuthGuard('jwt'))
+  @Get('missions/client')
+  async getPendingMissionsByClient(@CurrentUser() user: any): Promise<Mission[]> {
+    console.log('Fetching pending missions for client:', user.userId);
+    return await this.paymentService.getPendingMissionsByClient(user.userId);
   }
 
   @Get('missions/status/:status')
