@@ -53,6 +53,26 @@ export async function getReviewMissionById(id: number): Promise<reviewMission> {
     throw error;
   }
 }
+export enum BadgeType {
+  BEGINNER = 'BEGINNER',
+  ADVANCED = 'ADVANCED',
+  CERTIFIED = 'CERTIFIED',
+}
+export interface Badge {
+  id: number;
+  type: BadgeType;
+  description: string;
+}
+
+export async function getBadgesByUserId(userId: number): Promise<Badge[]> {
+  try {
+    const response = await api.get(`/user/badges/${userId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching badges by user ID:", error);
+    throw error;
+  }
+}
 /*
 
 export const getReviewFormData = async (

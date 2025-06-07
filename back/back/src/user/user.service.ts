@@ -16,7 +16,17 @@ export class UserService extends GenericService  {
   ) {
     super(userRepo);
   }
-  
+  async findBadgesByUserId(userId: number) {
+    return this.userRepo
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.badges', 'badge')
+      .where('user.id = :userId', { userId })
+      .select(['badge.id', 'badge.type', 'badge.description'])
+      .getMany();
+      
+  }
+
+
   async findByEmail(email: string): Promise<User | null> {
     return this.userRepo.findOne({ where: { email } });
   }
