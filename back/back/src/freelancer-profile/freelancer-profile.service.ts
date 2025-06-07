@@ -113,11 +113,7 @@ async updateFreelancerProfile(freelancerId: number, updateDto: UpdateFreelancerP
   const avgRating = await this.reviewRepo
     .createQueryBuilder('review')
     .select('AVG(review.stars)', 'average')
-    .innerJoin('review.mission', 'mission')
-  .innerJoin('mission.selectedFreelancer', 'freelancer')
-  .innerJoin('freelancer.user', 'freelancerUser')
-  .where('freelancerUser.id = :userId', { userId })
-  .andWhere('review.reviewedUser = :userId', { userId })
+  .where('review.reviewedUser = :userId', { userId })
     .getRawOne();
 
   return {

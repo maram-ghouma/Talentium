@@ -102,11 +102,7 @@ async updateClientProfile(clientId: number, updateDto: UpdateClientProfileDto) {
   const avgRating = await this.reviewRepo
   .createQueryBuilder('review')
   .select('AVG(review.stars)', 'average')
-  .innerJoin('review.mission', 'mission')
-  .innerJoin('mission.client', 'client')
-  .innerJoin('client.user', 'clientUser')
-  .where('clientUser.id = :userId', { userId })
-  .andWhere('review.reviewedUser = :userId', { userId })
+  .where('review.reviewedUser = :userId', { userId })
   .getRawOne();
 
 

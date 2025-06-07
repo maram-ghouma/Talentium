@@ -1,5 +1,5 @@
 
-import { Body, Controller, Get, NotFoundException, Patch, Put, Query, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, NotFoundException, Param, Patch, Put, Query, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { ClientProfileService } from './client-profile.service';
 import { AuthGuard } from '@nestjs/passport';
 import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
@@ -59,11 +59,18 @@ profile.user.imageUrl = profile.user.imageUrl ? `${baseUrl}${profile.user.imageU
       imageUrl: imagePath, 
     });
   }
-  @UseGuards(AuthGuard('jwt'))
-    @Get('stats')
-  async getStats(@CurrentUser() user: any, @Query('id') id?: number) {
-    return this.clientProfileService.getClientStats(id ?? user.userId);
+  @UseGuards(AuthGuard('jwt'),RolesGuard)
+  @Roles('client')
+    @Get('Mystats')
+  async getMyStats(@CurrentUser() user: any) {
+    return this.clientProfileService.getClientStats(user.userId);
   }
+   @UseGuards(AuthGuard('jwt'))
+    @Get('stats')
+  async getStats(@Query('id') id: number) {
+    return this.clientProfileService.getClientStats(id);
+  }
+
   @UseGuards(AuthGuard('jwt'),RolesGuard)
   @Roles('admin')
   @Get('AllClients')
