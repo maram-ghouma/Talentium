@@ -30,6 +30,7 @@ export class MissionResolver {
     console.log('User passed to findAll:', user);
 
     return this.missionService.findAllNotMine(user);
+    //return this.missionService.findAllWithAI(user);
   }
 
   @Query(() => Mission, { name: 'mission' })

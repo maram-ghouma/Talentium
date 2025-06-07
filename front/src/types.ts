@@ -178,6 +178,7 @@ export interface ClientProfileType {
   country?: string;
   bio?: string;
   user: User;
+  stripeAccountId?: string;
 }
 
 export interface FreelancerProfileType {
@@ -190,6 +191,7 @@ export interface FreelancerProfileType {
   github?: string;
   linkedIn?: string;
   user: User;
+  stripeAccountId?: string;
 }
     export interface Interview {
       id: string;

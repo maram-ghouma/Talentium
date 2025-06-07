@@ -115,8 +115,8 @@ enum PaymentStatus {
 }
 
 type TaskStats {
-  total: Int!
-  completed: Int!
+  total: Int
+  completed: Int
 }
 
 type Review {

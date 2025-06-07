@@ -35,6 +35,7 @@ import FreelancerFeed from './Pages/Freelancer/feed';
 import ClientEditProfile from './Pages/Client/ClientEditProfile';
 import FreelancerEditProfile from './Pages/Freelancer/FreelancerEditProfile';
 import JalonsPage from './Pages/PaymentPage/JalonsPage';
+import NotFoundPage from './components/layout/NotFound';
 
 
 
@@ -71,6 +72,8 @@ function App() {
   <Route path="/payment" element={<PaymentPage />} />
   <Route path="/notifications" element={<NotificationsPage />} />
     <Route path="/" element={<GuestHome />} />
+        <Route path="*" element={<NotFoundPage />} />
+
 
 </Routes>
   );

@@ -115,7 +115,7 @@ export class Mission {
 
   @Field(() => [Application], { nullable: true })
   @OneToMany(() => Application, application => application.mission)
-  applications?: Application[];
+  applications: Application[];
 
   @Field(() => PaymentStatus)
   @Column({
@@ -125,6 +125,8 @@ export class Mission {
   })
   paymentStatus: PaymentStatus;
 
+  selectionProbability?: number;
+
 
 
 }
@@ -132,9 +134,9 @@ export class Mission {
 
 @ObjectType()
 class TaskStats {
-  @Field(() => Int)
+  @Field(() => Int,{nullable: true})
   total: number;
 
-  @Field(() => Int)
+  @Field(() => Int, {nullable: true})
   completed: number;
 }

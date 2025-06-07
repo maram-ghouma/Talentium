@@ -77,6 +77,7 @@ async updateFreelancerProfile(freelancerId: number, updateDto: UpdateFreelancerP
     profile.phoneNumber = updateDto.phoneNumber ?? profile.phoneNumber;
     profile.linkedIn = updateDto.linkedIn ?? profile.linkedIn;
     profile.skills = updateDto.skills ?? profile.skills;
+    profile.stripeAccountId = updateDto.stripeAccountId ?? profile.stripeAccountId;
     return await this.freelancerProfileRepository.save(profile);
   }
 

@@ -9,11 +9,15 @@ import { diskStorage } from 'multer';
 import { User } from 'src/user/entities/user.entity';
 import { UpdateClientProfileDto } from 'src/client-profile/dto/update-client-profile.dto';
 import { FreelancerProfile } from './entities/freelancer-profile.entity';
+import { Roles } from 'src/auth/decorators/role.decorator';
+import { RolesGuard } from 'src/auth/guards/RoleGuard';
+
 
 @Controller('freelancer-profile')
 export class FreelancerProfileController {
   constructor(private readonly freelancerProfileService: FreelancerProfileService) {}
-  @UseGuards(AuthGuard('jwt'))
+  
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
     @Get('me')
     async getMyProfile(@CurrentUser() user: any, @Query('id') id?: number) {
       const userId = id ?? user.userId;
@@ -26,7 +30,8 @@ export class FreelancerProfileController {
   
       return profile;
     }
-    @UseGuards(AuthGuard('jwt'))
+    @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles('freelancer')
     @Put('update')
     @UseInterceptors(FileInterceptor('imageUrl', {
     storage: diskStorage({
@@ -52,13 +57,14 @@ export class FreelancerProfileController {
       });
     }
 
-    @UseGuards(AuthGuard('jwt'))
+    @UseGuards(AuthGuard('jwt'), RolesGuard)
     @Get('stats')
     async getStats(@CurrentUser() user: any, @Query('id') id?: number) {
       const userId = id ?? user.userId;
       return this.freelancerProfileService.getFreelancerStats(userId);
     }
-  @UseGuards(AuthGuard('jwt'))
+    @UseGuards(AuthGuard('jwt'), RolesGuard)
+    @Roles('admin')
     @Get('AllFreelancers')
     async getAllFreelancers(): Promise<FreelancerProfile[]> {
       return this.freelancerProfileService.getAllFreelancers();

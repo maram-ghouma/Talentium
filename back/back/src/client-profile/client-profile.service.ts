@@ -66,6 +66,7 @@ async updateClientProfile(clientId: number, updateDto: UpdateClientProfileDto) {
     profile.industry = updateDto.industry ?? profile.industry;
     profile.phoneNumber = updateDto.phoneNumber ?? profile.phoneNumber;
     profile.linkedIn = updateDto.linkedIn ?? profile.linkedIn;
+    profile.stripeAccountId = updateDto.stripeAccountId ?? profile.stripeAccountId;
     return await this.clientProfileRepository.save(profile);
   }
 

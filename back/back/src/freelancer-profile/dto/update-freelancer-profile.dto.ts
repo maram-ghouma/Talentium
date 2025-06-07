@@ -44,4 +44,8 @@ export class UpdateFreelancerProfileDto {
       @IsOptional()
       @IsString()
       linkedIn?: string;
+
+      @IsOptional()
+      @IsString() 
+      stripeAccountId?: string;
 }
