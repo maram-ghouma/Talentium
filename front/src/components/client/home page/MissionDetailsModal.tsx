@@ -84,6 +84,8 @@ const MissionDetailsModal: React.FC<MissionDetailsModalProps> = ({
 const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 const [showApplicationInfo, setShowApplicationInfo] = useState(false);
 const [selectedApplicant, setSelectedApplicant] = useState<Applicant | null>(null);
+const [localStatus, setLocalStatus] = useState(mission.status);
+
 const handleDelete = () => {
   removeMission({
     variables: { id: mission.id },
@@ -176,6 +178,7 @@ const handleMarkCompleted = async (missionId: string) => {
         }
       }
     });
+    setLocalStatus('completed');
   } catch (error) {
     console.error("Error updating mission status:", error);
   }
@@ -444,7 +447,7 @@ const handleMarkCompleted = async (missionId: string) => {
                         />
                       </div>
                         <div>
-                          <h5 className="mb-0">{assignedDeveloper?.user.name}</h5>
+                          <h5 className="mb-0">{assignedDeveloper?.user.username}</h5>
                           <div className="d-flex align-items-center">
                             <Star size={16} className="text-warning me-1" />
                             <span className="text-muted">5.0 / 5.0</span>{/*  baddel lehne!!!!!!!!!!!!!!!!!!!!!!!!!!!!!(w fi lokhra) */}
@@ -489,19 +492,19 @@ const handleMarkCompleted = async (missionId: string) => {
           )}
         </Modal.Body>
         <Modal.Footer className="border-top-0 d-flex justify-content-end" style={{ backgroundColor: darkMode ? 'var(--navy-secondary)' : '' }}>
-          {mission.status === "not_assigned"  && (
+          {localStatus === "not_assigned"  && (
   <Button variant="danger" onClick={() => setShowDeleteConfirm(true)}>
     Delete
   </Button>
 )}
 
-{mission.status === "in_progress" && (
+{localStatus === "in_progress" && (
   <Button variant="warning" onClick={() => handleMarkCompleted(mission.id)}>
     Complete
   </Button>
 )}
 
-{mission.status === "completed" && (
+{localStatus === "completed" && (
   <Button variant="success" onClick={() => handlePay(mission.id)}>
     Pay
   </Button>
