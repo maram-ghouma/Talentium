@@ -1,10 +1,12 @@
-import { Controller, Get, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
 import { ReviewService } from './review.service';
 import { User } from 'src/user/entities/user.entity';
 import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
 import { AuthGuard } from '@nestjs/passport';
 import { Roles } from 'src/auth/decorators/role.decorator';
 import { RolesGuard } from 'src/auth/guards/RoleGuard';
+
+import { CreateReviewDto } from './dto/create-review.dto';
 
 @Controller('review')
 export class ReviewController {
@@ -32,5 +34,15 @@ export class ReviewController {
   async getTopRatedFreelancers(@Query('limit') limit: number = 3) {
     const result = await this.reviewService.getTopRatedFreelancers(limit);
     return result;
+  }
+  @Post('')
+  async createReview(@Body() reviewData: CreateReviewDto) {
+    return this.reviewService.createReview(reviewData);
+  }
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Get('mission/:id')
+  async getReviewMissionById(@CurrentUser() user: any, @Query('id') missionId: number) {
+    console.log('User in getReviewMissionById:', user);
+    return this.reviewService.getReviewMissionById(missionId, user);
   }
 }

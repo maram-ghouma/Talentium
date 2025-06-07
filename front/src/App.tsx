@@ -36,6 +36,7 @@ import ClientEditProfile from './Pages/Client/ClientEditProfile';
 import FreelancerEditProfile from './Pages/Freelancer/FreelancerEditProfile';
 import JalonsPage from './Pages/PaymentPage/JalonsPage';
 import NotFoundPage from './components/layout/NotFound';
+import ReviewPage from './Pages/Review/ReviewPage';
 
 
 
@@ -58,6 +59,7 @@ function App() {
   <Route path="/freelancer/interviews" element ={<ClientInterviewSchedule/>}/>
   <Route path="/Freelancer" element={<FreelancerFeed />} />
           
+  <Route path="/reviews" element={<ReviewPage  />} />
 
   <Route path="/admin/reports" element={<ReportsInterface />} />
   <Route path="/client" element ={<ClientHome/>}/>
