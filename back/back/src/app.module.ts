@@ -68,9 +68,6 @@ import { InterviewModule } from './interview/interview.module';
    PaymentModule,
    InterviewModule,],
   controllers: [AppController],
-
-  providers: [AppService, PaymentService,
-    //DatasetService
-  ],
+  providers: [AppService, PaymentService],
 })
 export class AppModule {}

@@ -24,6 +24,7 @@ export const GET_APPLICATIONS_BY_MISSION = gql`
       freelancer {
         id
         user{
+        id
           username
           imageUrl
         }

@@ -66,18 +66,7 @@ const [createApplication] = useMutation(CREATE_APPLICATION, {
   context: { hasUpload: true }
 });
 
-  const getStatusBadgeVariant = (status: string) => {
-    switch (status) {
-      case 'not_assigned':
-        return 'warning';
-      case 'assigned':
-        return 'info';
-      case 'completed':
-        return 'success';
-      default:
-        return 'secondary';
-    }
-  };
+
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleModalClose = () => {
@@ -124,7 +113,7 @@ formData.append('file', selectedFile);
 fetch(`http://localhost:3000/files/upload/resume/${applicationId}`, {
   method: 'POST',
   headers: {
-    Authorization: `Bearer ${token}`, // <-- add this header!
+    Authorization: `Bearer ${token}`, 
   },
   body: formData,
 })
@@ -186,7 +175,7 @@ const applications = data?.myApplicationsByMission || [];
         <Modal.Body style={{ backgroundColor: darkMode ? 'var(--navy-primary)' : ''}}>
           <Row>
             <Col lg={7}>
-              <Card className="mb-4" style={{ 
+              <Card className="mb-4 h-100" style={{ 
                 backgroundColor: darkMode ? 'var(--navy-secondary)' : 'white',
                 border: darkMode ? '1px solid var(--slate)' : undefined
               }}>
@@ -210,17 +199,11 @@ const applications = data?.myApplicationsByMission || [];
             </Col>
             
             <Col lg={5}>
-              <Card className="mb-4" style={{ 
+              <Card className="mb-4 h-100" style={{ 
                 backgroundColor: darkMode ? 'var(--navy-secondary)' : 'white',
                 border: darkMode ? '1px solid var(--slate)' : undefined
               }}>
                 <Card.Body>
-                  
-                    <Badge bg={getStatusBadgeVariant(mission.status)} style={{paddingBottom:"17px"}}>
-                      {mission.status.replace('_', ' ').toUpperCase()}
-                    </Badge>
-                  
-                  
                   <div className="mb-3">
                     <h6 className="text-muted mb-1">Deadline</h6>
                     <p className="mb-0">{mission.deadline?.toLocaleString()}</p>
@@ -241,7 +224,18 @@ const applications = data?.myApplicationsByMission || [];
               </Card>
             </Col>
           </Row>
-
+          <Card className="mt-3 mb-4" style={{ 
+            backgroundColor: darkMode ? 'var(--navy-secondary)' : 'white',
+            border: darkMode ? '1px solid var(--slate)' : undefined
+          }}>
+            <Card.Body className="d-flex align-items-center" style={{ cursor: 'pointer' }} onClick={() => navigate(`/client/profile/${mission.userId}`)}>
+              <User size={28} className="me-3" />
+              <div>
+                <h6 className="mb-0" style={{ color: darkMode ? 'var(--powder)' : 'inherit' }}>{mission.clientName}</h6>
+                <small className="text-muted">Client</small>
+              </div>
+            </Card.Body>
+          </Card>
               {!showApplyForm ? (
                 <div className="text-center my-5">
                   <Button

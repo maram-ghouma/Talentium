@@ -7,22 +7,27 @@ import { UseGuards } from '@nestjs/common';
 import { GqlAuthGuard } from 'src/auth/gql-auth-guard';
 import { GqlCurrentUser } from 'src/auth/decorators/gql-current-user.decorator';
 import { User } from 'src/user/entities/user.entity';
+import { Roles } from 'src/auth/decorators/role.decorator';
+import { GqlRolesGuard } from 'src/auth/guards/GqlRoleGuard';
 
 @Resolver(() => Interview)
 export class InterviewResolver {
   constructor(private readonly interviewService: InterviewService) {}
-  @UseGuards(GqlAuthGuard)
+  @UseGuards(GqlAuthGuard,GqlRolesGuard)
+  @Roles('client')
   @Mutation(() => Interview)
   createInterview(@Args('input') input: CreateInterviewInput,@GqlCurrentUser() user : any) {
     return this.interviewService.create(input,user);
   }
-  @UseGuards(GqlAuthGuard)
+  @UseGuards(GqlAuthGuard,GqlRolesGuard)
+  @Roles('client','freelancer')
   @Query(() => [Interview])
   interviews(@Args('type', { type: () => String }) type: String,@GqlCurrentUser() user : any) {
     return this.interviewService.findAll(type,user);
   }
 
-  @UseGuards(GqlAuthGuard)
+  @UseGuards(GqlAuthGuard,GqlRolesGuard)
+  @Roles('client','freelancer')
   @Mutation(() => Interview)
   remindMe(@Args('interviewId', { type: () => String }) interviewId: String,@GqlCurrentUser() user : any) {
     return this.interviewService.switchRemindMe(interviewId,user);

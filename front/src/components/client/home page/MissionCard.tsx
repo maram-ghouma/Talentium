@@ -6,7 +6,7 @@ import '../../../Styles/client/missionCard.css';
 interface MissionCardProps {
   mission: Mission;
   isDarkMode: boolean;
-  onClick?: () => void; // Add optional onClick handler
+  onClick?: () => void; 
 }
 
 export const MissionCard: React.FC<MissionCardProps> = ({ mission, isDarkMode, onClick }) => {
@@ -19,8 +19,8 @@ export const MissionCard: React.FC<MissionCardProps> = ({ mission, isDarkMode, o
   return (
     <div 
       className={`mission-card ${isDarkMode ? 'dark-mode' : ''}`}
-      onClick={onClick} // Add the onClick handler
-      style={{ cursor: onClick ? 'pointer' : 'default' }} // Add pointer cursor only if onClick is provided
+      onClick={onClick} 
+      style={{ cursor: onClick ? 'pointer' : 'default' }} 
     >
       <div className="mission-header">
         <h3 className="mission-title">{mission.title}</h3>

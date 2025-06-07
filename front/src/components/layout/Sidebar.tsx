@@ -69,6 +69,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { icon: Bell, label: 'Notifications', badge: 3, path: "/Freelancer" },
     { icon: MessageSquare, label: 'Chat', badge: 2, path: "/Freelancer/chat" },
     { icon: History, label: 'Work History', path: "/Freelancer/history" },
+    { icon: CalendarCheck, label: 'Schedule', path: "/freelancer/interviews" },
   ];
   const [userDropdownOpen, setUserDropdownOpen] = React.useState(false);
 const toggleUserDropdown = () => setUserDropdownOpen(prev => !prev);

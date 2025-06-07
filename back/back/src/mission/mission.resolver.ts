@@ -7,30 +7,34 @@ import { GqlCurrentUser } from 'src/auth/decorators/gql-current-user.decorator';
 import { User } from 'src/user/entities/user.entity';
 import { UseGuards } from '@nestjs/common';
 import { GqlAuthGuard } from 'src/auth/gql-auth-guard';
+import { Roles } from 'src/auth/decorators/role.decorator';
+import { GqlRolesGuard } from 'src/auth/guards/GqlRoleGuard';
 
 @Resolver(() => Mission)
 export class MissionResolver {
   constructor(private readonly missionService: MissionService) {}
-  @UseGuards(GqlAuthGuard)
+  @UseGuards(GqlAuthGuard,GqlRolesGuard)
+  @Roles('client')
   @Mutation(() => Mission)
   createMission(@Args('createMissionInput') createMissionInput: CreateMissionInput,@GqlCurrentUser() User : User) {
     return this.missionService.create(createMissionInput,User);
   }
-  @UseGuards(GqlAuthGuard)
+  @UseGuards(GqlAuthGuard,GqlRolesGuard)
+  @Roles('client')
   @Query(() => [Mission], { name: 'missions' })
   findAll(@GqlCurrentUser() user : User) {
-    console.log('User passed to findAll:', user);
 
     return this.missionService.findAll(user);
   }
 
-    @UseGuards(GqlAuthGuard)
+  @UseGuards(GqlAuthGuard,GqlRolesGuard)
+  @Roles('freelancer')
   @Query(() => [Mission], { name: 'allMissions' })
   findAllMissions(@GqlCurrentUser() user : User) {
     console.log('User passed to findAll:', user);
 
-    return this.missionService.findAllNotMine(user);
-    //return this.missionService.findAllWithAI(user);
+    //return this.missionService.findAllNotMine(user);
+    return this.missionService.findAllWithAI(user);
   }
 
   @Query(() => Mission, { name: 'mission' })
@@ -38,14 +42,18 @@ export class MissionResolver {
     return this.missionService.findOne(id);
   }
 
+  @UseGuards(GqlAuthGuard,GqlRolesGuard)
+  @Roles('client')
   @Mutation(() => Mission)
   updateMission(@Args('updateMissionInput') updateMissionInput: UpdateMissionInput) {
     return this.missionService.update(updateMissionInput.id, updateMissionInput);
   }
-
+@UseGuards(GqlAuthGuard,GqlRolesGuard)
+@Roles('client')
 @Mutation(() => Boolean)
 removeMission(@Args('id', { type: () => Int }) id: number): Promise<boolean> {
   return this.missionService.remove(id);
 }
+
 
 }
