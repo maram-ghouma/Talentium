@@ -59,7 +59,7 @@ function App() {
   <Route path="/freelancer/interviews" element ={<ClientInterviewSchedule/>}/>
   <Route path="/Freelancer" element={<FreelancerFeed />} />
           
-  <Route path="/reviews" element={<ReviewPage  />} />
+<Route path="/reviews/:missionId" element={<ReviewPage />} />
 
   <Route path="/admin/reports" element={<ReportsInterface />} />
   <Route path="/client" element ={<ClientHome/>}/>
