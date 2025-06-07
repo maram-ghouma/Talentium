@@ -39,6 +39,30 @@ const PaymentConfirmationView = ({ missions }: { missions: MissionLight[]; }) =>
     cvc: '',
     name: ''
   });
+  
+  const handleInvoice = async (event: React.FormEvent) => {
+    event.preventDefault();
+    
+    if (!selectedMission) return;
+
+    setLoading(true);
+    
+    try {
+      const invoice = await paymentService.generateInvoice(
+        Number(selectedMission.id),
+        Number(selectedMission.price),
+        `Mission ${selectedMission.title} Payment by ${companyName}`,
+      );
+      console.log('Invoice generated:', invoice);
+    } catch (error:any) {
+      console.error('Error generating invoice:', error);
+        const message = error.response?.data?.message || 'Une erreur inattendue est survenue.';
+      alert(message);
+    } finally {
+      setLoading(false);
+    }
+
+  };
 
   const handleCardInputChange = (field: string, value: string) => {
     setCardDetails(prev => ({
@@ -46,6 +70,8 @@ const PaymentConfirmationView = ({ missions }: { missions: MissionLight[]; }) =>
       [field]: value
     }));
   };
+  
+
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -197,7 +223,12 @@ const PaymentConfirmationView = ({ missions }: { missions: MissionLight[]; }) =>
               </button>
             </div>
           </form>
+          
         )}
+        {selectedMission && paymentStatus?.type === 'success' && (
+          <button onClick={handleInvoice} className='invoice-btn' style={{ marginTop: '20px' }}>Voir la facture</button>
+        )}
+
       </div>
     </div>
   );
