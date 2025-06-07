@@ -28,6 +28,8 @@ export class Dispute {
   @ManyToOne(() => User)
   openedBy: User;
 
+  
+
   @Field()
   @Column()
   reason: string;
