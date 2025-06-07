@@ -3,7 +3,7 @@ import { X } from 'lucide-react';
 
 export interface NotificationProps {
   id: string;
-  title: string;
+  title?: string; // Made optional
   content: string;
   type?: 'default' | 'success' | 'warning' | 'error';
   onDismiss: (id: string) => void;
@@ -13,11 +13,11 @@ export interface NotificationProps {
 
 const Notification: React.FC<NotificationProps> = ({
   id,
-  title,
+  title = 'Notification', // Default title if not provided
   content,
   type = 'default',
   onDismiss,
-  autoHide = false,
+  autoHide = true, // Changed to true for consistency
   duration = 5000
 }) => {
   const [isVisible, setIsVisible] = useState(false);

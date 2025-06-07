@@ -10,6 +10,8 @@ const NotificationContainer: React.FC<NotificationContainerProps> = ({
   notifications,
   onDismiss
 }) => {
+  console.log('NotificationContainer notifications:', notifications); // Debug data
+
   if (notifications.length === 0) {
     return null;
   }

@@ -39,11 +39,12 @@ function App() {
   const { notifications, removeNotification, addNotification } = useNotifications();
 
   return (
-    <DndProvider backend={HTML5Backend}>
-      <NotificationContainer 
+    <>
+    <NotificationContainer 
         notifications={notifications} 
         onDismiss={removeNotification} 
       />
+    <DndProvider backend={HTML5Backend}>
         <Routes>
           <Route path="/admin/clients" element={<ClientsList />} />
           <Route path="/admin" element={<AdminDashboard />} />
@@ -73,6 +74,7 @@ function App() {
           <Route path="/" element={<GuestHome />} />
         </Routes>
     </DndProvider>
+    </>
   );
 }
 

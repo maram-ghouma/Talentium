@@ -37,7 +37,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   profileRole,
   userType
 }) => {
-  const [totalUnread, setTotalUnread] = useState(0);
+  const [totalUnread, setTotalUnread] = useState(5); // Static value for Chat badge
   const socketService = new SocketService(); // Replace with dependency injection
   const chatService = new ChatService(socketService);
 
@@ -63,7 +63,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const ClientMenuItems = [
     { icon: Bell, label: 'Notifications', badge: 3, path: "" },
     { icon: CalendarCheck, label: 'Schedule', path: "" },
-    { icon: MessageSquare, label: 'Chat', badge: totalUnread, path: "" },
+    { icon: MessageSquare, label: 'Chat', badge: 5, path: "" }, // Static badge value
     { icon: History, label: 'History', path: "" },
   ];
 
@@ -78,7 +78,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const FreelancerMenuItems = [
     { icon: User, label: 'Profile', path: "/Freelancer/profile" },
     { icon: Bell, label: 'Notifications', badge: 3, path: "/Freelancer" },
-    { icon: MessageSquare, label: 'Chat', badge: totalUnread, path: "/Freelancer/chat" },
+    { icon: MessageSquare, label: 'Chat', badge: 5, path: "/Freelancer/chat" }, // Static badge value
     { icon: History, label: 'Work History', path: "/Freelancer/history" },
     { icon: Briefcase, label: 'Missions', path: "/Freelancer" },
   ];

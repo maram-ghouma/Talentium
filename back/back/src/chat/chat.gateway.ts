@@ -9,8 +9,8 @@ import { JwtService } from '@nestjs/jwt';
 import { Conversation } from 'src/conversation/entities/conversation.entity';
 import { ConfigService } from '@nestjs/config';
 import { Logger } from '@nestjs/common';
-import { NotificationService } from 'src/notification/notification.service';
-import { NotificationGateway } from 'src/notification/notification.gateway';
+import { NotificationService } from '../notification/notification.service';
+import { NotificationGateway } from '../notification/notification.gateway';
 
 @WebSocketGateway({
   cors: { origin: 'http://localhost:4200', credentials: true },
