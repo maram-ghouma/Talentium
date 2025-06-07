@@ -41,3 +41,7 @@ export const updateDisputeResolution = async (disputeId, resolution) => {
   const response = await api.patch(`/dispute/dispute-resolve`, { resolution, disputeId });
   return response.data;
 };
+export const getResolvedDisputesWithProfiles = async () => {
+  const response = await api.get('/dispute/resolved-disputes');
+  return response.data;
+};

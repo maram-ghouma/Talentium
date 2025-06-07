@@ -5,58 +5,11 @@ import ReportsList from '../../components/admin/ReportsComponents/ReportsList';
 import '../../Styles/admin/reports.css';
 import { MainLayout } from '../../components/layout/MainLayout';
 import { useNavigate } from 'react-router-dom';
-import { getDisputeStats, getOpenDisputesWithProfiles } from '../../services/adminService';
+import { getDisputeStats, getOpenDisputesWithProfiles, getResolvedDisputesWithProfiles } from '../../services/adminService';
 import { report } from 'process';
 
 const ReportsInterface = () => {
   const [activeTab, setActiveTab] = useState('pending');
-
-  /*const pendingReports = [
-    {
-      id: 1,
-      reportedUser: 'John Smith',
-      reportedBy: 'Client Corp Ltd',
-      reason: 'Unprofessional conduct',
-      date: '2024-03-15',
-      type: 'freelancer',
-      status: 'pending',
-      details: 'Failed to communicate project delays and missed multiple deadlines.'
-    },
-    {
-      id: 2,
-      reportedUser: 'Tech Solutions Inc',
-      reportedBy: 'Sarah Wilson',
-      reason: 'Payment dispute',
-      date: '2024-03-14',
-      type: 'client',
-      status: 'pending',
-      details: 'Client refusing to pay for completed work citing unreasonable demands.'
-    },
-    {
-      id: 3,
-      reportedUser: 'Alice Cooper',
-      reportedBy: 'Digital Agency X',
-      reason: 'Quality concerns',
-      date: '2024-03-13',
-      type: 'freelancer',
-      status: 'pending',
-      details: 'Delivered work does not match the promised quality standards.'
-    }
-  ];*/
-
-  const resolvedReports = [
-    {
-      id: 4,
-      reportedUser: 'Mark Johnson',
-      reportedBy: 'WebDev Solutions',
-      reason: 'Contract violation',
-      date: '2024-03-10',
-      type: 'client',
-      status: 'resolved',
-      resolution: 'Warning issued to client',
-      details: 'Changed project scope without proper communication.'
-    }
-  ];
   const transformReportData = (data: any[]) => {
   return data.map(item => {
     const { mission, openedBy, reason, status, openedAt, resolution } = item;
@@ -148,6 +101,28 @@ const ReportsInterface = () => {
     fetchPendingReports();
 
   }, []);
+  const [ResolvedReports, setResolvedReports] = useState<any[]>([]);
+  useEffect(() => {
+    const fetchResolvedReports = async () => {
+      try {
+        const data = await getResolvedDisputesWithProfiles();
+        const transformed = transformReportData(data);
+        setResolvedReports(transformed);
+        console.log("Transformed Resolved Reports:", transformed);
+      } catch (err: any) {
+        if (err.response && err.response.status === 404) {
+          navigate('/404', { replace: true });
+          return;
+        }
+        setError('Failed to load profile');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchResolvedReports();
+
+  }, []);
   const handleSearch = (query: string) => {
     console.log("Search query:", query);
   };
@@ -169,7 +144,7 @@ const ReportsInterface = () => {
       />
       <ReportsTabs activeTab={activeTab} setActiveTab={setActiveTab} />
       <ReportsList 
-        reports={activeTab === 'pending' ? PendingReports : resolvedReports} activeTab={activeTab} 
+        reports={activeTab === 'pending' ? PendingReports : ResolvedReports} activeTab={activeTab} 
       />
     </div>
       

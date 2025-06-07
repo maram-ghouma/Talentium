@@ -17,76 +17,77 @@ export class ReviewService {
   ) {}
 
   async getReviewsFreelancer(userId: number): Promise<Review[]> {
-  return this.reviewRepository
+   return this.reviewRepository
     .createQueryBuilder('review')
-    .leftJoinAndSelect('review.reviewedUser', 'reviewedUser')
-    .leftJoinAndSelect('review.reviewer', 'reviewer')
+    .leftJoinAndSelect('review.reviewedUser', 'reviewedUser') // the freelancer being reviewed
+    .leftJoinAndSelect('review.reviewer', 'reviewer')         // the client who wrote the review
     .leftJoinAndSelect('review.mission', 'mission')
-    .leftJoinAndSelect('mission.selectedFreelancer', 'freelancerProfile')
-    .leftJoinAndSelect('freelancerProfile.user', 'freelancerUser')
-    .where('freelancerUser.id = :userId', { userId })
-    .andWhere('reviewedUser.id = :userId', { userId })
+    .where('reviewedUser.id = :userId', { userId })           // filter by reviewed freelancer
     .orderBy('review.date', 'DESC')
     .limit(3)
-    .getMany(); 
+    .getMany();
 
 }
 
 async getReviewsClient(userId: number): Promise<Review[]> {
-  return this.reviewRepository
+   return this.reviewRepository
     .createQueryBuilder('review')
-    .leftJoinAndSelect('review.reviewedUser', 'reviewedUser')
-    .leftJoinAndSelect('review.reviewer', 'reviewer')
+    .leftJoinAndSelect('review.reviewedUser', 'reviewedUser') // the client being reviewed
+    .leftJoinAndSelect('review.reviewer', 'reviewer')         // the freelancer writing the review
     .leftJoinAndSelect('review.mission', 'mission')
-    .leftJoinAndSelect('mission.client', 'client')
-    .leftJoinAndSelect('client.user', 'clientUser')
-    .where('clientUser.id = :userId', { userId })
-    .andWhere('reviewedUser.id = :userId', { userId })
+    .where('reviewedUser.id = :userId', { userId }) // ✅ client is the reviewed user
     .orderBy('review.date', 'DESC')
     .limit(3)
-    .getMany(); 
+    .getMany();
 
 }
 
  async getTopRatedClients(limit: number = 3) {
     const topClients = await this.reviewRepository
-      .createQueryBuilder('review')
-      .select('review.reviewedUserId', 'userId')
-      .addSelect('AVG(review.stars)', 'avgRating')
-      .innerJoin(ClientProfile, 'client', 'client.userId = review.reviewedUserId')
-      .groupBy('review.reviewedUserId')
-      .orderBy('avgRating', 'DESC')
-      .limit(limit)
-      .getRawMany();
+  .createQueryBuilder('review')
+  .select('reviewedUser.id', 'userId')
+  .addSelect('AVG(review.stars)', 'avgRating')
+  .innerJoin('review.reviewedUser', 'reviewedUser') // explicitly join the reviewed user
+  .innerJoin('review.mission', 'mission')
+  .innerJoin('mission.client', 'client')
+  .innerJoin('client.user', 'clientUser')
+  .where('reviewedUser.id = clientUser.id') // make sure reviewed user is client of the mission
+  .groupBy('reviewedUser.id')
+  .orderBy('avgRating', 'DESC')
+  .limit(limit)
+  .getRawMany();
 
-    const enriched = await Promise.all(
-      topClients.map(async (entry) => {
-        const profile = await this.clientProfileRepository.findOne({
-          where: { user: { id: entry.userId } },
-          relations: ['user'],
-        });
-        return {
-          username: profile?.user.username,
-          averageRating: parseFloat(entry.avgRating),
-          industry: profile?.industry,
-        };
-      }),
-    );
+  const enriched = await Promise.all(
+    topClients.map(async (entry) => {
+      const profile = await this.clientProfileRepository.findOne({
+        where: { user: { id: entry.userId } },
+        relations: ['user'],
+      });
+      return {
+        username: profile?.user.username,
+        averageRating: parseFloat(entry.avgRating),
+        industry: profile?.industry,
+      };
+    }),
+  );
 
-    return enriched;
+  return enriched;
   }
 
   async getTopRatedFreelancers(limit: number = 3) {
   const topFreelancers = await this.reviewRepository
-    .createQueryBuilder('review')
-    .select('review.reviewedUserId', 'userId')
-    .addSelect('AVG(review.stars)', 'avgRating')
-    .innerJoin(FreelancerProfile, 'freelancer', 'freelancer.userId = review.reviewedUserId')
-    .groupBy('review.reviewedUserId')
-    .orderBy('avgRating', 'DESC')
-    .limit(limit)
-    .getRawMany();
-
+     .createQueryBuilder('review')
+  .select('reviewedUser.id', 'userId')
+  .addSelect('AVG(review.stars)', 'avgRating')
+  .innerJoin('review.reviewedUser', 'reviewedUser')    // the reviewed user
+  .innerJoin('review.mission', 'mission')              // the mission related to review
+  .innerJoin('mission.selectedFreelancer', 'freelancer')       // the freelancer for the mission
+  .innerJoin('freelancer.user', 'freelancerUser')      // user entity for freelancer if applicable
+  .where('reviewedUser.id = freelancerUser.id')        // ensure reviewed user is the freelancer for the mission
+  .groupBy('reviewedUser.id')
+  .orderBy('avgRating', 'DESC')
+  .limit(limit)
+  .getRawMany();
   // Enrich with user and freelancer profile
   const enriched = await Promise.all(
     topFreelancers.map(async (entry) => {

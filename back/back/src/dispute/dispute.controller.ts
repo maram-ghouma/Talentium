@@ -23,6 +23,12 @@ export class DisputeController {
   async getOpenDisputesWithProfiles() {
     return this.disputeService.getOpenDisputesWithProfiles();
   }
+    @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles('admin')
+  @Get('resolved-disputes')
+  async getResolvedDisputesWithProfiles() {
+    return this.disputeService.getResolvedDisputesWithProfiles();
+  }
   @Patch('dispute-resolve')
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles('admin')

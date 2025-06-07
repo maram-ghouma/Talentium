@@ -46,8 +46,8 @@ export class AuthController {
   async switchRole(
     @CurrentUser() user: any,
     @Body() switchDto: SwitchRoleDto,
-  ): Promise<User> {
-    return this.userService.switchUserRole(user.userId, switchDto);
+  ) {
+    return this.authService.switchUserRole(user.userId, switchDto);
   }
     @UseGuards(AuthGuard('jwt'))
     @Get('getClientName')

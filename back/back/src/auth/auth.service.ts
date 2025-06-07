@@ -21,6 +21,7 @@ import { FreelancerProfile } from 'src/freelancer-profile/entities/freelancer-pr
 import { Mission } from 'src/mission/entities/mission.entity';
 import { Review } from 'src/review/entities/review.entity';
 import { Dispute, DisputeStatus } from 'src/dispute/entities/dispute.entity';
+import { SwitchRoleDto } from 'src/user/dto/switch-role.sto';
 
 @Injectable()
 export class AuthService {
@@ -137,10 +138,41 @@ await this.freelancerProfilesService.createProfileForUser(newUser, {
 
   // Resolve dispute
   dispute.status = DisputeStatus.RESOLVED;  
+  dispute.resolution = `User has been suspended due to violation of terms.`;
   await this.disputeRepo.save(dispute);
 
   return { message: 'User suspended and dispute resolved successfully' };
 }
+
+async switchUserRole(userId: number, switchDto: SwitchRoleDto): Promise<{ user: User; access_token: string }> {
+    const user = await this.userRepo.findOne({ where: { id: userId } });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    if (user.currentRole === switchDto.newRole) {
+      throw new BadRequestException(`User already has the role '${switchDto.newRole}'`);
+    }
+
+    user.currentRole = switchDto.newRole;
+    const updatedUser = await this.userRepo.save(user);
+
+    // 🔐 Create a new JWT with the updated role
+    const payload = {
+      sub: updatedUser.id,
+      email: updatedUser.email,
+      role: updatedUser.currentRole,
+    };
+
+    const token = this.jwtService.sign(payload);
+
+    return {
+      user: updatedUser,
+      access_token: token,
+    };
+  }
+
   
 }
 

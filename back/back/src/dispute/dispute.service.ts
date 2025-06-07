@@ -45,6 +45,7 @@ export class DisputeService {
   });
   return disputes;
 }
+
   async resolveDispute(disputeId: number, resolution: string): Promise<{ message: string }> {
     const dispute = await this.disputeRepository.findOne({ where: { id: disputeId } });
 
@@ -59,6 +60,22 @@ export class DisputeService {
 
     return { message: 'Dispute resolved successfully' };
   }
+  async getResolvedDisputesWithProfiles() {
+  const disputes = await this.disputeRepository.find({
+    where: {
+      status: In([DisputeStatus.RESOLVED]),
+    },
+    relations: [
+      'openedBy',
+      'mission',
+      'mission.client',
+      'mission.client.user',         
+      'mission.selectedFreelancer',
+      'mission.selectedFreelancer.user'  
+    ],
+  });
+  return disputes;
+}
 
 
 }

@@ -4,14 +4,14 @@ import { UserService } from './user/user.service';
 import { seedAdmin } from './SeedAdmin';
 import * as express from 'express';
 import { join } from 'path';
-import { seed } from './seed';
+//import { seed } from './seed';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { User } from './user/entities/user.entity';
 import { ClientProfile } from './client-profile/entities/client-profile.entity';
 import { FreelancerProfile } from './freelancer-profile/entities/freelancer-profile.entity';
 import { Mission } from './mission/entities/mission.entity';
 import { Application } from './application/entities/application.entity';
-import { DatasetService } from './generate-dataset.service';
+//import { DatasetService } from './generate-dataset.service';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);

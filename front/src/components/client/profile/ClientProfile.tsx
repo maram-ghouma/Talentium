@@ -521,7 +521,7 @@ const handleSavePersonal = async () => {
         <Card className="card">
           <Card.Body>
             <div className="profile-header">
-              <h5 className="mb-0">Developer Reviews</h5>
+              <h5 className="mb-0">Reviews</h5>
             </div>
         
             {reviews && reviews.length > 0 ? (
