@@ -17,8 +17,8 @@ import {
   SwitchCamera,
 } from 'lucide-react';
 import '../../Styles/sidebar.css';
-import { ChatService } from '../../services/Chat/chat.service'; 
-import { SocketService } from '../../services/Chat/socket.service'; 
+import { ChatService } from '../../services/Chat/chat.service'; // Adjust path
+import { SocketService } from '../../services/Chat/socket.service'; // Adjust path
 
 interface SidebarProps {
   isOpen: boolean;

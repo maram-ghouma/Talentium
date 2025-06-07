@@ -62,12 +62,12 @@ function App() {
           <Route path="/client/interviews" element={<ClientInterviewSchedule />} />
           <Route path="/client/profile" element={<ClientProfilePage />} />
           <Route path="/client/chat" element={<ClientChat />} />
-          <Route path="/client/missions/:id/kanban" element={<ClientKanban />} />
+          <Route path="/kanban/:id" element={<ClientKanban />} />
 
 
           <Route path="/signup" element={<SignUpPage />} />
           <Route path="/signin" element={<SignInPage />} />
-          <Route path="/payment" element={<PaymentPage />} />
+          <Route path="/paym²ent" element={<PaymentPage />} />
           <Route path="/notifications" element={<NotificationsPage />} />
 
           <Route path="/" element={<GuestHome />} />

@@ -37,6 +37,22 @@ type Conversation {
   messages: [Message!]!
 }
 
+type Task {
+  id: Int!
+  title: String!
+  description: String!
+  status: TaskStatus!
+  mission: Mission!
+  createdAt: DateTime!
+}
+
+"""The status of a task"""
+enum TaskStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETED
+}
+
 type Mission {
   id: Int!
   title: String!
@@ -52,6 +68,7 @@ type Mission {
   clientName: String!
   progress: Int!
   tasks: TaskStats!
+  tasklist: [Task!]!
 }
 
 """

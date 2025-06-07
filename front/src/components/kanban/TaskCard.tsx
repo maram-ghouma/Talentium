@@ -1,15 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useDrag } from 'react-dnd';
-
-interface Mission {
-  id: string;
-  title: string;
-  description: string;
-  client: string;
-  startDate: string;
-  dueDate: string;
-  status: string;
-}
 
 export interface Task {
   id: string;
@@ -25,9 +15,11 @@ export interface Task {
 
 interface TaskCardProps {
   task: Task;
+  onDeleteTask: (taskId: string) => void;
+  onRightClick?: (event: React.MouseEvent) => void;
 }
 
-const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
+const TaskCard: React.FC<TaskCardProps> = ({ task, onDeleteTask, onRightClick }) => {
   const [{ isDragging }, drag] = useDrag(() => ({
     type: 'task',
     item: { id: task.id },
@@ -36,19 +28,21 @@ const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
     }),
   }));
 
+  const handleDelete = () => {
+    onDeleteTask(task.id);
+  };
+
   return drag(
     <div
       className={`task-card ${isDragging ? 'task-dragging' : ''}`}
       style={{ opacity: isDragging ? 0.5 : 1 }}
+      onContextMenu={onRightClick} // Let parent handle context menu
       aria-label={`Task: ${task.title}`}
     >
       <h3 className="task-title">{task.title}</h3>
-      {task.description && (
-        <p className="task-description">{task.description}</p>
-      )}
+      {task.description && <p className="task-description">{task.description}</p>}
     </div>
   );
 };
-
 
 export default TaskCard;

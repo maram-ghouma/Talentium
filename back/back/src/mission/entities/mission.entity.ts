@@ -13,6 +13,7 @@ import { ObjectType, Field, Int, GraphQLISODateTime } from '@nestjs/graphql';
 import { FreelancerProfile } from 'src/freelancer-profile/entities/freelancer-profile.entity';
 import { GraphQLDate } from 'graphql-scalars';
 import { Conversation } from 'src/conversation/entities/conversation.entity';
+import { Task } from './task.entity';
 
 @ObjectType()
 @Entity()
@@ -49,7 +50,7 @@ export class Mission {
   @Column('simple-array')
   requiredSkills: string[];
 
-@Field(() => GraphQLDate)
+  @Field(() => GraphQLDate)
   @Column({ type: 'date' })
   deadline: Date;
 
@@ -57,12 +58,12 @@ export class Mission {
   @Column()
   budget: string;
 
- @Field(() => GraphQLDate)
+  @Field(() => GraphQLDate)
   @CreateDateColumn()
   createdAt: Date;
 
   @Field()
-  @Column({  default: "john Client" })
+  @Column({ default: "john Client" })
   clientName: string;
 
   @Field(() => Int)
@@ -70,7 +71,7 @@ export class Mission {
   progress: number;
 
   @Field(() => TaskStats)
-@Column('json',  { nullable: true })
+  @Column('json', { nullable: true })
   tasks: {
     total: number;
     completed: number;
@@ -86,6 +87,10 @@ export class Mission {
   @OneToMany(() => Conversation, (conversation) => conversation.mission)
   conversations: Conversation[];
 
+  // New tasklist attribute
+  @Field(() => [Task])
+  @OneToMany(() => Task, (task) => task.mission, { cascade: true })
+  tasklist: Task[];
 }
 
 @ObjectType()

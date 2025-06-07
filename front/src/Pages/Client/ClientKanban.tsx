@@ -13,6 +13,10 @@ const ClientKanban: React.FC = () => {
 
   const { id: missionId } = useParams<{ id: string }>();
 
+  if (!missionId) {
+    return <div>Error: Mission ID is missing</div>;
+  }
+
   return (
     <MainLayout
       isDarkMode={isDarkMode}
@@ -24,7 +28,7 @@ const ClientKanban: React.FC = () => {
       profileName="Client"
       profileRole=""
     >
-      <KanbanBoard missionId={missionId ?? ''} />
+      <KanbanBoard missionId={missionId} />
     </MainLayout>
   );
 };

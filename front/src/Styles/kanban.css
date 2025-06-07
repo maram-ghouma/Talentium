@@ -231,3 +231,27 @@ body {
     font-size: 16px;
   }
 }
+
+.add-task-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+  margin-top: var(--spacing-3);
+}
+
+.add-task-inputs input {
+  padding: var(--spacing-2);
+  font-size: 14px;
+  border: 1px solid var(--slate);
+  border-radius: var(--border-radius);
+  outline: none;
+  box-shadow: var(--shadow-sm);
+  background-color: white;
+  color: var(--navy-primary);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.add-task-inputs input:focus {
+  border-color: var(--navy-secondary);
+  box-shadow: var(--shadow-md);
+}
