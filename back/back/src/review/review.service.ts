@@ -58,6 +58,7 @@ export class ReviewService {
   // Get client and freelancer profiles with their users
   const clientProfile = mission.client;
   const freelancerProfile = mission.selectedFreelancer;
+  
 
   if (!clientProfile?.user || !freelancerProfile?.user) {
     throw new Error('Informations manquantes sur le client ou le freelancer');
@@ -188,8 +189,7 @@ async getReviewsClient(userId: number): Promise<Review[]> {
     throw new Error('Mission non trouvée');
   }
 
-  console.log('Mission:', mission);
-  console.log('createReviewDto:', createReviewDto);
+ 
   
   // Get the reviewer user to determine their role and profile
   const reviewer = await this.clientProfileRepository.findOne({ 
@@ -215,11 +215,7 @@ async getReviewsClient(userId: number): Promise<Review[]> {
     isFreelancerReviewing = true;
   }
 ;
-  console.log('Mission client user ID:', mission.client?.id);
-  console.log('Mission selectedFreelancer user ID:', mission.selectedFreelancer?.id);
-  console.log('Reviewer user ID:', reviewer.id);
-  console.log('clientReviewing:', isClientReviewing);
-  console.log('freelancerReviewing:', isFreelancerReviewing);
+
 
   if (!isClientReviewing && !isFreelancerReviewing) {
     throw new Error('Seuls les participants à la mission peuvent laisser un avis');

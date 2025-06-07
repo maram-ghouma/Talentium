@@ -8,17 +8,17 @@ const BadgeDisplay = ({ userid }) => {
   [BadgeType.BEGINNER]: { 
     style: { backgroundColor: '#d1fae5', color: '#065f46' }, // light green bg, dark green text
     icon: '🌱', 
-    label: 'Débutant' 
+    label: 'Beginner' 
   },
   [BadgeType.ADVANCED]: { 
     style: { backgroundColor: '#dbeafe', color: '#1e3a8a' }, // light blue bg, dark blue text
     icon: '⭐', 
-    label: 'Avancé' 
+    label: 'Advanced' 
   },
   [BadgeType.CERTIFIED]: { 
     style: { backgroundColor: '#ede9fe', color: '#6b21a8' }, // light purple bg, dark purple text
     icon: '👑', 
-    label: 'Certifié' 
+    label: 'Certified' 
   }
 };
 
