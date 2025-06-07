@@ -17,13 +17,16 @@ export class UserService extends GenericService  {
     super(userRepo);
   }
   async findBadgesByUserId(userId: number) {
-    return this.userRepo
-      .createQueryBuilder('user')
-      .leftJoinAndSelect('user.badges', 'badge')
-      .where('user.id = :userId', { userId })
-      .select(['badge.id', 'badge.type', 'badge.description'])
-      .getMany();
-      
+    const user = await this.userRepo.findOne({ where: { id: userId }, relations: ['badges'] });
+    if (!user) {
+      throw new NotFoundException(`User with ID ${userId} not found`);
+    }
+    if (user.badges.length === 0) {
+      throw new NotFoundException(`No badges found for user with ID ${userId}`);
+    }
+
+    return user.badges;
+
   }
 
 

@@ -249,7 +249,8 @@ const handleSavePersonal = async () => {
         <div className="profile-header-info">
           <h1 className="prof-name">{formData.name}</h1>
           <h2 className="prof-title" style={{fontSize: 'var(--font-size-sm)'}}>{formData.tagline}</h2>
-          <BadgeDisplay user={profile?.user.id} />
+          <BadgeDisplay userid={profile?.user?.id} />
+
 
           <div className="profile-meta">
             <div className="profile-meta-item">
