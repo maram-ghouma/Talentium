@@ -115,7 +115,7 @@ export class Mission {
 
   @Field(() => [Application], { nullable: true })
   @OneToMany(() => Application, application => application.mission)
-  applications?: Application[];
+  applications: Application[];
 
   @Field(() => PaymentStatus)
   @Column({
@@ -124,6 +124,8 @@ export class Mission {
     default: PaymentStatus.PENDING
   })
   paymentStatus: PaymentStatus;
+
+  selectionProbability?: number;
 
 
 
