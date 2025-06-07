@@ -231,6 +231,11 @@ import { User } from '../user/entities/user.entity';
 import { Invoice } from '../invoice/entities/invoice.entity';
 import { FreelancerProfile } from '../freelancer-profile/entities/freelancer-profile.entity';
 import { CreateEscrowResponse ,PaymentResponse} from './payment.types';
+import * as PDFDocument from 'pdfkit';
+import * as fs from 'fs';
+import * as path from 'path';
+import { finished } from 'stream/promises';
+
 
 @Injectable()
 export class PaymentService {
@@ -470,10 +475,65 @@ async createEscrowPayment(missionId: number, clientId: number) {
   }
 
   private async generateInvoicePDF(invoice: Invoice) {
-    // PDF generation logic with pdfkit or html-pdf
-    console.log(`Génération PDF pour facture ${invoice.id}`);
-    // Implementation details...
+  const load = await this.invoiceRepository.findOne({
+    where: { id: invoice.id },
+    relations: ['client', 'freelancer', 'mission','freelancer.user'],
+  });
+
+  if (!load) {
+    throw new Error('Invoice not found');
   }
+
+  const uploadsDir = path.join(process.cwd(), 'uploads');
+  fs.mkdirSync(uploadsDir, { recursive: true });
+
+  const filePath = path.join(uploadsDir, `facture_${load.id}.pdf`);
+  const doc = new PDFDocument({ margin: 50 });
+  const writeStream = fs.createWriteStream(filePath);
+  doc.pipe(writeStream);
+
+  // Content
+  doc
+    .fontSize(24)
+    .text('FACTURE', { align: 'center' })
+    .moveDown(1.5);
+
+  doc
+    .fontSize(12)
+    .text(`Facture n° : ${load.id}`)
+    .text(`Date : ${load.date}`)
+    .text(`Client : ${load.client?.username || 'N/A'}`)
+    .text(`Montant : ${parseFloat(typeof load.amount === 'string' ? load.amount : String(load.amount || 0)).toFixed(2)} €`)
+    .text(`Freelancer : ${load.freelancer?.user?.username || 'N/A'}`)
+    .moveDown();
+
+  doc
+    .moveTo(doc.x, doc.y)
+    .lineTo(doc.page.width - 50, doc.y)
+    .stroke()
+    .moveDown();
+
+  doc
+    .fontSize(14)
+    .text('Détails de la mission :', { underline: true })
+    .moveDown(0.5)
+    .fontSize(12)
+    .text(`Description : ${load.description}`)
+    .text(`Montant à payer : ${(typeof load.amount === 'string' ? parseFloat(load.amount) : Number(load.amount || 0)).toFixed(2)} €`)
+    .moveDown(2);
+
+  doc
+    .fontSize(10)
+    .fillColor('gray')
+    .text('Merci pour votre confiance.', { align: 'center' });
+
+  doc.end();
+
+  // ✅ Wait for the file to finish writing
+  await finished(writeStream);
+
+  console.log(`PDF enregistré avec succès dans : ${filePath}`);
+}
 
   async refundPayment(missionId: number, reason: string) {
     const mission = await this.missionRepository.findOne({

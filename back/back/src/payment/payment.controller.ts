@@ -88,6 +88,7 @@ export class PaymentController {
     }
   }
 
+
   @Post('milestone/release-batch')
   async releaseBatchMilestones(@Body() releaseBatchDto: ReleaseBatchMilestonesDto): Promise<ReleaseMilestoneResponse[]> {
     const results: ReleaseMilestoneResponse[] = [];
@@ -180,4 +181,12 @@ async retryPaymentSetup(@Body() body: { missionId: number }): Promise<CreateEscr
   handleStripeError(error);
 }
 }
-}
+@Post('invoice')
+async getInvoice(@Body() body): Promise<Invoice> {
+  try {
+    return await this.paymentService.generateInvoice(body.missionId, body.amount, body.description);
+  } catch (error) {
+    console.error('Error getting invoice:', error);
+    handleStripeError(error);
+  }
+}}
