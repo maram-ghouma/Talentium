@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { MainLayout } from '../../components/layout/MainLayout'; // Ensure MainLayout is correctly imported
 import ClientProfile from '../../components/client/profile/ClientProfile';
-import { getClientMissions, getClientProfile, getClientReviews, getClientStats } from '../../services/userService';
+import { getClientMissions, getClientProfile, getClientReviews, getClientStats, getMyStats } from '../../services/userService';
 import { useNavigate } from 'react-router-dom';
 
 
@@ -72,7 +72,7 @@ const navigate = useNavigate();
     useEffect(() => {
       const fetchStats = async () => {
         try {
-          const data = await getClientStats();
+          const data = await getMyStats();
           setStats(data);
         } catch (err) {
           setError('Failed to load Stats');
