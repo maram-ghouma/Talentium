@@ -17,8 +17,8 @@
     bottom: 0;
     background-color: rgba(0, 0, 0, 0.5);
     backdrop-filter: blur(8px);
-    z-index: 9999;
-    pointer-events: none;
+    z-index: 10000;
+    pointer-events: none !important;
   }
   
   /* Modal container - completely separate from the blurred background */
@@ -82,19 +82,28 @@
   transform: translate(-50%, -50%);
   background: white;
   border-radius: 12px;
-  padding: 0rem 0rem 0rem 0rem;
+  padding: 0; /* zero padding is okay */
   width: 90%;
   max-width: 600px;
-  height: 92%; /* Limit max height */
-  overflow-y: auto; /* Add scrolling if needed */
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-    pointer-events: auto !important;
-  z-index: 2147483647 !important;
+  height: 92%;
+  overflow-y: auto;
   overflow-x: hidden;
-  
-  /* Custom scrollbar styling */
-  scrollbar-width: thin; /* Firefox */
-  scrollbar-color: var(--slate) transparent; 
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  pointer-events: auto !important;
+  z-index: 2147483647 !important;
+  scrollbar-width: thin;
+  scrollbar-color: var(--slate) transparent;
+
+  /* Add this to ensure inputs inside get pointer events */
+  user-select: text;
+}
+
+/* Specifically make inputs inside modal fully interactive */
+.modal-container1 input,
+.modal-container1 textarea {
+  pointer-events: auto;
+  user-select: text;
+  caret-color: auto; /* ensures blinking cursor shows */
 }
 
 /* More compact header */

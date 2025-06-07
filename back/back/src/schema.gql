@@ -2,14 +2,80 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-type User {
+type Application {
   id: ID!
-  username: String!
-  email: String!
-  password: String!
-  isAdmin: Boolean!
-  imageUrl: String!
-  currentRole: String!
+  message: String!
+  resumePath: String!
+  status: ApplicationStatus!
+  mission: Mission!
+  missionId: String!
+  freelancer: FreelancerProfile!
+  freelancerId: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+enum ApplicationStatus {
+  PENDING
+  PRE_SELECTED
+  ACCEPTED
+  REJECTED
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type ClientProfile {
+  id: ID!
+  user: User!
+  phoneNumber: String!
+  interviews: [Interview!]
+  stripeAccountId: String
+}
+
+type Interview {
+  id: ID!
+  freelancer: FreelancerProfile!
+  client: ClientProfile!
+  topic: String!
+  scheduledDateTime: DateTime!
+  remindMeF: Boolean!
+  remindMeC: Boolean!
+}
+
+type FreelancerProfile {
+  id: Int!
+  user: User!
+  skills: [String!]
+  phoneNumber: String!
+  country: String!
+  linkedIn: String
+  github: String
+  hourlyRate: Float
+  bio: String
+  selectedMissions: [Mission!]
+  applications: [Application!]
+  stripeAccountId: String
+  interviews: [Interview!]
+}
+
+type Dispute {
+  id: ID!
+  mission: Mission!
+  openedBy: User!
+  reason: String!
+  status: DisputeStatus!
+  openedAt: DateTime!
+  resolution: String
+}
+
+enum DisputeStatus {
+  OPEN
+  IN_REVIEW
+  RESOLVED
+  REJECTED
 }
 
 type Message {
@@ -60,7 +126,7 @@ type Mission {
   status: String!
   price: Int!
   date: Date!
-  client: User!
+  client: ClientProfile!
   requiredSkills: [String!]!
   deadline: Date!
   budget: String!
@@ -68,7 +134,16 @@ type Mission {
   clientName: String!
   progress: Int!
   tasks: TaskStats!
+<<<<<<< HEAD
   tasklist: [Task!]!
+=======
+  preselectedFreelancers: FreelancerProfile
+  selectedFreelancer: FreelancerProfile
+  disputes: [Dispute!]!
+  paymentIntentId: String
+  applications: [Application!]
+  paymentStatus: PaymentStatus!
+>>>>>>> origin/main
 }
 
 """
@@ -76,20 +151,102 @@ A date string, such as 2007-12-03, compliant with the `full-date` format outline
 """
 scalar Date
 
-type TaskStats {
-  total: Int!
-  completed: Int!
+"""The status of payment for a mission"""
+enum PaymentStatus {
+  PENDING
+  ESCROWED
+  RELEASED
+  REFUNDED
 }
+
+type TaskStats {
+  total: Int
+  completed: Int
+}
+
+type Review {
+  id: ID!
+  stars: Float!
+  comment: String
+  date: String!
+  reviewer: User!
+  reviewedUser: User!
+  mission: Mission!
+}
+
+type User {
+  id: ID!
+  username: String!
+  email: String!
+  password: String!
+  isAdmin: Boolean!
+  imageUrl: String!
+  currentRole: String!
+  reviews: [Review!]
+}
+
+type Invoice {
+  id: ID!
+  amount: Float!
+  date: String!
+  description: String!
+  clientId: Float!
+  freelancerId: Float
+  missionId: Float!
+  client: User!
+  freelancer: FreelancerProfile
+  mission: Mission!
+}
+
+type CreateEscrowResponse {
+  clientSecret: String
+  paymentIntentId: String!
+}
+
+type ReleaseMilestoneResponse {
+  success: Boolean!
+  amountReleased: Float!
+}
+
+type RefundResponse {
+  success: Boolean!
+  refundId: String!
+}
+
+"""Upload custom scalar type"""
+scalar Upload
 
 type Query {
   missions: [Mission!]!
+  allMissions: [Mission!]!
   mission(id: Int!): Mission!
+  getMissionsByPaymentStatus(status: PaymentStatus!): [Mission!]!
+  getPaymentHistory(missionId: Int!): [Invoice!]!
+  applications: [Application!]!
+  applicationsByMission(missionId: String!): [Application!]!
+  myApplicationsByMission(missionId: String!): [Application!]!
+  applicationsByFreelancer(freelancerId: String!): [Application!]!
+  application(id: String!): Application!
+  getFreelancersWhoAppliedToMyMissions: [FreelancerProfile!]!
+  interviews(type: String!): [Interview!]!
+  interview(id: Int!): Interview!
 }
 
 type Mutation {
   createMission(createMissionInput: CreateMissionInput!): Mission!
   updateMission(updateMissionInput: UpdateMissionInput!): Mission!
   removeMission(id: Int!): Boolean!
+  createEscrowPayment(missionId: Int!, clientId: Int!): CreateEscrowResponse!
+  releaseMilestonePayment(missionId: Int!, milestonePercentage: Int!): ReleaseMilestoneResponse!
+  refundPayment(missionId: Int!, reason: String!): RefundResponse!
+  createApplication(createApplicationInput: CreateApplicationInput!): Application!
+  updateApplication(id: String!, updateApplicationInput: UpdateApplicationInput!): Application!
+  removeApplication(id: String!): Boolean!
+  updateApplicationStatus(applicationId: ID!, newStatus: ApplicationStatus!): Application!
+  createInterview(input: CreateInterviewInput!): Interview!
+  remindMe(interviewId: String!): Interview!
+  updateInterview(input: UpdateInterviewInput!): Interview!
+  removeInterview(id: Int!): Boolean!
 }
 
 input CreateMissionInput {
@@ -122,4 +279,29 @@ input UpdateMissionInput {
   progress: Int = 0
   tasks: TaskStatsInput = {total: 0, completed: 0}
   id: Int!
+}
+
+input CreateApplicationInput {
+  message: String!
+  missionId: String!
+}
+
+input UpdateApplicationInput {
+  message: String
+  status: ApplicationStatus
+}
+
+input CreateInterviewInput {
+  freelancerId: Float!
+  topic: String!
+  scheduledDateTime: String!
+  remindMe: Boolean! = false
+}
+
+input UpdateInterviewInput {
+  freelancerId: Float
+  topic: String
+  scheduledDateTime: String
+  remindMe: Boolean = false
+  id: ID!
 }

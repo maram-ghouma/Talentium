@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { toast } from 'react-toastify';
+
 import {
   Bell,
   User,
@@ -15,10 +17,15 @@ import {
   Handshake,
   Shield,
   SwitchCamera,
+  DollarSign,
+  Home,
 } from 'lucide-react';
 import '../../Styles/sidebar.css';
 import { ChatService } from '../../services/Chat/chat.service'; // Adjust path
 import { SocketService } from '../../services/Chat/socket.service'; // Adjust path
+import { report } from 'process';
+import { signOut, SwitchProfile } from '../../services/userService';
+import { on } from 'events';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -26,16 +33,18 @@ interface SidebarProps {
   isDarkMode: boolean;
   profileName?: string;
   profileRole?: string;
-  userType: 'admin' | 'client' | 'freelancer';
+  userType: 'admin' | 'client' | 'freelancer'; 
+  onRoleChange: (newRole: string) => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({ 
   isOpen, 
   toggleSidebar, 
   isDarkMode,
-  profileName,
-  profileRole,
-  userType
+  profileName ,
+  profileRole ,
+  userType, 
+  onRoleChange,
 }) => {
   const [totalUnread, setTotalUnread] = useState(5); // Static value for Chat badge
   const socketService = new SocketService(); // Replace with dependency injection
@@ -61,37 +70,61 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   // Client menu items
   const ClientMenuItems = [
-    { icon: Bell, label: 'Notifications', badge: 3, path: "" },
-    { icon: CalendarCheck, label: 'Schedule', path: "" },
-    { icon: MessageSquare, label: 'Chat', badge: 5, path: "" }, // Static badge value
+    { icon: Home, label: 'Home', path: "/client" },
+    { icon: User, label: 'Profile', path: "/client/editProfile" },
+    { icon: Bell, label: 'Notifications', badge: 3, path: "/notifications" },
+    { icon: CalendarCheck, label: 'Schedule', path: "/client/interviews" },
+    { icon: MessageSquare, label: 'Chat', badge: 5, path: "/chat" }, // Static badge value
     { icon: History, label: 'History', path: "" },
   ];
 
   // Admin menu items
   const AdminMenuItems = [
-    { icon: Briefcase, label: 'Dashboard', path: "/admin" }, 
-    { icon: Bell, label: 'Notifications', badge: 3, path: "" },
-    { icon: Shield, label: 'Reports', path: "/admin/reports" },
+    { icon: Briefcase, label: 'Dashboard' ,path: "/admin"}, 
+    { icon: Bell, label: 'Notifications', badge: 3,path: "/notifications" },
+    { icon: Shield, label: 'Reports',path: "/admin/reports" },
+    { icon: DollarSign, label: 'Payment',path: "/jalons" },
+
+
   ];
 
   // Freelancer menu items
   const FreelancerMenuItems = [
-    { icon: User, label: 'Profile', path: "/Freelancer/profile" },
+    { icon: Home, label: 'Home', path: "/Freelancer" },
+    { icon: User, label: 'Profile', path: "/Freelancer/editProfile" },
     { icon: Bell, label: 'Notifications', badge: 3, path: "/Freelancer" },
     { icon: MessageSquare, label: 'Chat', badge: 5, path: "/Freelancer/chat" }, // Static badge value
     { icon: History, label: 'Work History', path: "/Freelancer/history" },
-    { icon: Briefcase, label: 'Missions', path: "/Freelancer" },
+    { icon: CalendarCheck, label: 'Schedule', path: "/freelancer/interviews" },
   ];
 
   const [userDropdownOpen, setUserDropdownOpen] = React.useState(false);
-  const toggleUserDropdown = () => setUserDropdownOpen(prev => !prev);
+  const toggleUserDropdown = () => setUserDropdownOpen(prev => !prev);  
+// Determine which menu to render based on userType
+  const menuItems = profileRole === 'admin' 
+  ? AdminMenuItems 
+  : profileRole === 'client' 
+  ? ClientMenuItems 
+  : FreelancerMenuItems;
 
-  const menuItems = userType === 'admin' 
-    ? AdminMenuItems 
-    : userType === 'client' 
-    ? ClientMenuItems 
-    : FreelancerMenuItems;
+  const [loading, setLoading] = useState(false);
 
+  const handleSwitch = async () => {
+    const newRole = profileRole === 'client' ? 'freelancer' : 'client';
+    try {
+      setLoading(true);
+      const updatedUser = await SwitchProfile(newRole);
+      localStorage.setItem('authToken', updatedUser.access_token);
+      console.log('Profile switched successfully:', updatedUser);
+      toast.success(`Switched to ${newRole} successfully!`);
+      onRoleChange(updatedUser.currentRole); 
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to switch profile');
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
     <div className={`sidebar ${isOpen ? 'open' : 'closed'} ${isDarkMode ? 'dark-mode' : ''}`}>
       <div className="sidebar-content">
@@ -143,19 +176,20 @@ export const Sidebar: React.FC<SidebarProps> = ({
               </button>
             </Link>
           ))}
-          {userType === 'admin' && (
-            <div className="sidebar-dropdown">
-              <button onClick={toggleUserDropdown} className="sidebar-button">
-                <div className="icon-container">
-                  <User size={20} />
-                </div>
-                {isOpen && (
-                  <>
-                    <span className="button-label">Users</span>
-                    <ChevronDown size={16} style={{ marginLeft: 'auto' }} />
-                  </>
-                )}
-              </button>
+            {/* Admin-specific "Users" dropdown */}
+  {profileRole === 'admin' && (
+    <div className="sidebar-dropdown">
+      <button onClick={toggleUserDropdown} className="sidebar-button">
+        <div className="icon-container">
+          <User size={20} />
+        </div>
+        {isOpen && (
+          <>
+            <span className="button-label">Users</span>
+            <ChevronDown size={16} style={{ marginLeft: 'auto' }} />
+          </>
+        )}
+      </button>
 
               {isOpen && userDropdownOpen && (
                 <div className="dropdown-content">
@@ -183,9 +217,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </div>
 
       <div className="footer-menu">
-        {userType === 'admin' && (
+        {/* Admin specific footer items */}
+        {profileRole === 'admin' && (
           <>
-            <button key="sign-out" className="sidebar-button">
+            <button key="sign-out" className="sidebar-button" onClick={signOut}>
               <div className="icon-container">
                 <LogOut size={20} />
               </div>
@@ -194,21 +229,22 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </>
         )}
 
-        {(userType === 'client' || userType === 'freelancer') && (
+        {/* Client specific footer items */}
+        {(profileRole === 'client' || profileRole === 'freelancer') && (
           <>
-            <button key="switch-profile" className="sidebar-button">
-              <div className="icon-container">
-                <SwitchCamera size={20} />
-              </div>
-              {isOpen && <span className="button-label">Switch Profile</span>}
-            </button>
-            <button key="sign-out" className="sidebar-button">
-              <div className="icon-container">
-                <LogOut size={20} />
-              </div>
-              {isOpen && <span className="button-label">Sign Out</span>}
-            </button>
-          </>
+          <button key="sign-out" className="sidebar-button" onClick={handleSwitch} disabled={loading}>
+            <div className="icon-container">
+              <SwitchCamera size={20} />
+            </div>
+            {isOpen && <span className="button-label">Switch to {profileRole === 'client' ? 'Freelancer' : 'Client'}</span>}
+          </button>
+          <button key="sign-out" className="sidebar-button" onClick={signOut}>
+          <div className="icon-container">
+            <LogOut size={20} />
+          </div>
+          {isOpen && <span className="button-label">Sign Out</span>}
+        </button>
+        </>
         )}
       </div>
     </div>

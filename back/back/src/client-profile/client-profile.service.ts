@@ -6,14 +6,20 @@ import { Repository } from 'typeorm';
 import { User } from 'src/user/entities/user.entity';
 import { UpdateClientProfileDto } from './dto/update-client-profile.dto';
 import { saveFile } from 'src/common/helpers/image-upload.helper';
+import { Mission } from 'src/mission/entities/mission.entity';
+import { Review } from 'src/review/entities/review.entity';
 
 @Injectable()
 export class ClientProfileService {
   constructor(
     @InjectRepository(ClientProfile)
     private readonly clientProfileRepository: Repository<ClientProfile>,
-      @InjectRepository(User)
+    @InjectRepository(User)
     private userRepo: Repository<User>,
+    @InjectRepository(Mission)
+    private missionRepo: Repository<Mission>,
+    @InjectRepository(Review)
+    private reviewRepo: Repository<Review>,
   ) {}
 
   async findByUserId(userId: number) {
@@ -22,21 +28,24 @@ export class ClientProfileService {
     relations: ['user'],
   });
 }
-async createProfileForUser(user: User,clientData: { phoneNumber?: string; country?: string }) {
+async createProfileForUser(user: User,clientData: { phoneNumber?: string; country?: string,  stripeAccountId: string }) {
   const profile = this.clientProfileRepository.create({
     user: user,
     phoneNumber: clientData.phoneNumber ?? undefined,
     country: clientData.country ?? undefined,
+    stripeAccountId: clientData.stripeAccountId,
   });
 
   return this.clientProfileRepository.save(profile);
 }
 
-async updateProfile(clientId: number, updateDto: UpdateClientProfileDto) {
-    const profile = await this.clientProfileRepository.findOne({
-      where: { id: clientId },
-      relations: ['user'],
-    });
+async updateClientProfile(clientId: number, updateDto: UpdateClientProfileDto) {
+  
+    const profile = await this.clientProfileRepository
+  .createQueryBuilder('profile')
+  .leftJoinAndSelect('profile.user', 'user')
+  .where('user.id = :clientId', { clientId })
+  .getOne();
 
     if (!profile) {
       throw new NotFoundException('Client profile not found');
@@ -57,7 +66,57 @@ async updateProfile(clientId: number, updateDto: UpdateClientProfileDto) {
     profile.industry = updateDto.industry ?? profile.industry;
     profile.phoneNumber = updateDto.phoneNumber ?? profile.phoneNumber;
     profile.linkedIn = updateDto.linkedIn ?? profile.linkedIn;
-
+    profile.stripeAccountId = updateDto.stripeAccountId ?? profile.stripeAccountId;
     return await this.clientProfileRepository.save(profile);
   }
+
+  async getClientStats(userId: number) {
+  const clientProfile = await this.clientProfileRepository
+    .createQueryBuilder('profile')
+    .leftJoinAndSelect('profile.user', 'user')
+    .where('user.id = :userId', { userId })
+    .getOne();
+
+  if (!clientProfile) {
+    throw new NotFoundException('Client profile not found');
+  }
+
+  const totalMissions = await this.missionRepo.count({
+    where: { client: { id: clientProfile.id } },
+  });
+
+  const missionsInProgress = await this.missionRepo.count({
+    where: {
+      client: { id: clientProfile.id },
+      status: 'in_progress',
+    },
+  });
+
+  const hiredFreelancers = await this.missionRepo
+    .createQueryBuilder('mission')
+    .select('COUNT(DISTINCT mission.selectedFreelancer)')
+    .where('mission.clientId = :clientId', { clientId: clientProfile.id })
+    .andWhere('mission.selectedFreelancer IS NOT NULL')
+    .getRawOne();
+
+  const avgRating = await this.reviewRepo
+  .createQueryBuilder('review')
+  .select('AVG(review.stars)', 'average')
+  .where('review.reviewedUser = :userId', { userId })
+  .getRawOne();
+
+
+  return {
+    averageRating: parseFloat(avgRating.average) || 0,
+    totalMissions,
+    missionsInProgress,
+    hiredFreelancers: parseInt(hiredFreelancers.count) || 0,
+  };
+}
+async getAllClients(): Promise<ClientProfile[]> {
+    return this.clientProfileRepository.find({
+      relations: ['user'], 
+    });
+  }
+
 }

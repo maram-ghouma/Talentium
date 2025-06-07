@@ -14,9 +14,12 @@ interface MainLayoutProps {
   pageTitle?: string;
   hideSearchBar?: boolean;
   onSearch?: (query: string) => void;
-  usertype: 'admin' | 'client' | 'freelancer';
   profileName: string;
   profileRole: string;
+  onFilter?: (filters: any) => void; 
+  onSort?: (sortOption: string) => void; 
+  usertype: 'admin' | 'client' | 'freelancer';
+
 }
 
 export const MainLayout: React.FC<MainLayoutProps> = ({
@@ -31,6 +34,8 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
   hideSearchBar = false,
   onSearch = (query) => console.log(query),
   usertype,
+  onFilter,
+  onSort
 }) => {
   const [user, setUser] = useState<any | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -60,14 +65,15 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
   }, []);
 
   return (
-    <div className={isDarkMode ? 'dark-mode' : ''} style={{ height: '100%', width: '100%' }}>
-      <Sidebar
-        isOpen={isSidebarOpen}
-        toggleSidebar={toggleSidebar}
-        isDarkMode={isDarkMode}
-        userType={usertype}
-        profileName={profileName}
-        profileRole={profileRole}
+    <div className={isDarkMode ? 'dark-mode' : ''} style={{height:'100%', width:'100%'}}>
+      <Sidebar 
+        isOpen={isSidebarOpen} 
+        toggleSidebar={toggleSidebar} 
+        isDarkMode={isDarkMode} 
+        userType= {usertype}
+        profileName= {user?.username || ''} 
+        profileRole={user?.currentRole || ''}
+        onRoleChange={(newRole) => setUser((prev) => ({ ...prev, currentRole: newRole }))}
       />
 
       <main
@@ -80,7 +86,8 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
         }}
       >
         {/* Header section with search bar and profile */}
-        <div className="header-section" style={{ padding: '1rem 2rem' }}>
+        <div className="header-section" style={{ padding: '1rem 2rem', overflow: 'visible',
+  position: 'relative'}}>
           {pageTitle && (
             <h1 className={`page-title mb-4 ${isDarkMode ? 'text-light' : 'text-dark'}`}>
               {pageTitle}
@@ -88,8 +95,15 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
           )}
 
           <div className="d-flex justify-content-between align-items-center mb-4">
-            {!hideSearchBar && <SearchBar onSearch={onSearch} isDarkMode={isDarkMode} />}
-
+            {!hideSearchBar && (
+              <SearchBar 
+                onSearch={onSearch} 
+                onFilter={onFilter}
+                onSort={onSort}
+                isDarkMode={isDarkMode} 
+              />
+            )}
+            
             <div className="d-flex align-items-center">
               <div className="profile-container me-3">
                 {usertype === 'admin' ? null : (

@@ -8,6 +8,14 @@ import { JwtStrategy } from './strategies/jwt.strategy';
 import { UserModule } from 'src/user/user.module';
 import { ClientProfileModule } from 'src/client-profile/client-profile.module';
 import { FreelancerProfileModule } from 'src/freelancer-profile/freelancer-profile.module';
+import { PaymentModule } from 'src/payment/payment.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { User } from 'src/user/entities/user.entity';
+import { ClientProfile } from 'src/client-profile/entities/client-profile.entity';
+import { FreelancerProfile } from 'src/freelancer-profile/entities/freelancer-profile.entity';
+import { Review } from 'src/review/entities/review.entity';
+import { Mission } from 'src/mission/entities/mission.entity';
+import { Dispute } from 'src/dispute/entities/dispute.entity';
 
 @Module({
   imports: [ 
@@ -19,6 +27,8 @@ import { FreelancerProfileModule } from 'src/freelancer-profile/freelancer-profi
     UserModule,
     ClientProfileModule,
     FreelancerProfileModule,
+    PaymentModule,
+    TypeOrmModule.forFeature([User,Dispute]), 
   ],
   providers: [AuthService, JwtStrategy],
   controllers: [AuthController],

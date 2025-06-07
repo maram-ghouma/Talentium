@@ -9,11 +9,28 @@ import {
   OneToMany,
 } from 'typeorm';
 import { User } from 'src/user/entities/user.entity';
-import { ObjectType, Field, Int, GraphQLISODateTime } from '@nestjs/graphql';
+import { ObjectType, Field, Int, GraphQLISODateTime, registerEnumType } from '@nestjs/graphql';
 import { FreelancerProfile } from 'src/freelancer-profile/entities/freelancer-profile.entity';
 import { GraphQLDate } from 'graphql-scalars';
 import { Conversation } from 'src/conversation/entities/conversation.entity';
 import { Task } from './task.entity';
+import { Dispute } from 'src/dispute/entities/dispute.entity';
+import { ClientProfile } from 'src/client-profile/entities/client-profile.entity';
+import { Application } from 'src/application/entities/application.entity';
+
+export enum PaymentStatus {
+  PENDING = 'PENDING',
+  ESCROWED = 'ESCROWED',
+  RELEASED = 'RELEASED',
+  REFUNDED = 'REFUNDED'
+}
+
+
+
+registerEnumType(PaymentStatus, {
+  name: 'PaymentStatus',
+  description: 'The status of payment for a mission',
+});
 
 @ObjectType()
 @Entity()
@@ -42,9 +59,9 @@ export class Mission {
   @Column({ type: 'date' })
   date: string;
 
-  @Field(() => User)
-  @ManyToOne(() => User)
-  client: User;
+  @Field(() => ClientProfile)
+  @ManyToOne(() => ClientProfile)
+  client: ClientProfile;
 
   @Field(() => [String])
   @Column('simple-array')
@@ -77,12 +94,41 @@ export class Mission {
     completed: number;
   };
 
+  @Field(() => FreelancerProfile, { nullable: true })
   @ManyToMany(() => FreelancerProfile)
   @JoinTable()
   preselectedFreelancers: FreelancerProfile[];
 
+  @Field(() => FreelancerProfile, { nullable: true })
+  @Field(() => FreelancerProfile, { nullable: true })
   @ManyToOne(() => FreelancerProfile, (freelancer) => freelancer.selectedMissions, { nullable: true })
   selectedFreelancer?: FreelancerProfile;
+  
+  @Field(() => [Dispute])
+  @OneToMany(() => Dispute, (dispute) => dispute.mission)
+  disputes: Dispute[];
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  paymentIntentId?: string;
+
+
+
+  @Field(() => [Application], { nullable: true })
+  @OneToMany(() => Application, application => application.mission)
+  applications: Application[];
+
+  @Field(() => PaymentStatus)
+  @Column({
+    type: 'enum',
+    enum: PaymentStatus,
+    default: PaymentStatus.PENDING
+  })
+  paymentStatus: PaymentStatus;
+
+  selectionProbability?: number;
+
+
 
   @OneToMany(() => Conversation, (conversation) => conversation.mission)
   conversations: Conversation[];
@@ -93,11 +139,12 @@ export class Mission {
   tasklist: Task[];
 }
 
+
 @ObjectType()
 class TaskStats {
-  @Field(() => Int)
+  @Field(() => Int,{nullable: true})
   total: number;
 
-  @Field(() => Int)
+  @Field(() => Int, {nullable: true})
   completed: number;
 }

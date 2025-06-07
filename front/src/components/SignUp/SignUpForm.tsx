@@ -136,7 +136,7 @@ const navigate = useNavigate();
 
         <div className="sign-in-prompt">
           <p>
-            Already have an account? <a href="signUp">Sign In</a>
+            Already have an account? <a href="signin">Sign In</a>
           </p>
         </div>
       </form>

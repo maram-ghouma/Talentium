@@ -1,7 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Modal, Button, Form, Row, Col } from 'react-bootstrap';
 import { Plus } from 'lucide-react';
 import { Interview } from '../../../types';
+import { useMutation, useQuery } from '@apollo/client';
+import { CREATE_INTERVIEW } from '../../../graphql/interviews';
+import { useLocation } from 'react-router-dom';
+import { GET_ALL_FREELANCERS } from '../../../graphql/application';
 
 interface NewInterviewModalProps {
   onClose: () => void;
@@ -9,12 +13,56 @@ interface NewInterviewModalProps {
 }
 
 const NewInterviewModal: React.FC<NewInterviewModalProps> = ({onClose, onSubmit }) => {
+      const location = useLocation();
+    const [type, setType] = useState('');
+
+  useEffect(() => {
+    if (location.pathname === '/client/interviews') {
+      setType('client');
+    } else if (location.pathname === '/freelancer/interviews') {
+      setType('freelancer');
+    }
+  }, [location.pathname]);
   const [show, setShow] = useState(false);
-  const [candidateName, setCandidateName] = useState('');
+  const [freelancerId, setFreelancerId] = useState('');
+
   const [topic, setTopic] = useState('');
   const [scheduledDateTime, setScheduledDateTime] = useState('');
   const [remindMe, setRemindMe] = useState(true);
 
+  const [createInterview] = useMutation(CREATE_INTERVIEW, {
+    onCompleted: () => {
+     setFreelancerId('');
+      setTopic('');
+      setScheduledDateTime('');
+      setRemindMe(true);
+      handleClose();
+    },
+    onError: (error) => {
+      console.error('Error creating interview:', error);
+    },
+  });
+
+  const handleClose = () => setShow(false);
+  const handleShow = () => setShow(true);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!topic || !scheduledDateTime) return;
+
+    createInterview({
+      variables: {
+        input: {
+          freelancerId: Number(freelancerId), 
+          topic,
+          scheduledDateTime,
+          remindMe,
+        },
+      },
+    });
+  };
+/*
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
 
@@ -32,16 +80,17 @@ const NewInterviewModal: React.FC<NewInterviewModalProps> = ({onClose, onSubmit 
       remindMe,
     });
 
-    // Reset form and close modal
     setCandidateName('');
     setTopic('');
     setScheduledDateTime('');
     setRemindMe(true);
     handleClose();
-  };
+  };*/
 
   const now = new Date();
   const localDateTime = now.toISOString().slice(0, 16);
+  const { data } = useQuery(GET_ALL_FREELANCERS);
+const freelancers = data?.getFreelancersWhoAppliedToMyMissions || [];
 
   return (
     <>
@@ -63,16 +112,22 @@ const NewInterviewModal: React.FC<NewInterviewModalProps> = ({onClose, onSubmit 
         </Modal.Header>
         <Modal.Body>
           <Form onSubmit={handleSubmit}>
-            <Form.Group className="mb-3" controlId="candidateName">
-              <Form.Label>Candidate Name</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="Enter candidate name"
-                value={candidateName}
-                onChange={(e) => setCandidateName(e.target.value)}
+            <Form.Group className="mb-3" controlId="freelancerId">
+              <Form.Label>Select Candidate</Form.Label>
+              <Form.Select
+                value={freelancerId}
+                onChange={(e) => setFreelancerId(e.target.value)}
                 required
-              />
+              >
+                <option value="">-- Select a candidate --</option>
+                {freelancers.map((f: any) => (
+                  <option key={f.id} value={f.id}>
+                    {f.user.username}
+                  </option>
+                ))}
+              </Form.Select>
             </Form.Group>
+
 
             <Form.Group className="mb-3" controlId="topic">
               <Form.Label>Interview Topic</Form.Label>

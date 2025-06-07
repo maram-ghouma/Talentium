@@ -26,3 +26,4 @@ yarn-error.log*
 
 back/back/.env
 back/back/node_modules
+/front/src/Data/mockData.tsx

@@ -10,6 +10,7 @@
       case 'not_assigned':*/
       price: number;
       date: string;
+      userId?:string;
       clientId: string;
       client?: string;
       clientLogo?: string;
@@ -18,9 +19,24 @@
       budget?: string;
       createdAt?: Date;
       clientName: string;
-      paymentStatus?: 'Paid' | 'Unpaid' | 'Partial';
+      paymentStatus?: 'PENDING' | 'ESCROWED' | 'RELEASED' | 'REFUNDED';
+      
       priority?: 'Low' | 'Medium' | 'High';
       progress?: number;
+      selectedFreelancer?:{
+        id: string;
+        user:{
+          id:string;
+          username:string;
+          imageUrl:string;
+        }
+        skills
+        bio
+        selectedMissions: {
+          id: string;
+        }[];
+        
+      }
       tasks: {
         total: number;
         completed: number;
@@ -30,7 +46,28 @@
     export type MissionStatus = 'not_assigned' | 'in_progress' | 'assigned' | 'completed';
     
    
-  
+
+  export type MissionLight = {
+  paymentIntentId: string;
+  id: number;
+  title: string;
+  price: number;
+  paymentStatus?: 'PENDING' | 'ESCROWED' | 'RELEASED' | 'REFUNDED';
+  selectedFreelancer?: {
+    name: string;
+  };
+  clientId?: number;
+  clientName?: string;
+};
+
+
+  export enum ApplicationStatus {
+  PENDING = 'pending',
+  PRE_SELECTED = 'pre-selected',
+  ACCEPTED = 'accepted',
+  REJECTED = 'rejected'
+}
+
     export interface Notification {
       id: string;
       message: string;
@@ -101,25 +138,19 @@
       linkTo?: string;
     };
   
+   
+
     export type WorkHistoryItem = {
-      id: string;
-      title: string;
-      client: string;
-      date: string;//date
-      clientLogo?: string;
-      description: string;
-      skills: string[];
-      endDate: string | null;
-/*
-      feedback?: string;
-      rating?: number;
-      */
-      testimonial?: {
-        text: string;
-        author: string;
-        rating: number;
-      };
-    };
+      id: string
+  title: string
+  client: ClientProfileType
+  date: string
+  description: string
+  deadline?: string
+  requiredSkills: string[]
+  review?: Review;
+}
+
     export interface Profile {
       id: string;
       name: string;
@@ -149,10 +180,12 @@ export interface ClientProfileType {
   country?: string;
   bio?: string;
   user: User;
+  stripeAccountId?: string;
 }
+
 export interface FreelancerProfileType {
   id: number;
-  skills: string[];
+  skills?: string[];
   hourlyRate?: number;
   phoneNumber?: string;
   country?: string;
@@ -160,6 +193,7 @@ export interface FreelancerProfileType {
   github?: string;
   linkedIn?: string;
   user: User;
+  stripeAccountId?: string;
 }
     export interface Interview {
       id: string;
@@ -184,4 +218,33 @@ export interface FreelancerProfileType {
   phone: string;
   linkedin: string;
   avatar: string;
+}
+export interface Review {
+  id: string;
+  reviewer: User;
+  reviewee: User;
+  stars: number;
+  comment: string;
+  date: string;
+  
+}
+
+export interface FreelancerStats {
+  averageRating: number;
+  totalMissions: number;
+  missionsInProgress: number;
+  completedMissions: number;
+
+}
+export interface ClientStats {
+  averageRating: number;
+  totalMissions: number;
+  missionsInProgress: number;
+  hiredFreelancers: number;
+
+}
+export interface AdminStats {
+  totalUsers: number;
+  selectedFreelancers: number;
+  completedMissions: number;
 }

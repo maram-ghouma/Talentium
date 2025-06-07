@@ -11,7 +11,7 @@ interface MissionProps {
   onView?: (id: string) => void;
 }
 
-const Mission: React.FC<MissionProps> = ({
+const MissionDetails: React.FC<MissionProps> = ({
   mission,
   onEdit,
   onDelete,
@@ -161,4 +161,4 @@ const Mission: React.FC<MissionProps> = ({
   );
 };
 
-export default Mission;
+export default MissionDetails;

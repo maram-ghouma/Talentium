@@ -1,5 +1,5 @@
 
-import { Body, Controller, Get, NotFoundException, Patch, Put, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, NotFoundException, Param, Patch, Put, Query, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { ClientProfileService } from './client-profile.service';
 import { AuthGuard } from '@nestjs/passport';
 import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
@@ -9,16 +9,21 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { extname } from 'path';
 import { diskStorage } from 'multer';
 import { Express } from 'express';
+import { ClientProfile } from './entities/client-profile.entity';
+import { Roles } from 'src/auth/decorators/role.decorator';
+import { RolesGuard } from 'src/auth/guards/RoleGuard';
 
 
-@Controller('client-profiles')
+@Controller('client-profile')
 export class ClientProfileController {
   constructor(private readonly clientProfileService: ClientProfileService) {}
 
   @UseGuards(AuthGuard('jwt'))
   @Get('me')
-  async getMyProfile(@CurrentUser() user: any) {
-    const profile = await this.clientProfileService.findByUserId(user.userId);
+  async getMyProfile(@CurrentUser() user: any, @Query('id') id?: number) {
+    console.log('User in the controller ', user);
+    const userId = id ?? user.userId;
+    const profile = await this.clientProfileService.findByUserId(userId);
     const baseUrl = 'http://localhost:3000'; 
     if (!profile) {
               throw new NotFoundException('User not found');
@@ -27,7 +32,9 @@ profile.user.imageUrl = profile.user.imageUrl ? `${baseUrl}${profile.user.imageU
 
     return profile;
   }
-  @UseGuards(AuthGuard('jwt'))
+  
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles('client')
   @Put('update')
   @UseInterceptors(FileInterceptor('imageUrl', {
   storage: diskStorage({
@@ -41,16 +48,34 @@ profile.user.imageUrl = profile.user.imageUrl ? `${baseUrl}${profile.user.imageU
   }),
 }))
   async updateProfile(
-    @CurrentUser() user: User,
+    @CurrentUser() user: any,
     @UploadedFile() imageUrl: Express.Multer.File,
     @Body() updateProfileDto: UpdateClientProfileDto,
   ) {
     const imagePath = imageUrl?.filename ? `/uploads/${imageUrl.filename}` : undefined;
-
-    return this.clientProfileService.updateProfile(user.id, {
+    console.log(user.userId);
+    return this.clientProfileService.updateClientProfile(user.userId, {
       ...updateProfileDto,
       imageUrl: imagePath, 
     });
+  }
+  @UseGuards(AuthGuard('jwt'),RolesGuard)
+  @Roles('client')
+    @Get('Mystats')
+  async getMyStats(@CurrentUser() user: any) {
+    return this.clientProfileService.getClientStats(user.userId);
+  }
+   @UseGuards(AuthGuard('jwt'))
+    @Get('stats')
+  async getStats(@Query('id') id: number) {
+    return this.clientProfileService.getClientStats(id);
+  }
+
+  @UseGuards(AuthGuard('jwt'),RolesGuard)
+  @Roles('admin')
+  @Get('AllClients')
+  async getAllClients(): Promise<ClientProfile[]> {
+    return this.clientProfileService.getAllClients();
   }
 
 }

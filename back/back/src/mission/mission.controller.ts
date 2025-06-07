@@ -8,9 +8,15 @@ import {
   BadRequestException,
   NotFoundException,
   Patch,
-  Delete
+  Delete,
+  Query, UseGuards
 } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
 import { MissionService } from './mission.service';
+import { User } from 'src/user/entities/user.entity';
+import { Roles } from 'src/auth/decorators/role.decorator';
+import { RolesGuard } from 'src/auth/guards/RoleGuard';
 import { Request } from 'express';
 import * as jsonwebtoken from 'jsonwebtoken';
 import { CreateTaskDto } from './dto/create-task.dto';
@@ -18,6 +24,31 @@ import { CreateTaskDto } from './dto/create-task.dto';
 @Controller('missions')
 export class MissionController {
   constructor(private readonly missionService: MissionService) {}
+  @UseGuards(AuthGuard('jwt'))
+  @Get('my-client-missions')
+  async getClientMissions(@CurrentUser() user: any, @Query('id') id?: number) {
+    return this.missionService.getClientMissions(id ?? user.userId);
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Get('my-freelancer-missions')
+  async getFreelancerMissions(@CurrentUser() user: any, @Query('id') id?: number) {
+    return this.missionService.getFreelancerMissions(id ??user.userId);
+  }
+
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles('admin')
+  @Get('admin-stats')
+  async getAdminStats() {
+    return this.missionService.getAdminStats();
+  }
+
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles('freelancer')
+  @Get('my-missions-with-reviews')
+  async getMyMissionsAsFreelancer(@CurrentUser() user: any) {
+    return this.missionService.getFreelancerMissionsWithReviews(user.userId);
+  }
 
   private getUserIdFromRequest(req: Request): number {
     const authHeader = req.headers.authorization;
@@ -45,7 +76,7 @@ export class MissionController {
   @Get()
   async findAllMissions(@Req() req: Request) {
     this.getUserIdFromRequest(req); // just to enforce auth
-    return this.missionService.findAll();
+    return this.missionService.findAllMaher();
   }
 
   @Get(':id')
@@ -66,7 +97,7 @@ export class MissionController {
       clientId: userId,
     };
 
-    return this.missionService.create(input);
+    return this.missionService.createMaher(input);
   }
 
   @Get('kanban/:id')
@@ -95,5 +126,6 @@ async updateTaskStatus(
   @Delete('/task/delete/:id')
   async deleteTask(@Param('id') id: string): Promise<void> {
     return this.missionService.deleteTask(id);
+
   }
 }

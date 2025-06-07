@@ -1,82 +1,7 @@
 import type { Mission, User, Message, ChatConversation,Interview, NotificationType, WorkHistoryItem,Client,Freelancer, Profile } from "../types"
 // Adapting missions from the provided mock data
 export const missions: Mission[] = [
-  {
-    id: "mission-1",
-    title: "Website Redesign",
-    description: "Need a complete redesign of our e-commerce website with modern UI/UX principles.",
-    status: "not_assigned",
-    date: "15/03/2024",
-    price: 2500,
-    clientName: "EcoShop Inc.",
-    clientId: "client-1",
-    paymentStatus: "Unpaid",
-    priority: "Medium",
-    progress: 0,
-    tasks: {
-      total: 5,
-      completed: 0
-    },
-    client: "EcoShop Inc.",
-    requiredSkills: ["UI Design", "UX Research", "Wireframing"]
-  },
-  {
-    id: "mission-2",
-    title: "Mobile App Development",
-    description: "Looking for a developer to create an iOS/Android app for our service.",
-    status: "in_progress",
-    date: "14/03/2024",
-    price: 5000,
-    clientName: "TechStart Solutions",
-    clientId: "client-1",
-    paymentStatus: "Partial",
-    priority: "High",
-    progress: 45,
-    tasks: {
-      total: 10,
-      completed: 4
-    },
-    client: "TechStart Solutions",
-    requiredSkills: ["Mobile Development", "UI Design", "API Integration"]
-  },
-  {
-    id: "mission-3",
-    title: "Brand Identity Design",
-    description: "Create a comprehensive brand identity including logo, color scheme, and typography.",
-    status: "completed",
-    date: "10/02/2024",
-    price: 1800,
-    clientName: "Green Earth Foods",
-    clientId: "client-1",
-    paymentStatus: "Paid",
-    priority: "Medium",
-    progress: 100,
-    tasks: {
-      total: 4,
-      completed: 4
-    },
-    client: "Green Earth Foods",
-    requiredSkills: ["Branding", "Logo Design", "Typography"]
-  },
-  {
-    id: "mission-4",
-    title: "Marketing Campaign Creatives",
-    description: "Design social media creatives for our upcoming summer campaign.",
-    status: "in_progress",
-    date: "20/03/2024",
-    price: 1200,
-    clientName: "Sunshine Beverages",
-    clientId: "client-1",
-    paymentStatus: "Unpaid",
-    priority: "Low",
-    progress: 60,
-    tasks: {
-      total: 8,
-      completed: 5
-    },
-    client: "Sunshine Beverages",
-    requiredSkills: ["Graphic Design", "Social Media", "Marketing"]
-  },
+  
 ]
 
 export const notifications: NotificationType[] = [
@@ -225,45 +150,43 @@ export const workHistory: WorkHistoryItem[] = [
   {
     id: "work-1",
     title: "Brand Identity Design",
-    client: "Green Earth Foods",
     date: "Feb 2024",
     description: "Created a comprehensive brand identity including logo, color scheme, and typography for an organic food company.",
-    skills: ["Branding", "Logo Design", "Typography"],
-    endDate: "Feb 2024",
-    testimonial: {
-      text: "Alex delivered exceptional work! The brand identity perfectly captures our company values.",
-      author: "Green Earth Foods",
-      rating: 5.0
-    }
+    review: {
+      comment: "Alex delivered exceptional work! The brand identity perfectly captures our company values.",
+      reviewer: {
+        id: "client-3",
+        username: "Green Earth Foods",
+        role: "Client",
+        email: "client3@example.com"
+      },
+      stars: 5.0,
+      date: "2024-02-28",
+      id: "review-1",
+      reviewee: {
+        id: "user-1",
+        username: "Alex Morgan",
+        role: "Freelancer",
+        email: "alex.morgan@example.com"
+      }
+    },
+    client: {
+      id: 3,
+      user: {
+        id: "client-3",
+        username: "Green Earth Foods",
+        role: "Client",
+        email: "client3@example.com"
+      },
+      industry: "Food & Beverage",
+      linkedIn: "https://linkedin.com/company/green-earth-foods",
+      phoneNumber: "+1 (555) 987-6543",
+      country: "USA",
+      bio: "We are committed to providing organic and sustainable food options."
+    },
+    requiredSkills: ["Branding", "Logo Design", "Typography"],
   },
-  {
-    id: "work-2",
-    title: "E-commerce Website Redesign",
-    client: "FashionHub",
-    date: "Jan 2024",
-    description: "Complete redesign of e-commerce website with focus on improving user experience and increasing conversion rates.",
-    skills: ["UI Design", "UX Research", "Wireframing", "Prototyping"],
-    endDate: "Jan 2024",
-    testimonial: {
-      text: "Great work on our website redesign. Sales increased by 25% after implementation.",
-      author: "FashionHub",
-      rating: 4.8
-    }
-  },
-  {
-    id: "work-3",
-    title: "Mobile App UI Design",
-    client: "HealthTrack",
-    date: "Dec 2023",
-    description: "Designed the user interface for a health tracking mobile application for iOS and Android platforms.",
-    skills: ["Mobile Design", "UI Design", "Figma", "Prototyping"],
-    endDate: "Dec 2023",
-    testimonial: {
-      text: "Alex was professional and delivered on time. Good communication throughout the project.",
-      author: "HealthTrack",
-      rating: 4.7
-    }
-  }
+ 
 ]
 
 // Creating user profile

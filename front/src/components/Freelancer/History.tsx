@@ -48,40 +48,49 @@ const History: React.FC<HistoryProps> = ({ historyItems }) => {
      
     <div className="history-container">
       <div className="timeline">
-        {historyItems.map((item) => (
+      {historyItems && historyItems.length > 0 ? (
+          historyItems.map((item) => (
           <div key={item.id} className="timeline-item">
             <div className="timeline-marker"></div>
             <div className="timeline-date">
-              <Calendar size={14} /> {getDateRange(item.date, item.endDate)}
+              <Calendar size={14} /> {getDateRange(item.date, item.deadline || null)}
             </div>
             <div className="timeline-content">
               <h3 className="timeline-title">{item.title}</h3>
               
-              <div className="timeline-client">
-                {item.clientLogo && <img src={item.clientLogo} alt={item.client} className="client-logo" />}
-                <span className="client-name">{item.client}</span>
-              </div>
               
               <p className="timeline-description">{item.description}</p>
               
               <div className="timeline-skills">
-                {item.skills.map((skill, index) => (
+                {item.requiredSkills?.map((skill, index) => (
                   <span key={index} className="timeline-skill">{skill}</span>
                 ))}
               </div>
               
-              {item.testimonial && (
+              {item.review && (
                 <div className="timeline-testimonial">
-                  <p className="testimonial-text">{item.testimonial.text}</p>
-                  <div className="testimonial-author">- {item.testimonial.author}</div>
+                  <p className="testimonial-text">{item.review.comment}</p>
+                  <div className="testimonial-author">- {item.review.reviewer.username}</div>
                   <div className="testimonial-rating">
-                    {renderStars(item.testimonial.rating)}
+                    <div className="mb-2">
+                     {[...Array(5)].map((_, i) => (
+                      <Star
+                        key={i}
+                        size={16}
+                        className={item.review && i < item.review.stars ? 'text-warning' : 'text-muted'}
+                        fill={item.review && i < item.review.stars ? 'currentColor' : 'none'}
+                      />
+                    ))}
+                    </div>
                   </div>
                 </div>
               )}
             </div>
           </div>
-        ))}
+            ))
+        ) : (
+          <div className="no-missions-message" style={{ margin: '100px 0 200px ', padding: '10px', textAlign: 'center', backgroundColor: 'var(--rose)', color: 'var(--navy-primary)', fontWeight: 'bold' }}>No missions yet</div>
+        )}
       </div>
     </div>
   
