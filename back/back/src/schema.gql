@@ -175,7 +175,6 @@ type Query {
   missions: [Mission!]!
   allMissions: [Mission!]!
   mission(id: Int!): Mission!
-  getMissionsByPaymentStatus(status: PaymentStatus!): [Mission!]!
   getPaymentHistory(missionId: Int!): [Invoice!]!
   applications: [Application!]!
   applicationsByMission(missionId: String!): [Application!]!

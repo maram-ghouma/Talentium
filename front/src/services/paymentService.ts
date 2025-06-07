@@ -65,7 +65,13 @@ export const paymentService = {
     });
     return response.data;
   },
+  
 
+
+  async getPendingMissionsByClient(): Promise<MissionLight[]> {
+    const response = await api.get(`/payment/missions/client`);
+    return response.data;
+  },
   // Check payment status before operations
   getPaymentStatus: async (paymentIntentId: string): Promise<PaymentStatusResponse> => {
     const response = await api.get(`/payment/status/${paymentIntentId}`);

@@ -16,7 +16,8 @@ const PaymentInterface = () => {
         setLoading(true);
         
         console.log('🔄 Starting to fetch missions...');
-        const data = await paymentService.getMissionsByPaymentStatus('PENDING');
+        //const data = await paymentService.getMissionsByPaymentStatus('PENDING');
+        const data=await paymentService.getPendingMissionsByClient();
         
         console.log('📡 Raw response from paymentService:', data);
         console.log('📊 Response type:', typeof data);
