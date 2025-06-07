@@ -25,7 +25,7 @@ export class Review {
   @CreateDateColumn()
   date: string;
 
-  @Field(() => User)
+  @Field(() => User, )
   @ManyToOne(() => User)
   reviewer: User;
 

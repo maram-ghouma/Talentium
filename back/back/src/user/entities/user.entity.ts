@@ -42,5 +42,9 @@ export class User {
 
   @ManyToMany(() => Badge, (badge) => badge.users, { eager: true })
   badges: Badge[];
+  
+  @Field()
+  @Column({ default: true })
+isActive: boolean;
 
 }

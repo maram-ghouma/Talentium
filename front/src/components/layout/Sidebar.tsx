@@ -57,7 +57,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   // Admin menu items
   const AdminMenuItems = [
     { icon: Briefcase, label: 'Dashboard' ,path: "/admin"}, 
-    { icon: Bell, label: 'Notifications', badge: 3,path: "notifications" },
+    { icon: Bell, label: 'Notifications', badge: 3,path: "/notifications" },
     { icon: Shield, label: 'Reports',path: "/admin/reports" },
     { icon: DollarSign, label: 'Payment',path: "/jalons" },
 
@@ -87,6 +87,8 @@ const toggleUserDropdown = () => setUserDropdownOpen(prev => !prev);
     try {
       setLoading(true);
       const updatedUser = await SwitchProfile(newRole);
+      localStorage.setItem('authToken', updatedUser.access_token);
+      console.log('Profile switched successfully:', updatedUser);
       toast.success(`Switched to ${newRole} successfully!`);
       onRoleChange(updatedUser.currentRole); 
     } catch (err) {

@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Injectable,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
@@ -8,11 +9,19 @@ import * as bcrypt from 'bcrypt';
 import { LoginDto } from './dto/login.dto';
 import { CreateUserDto } from '../user/dto/create-user.dto';
 import { UserService } from '../user/user.service';
-import { UserRole } from '../user/entities/user.entity';
+import { User, UserRole } from '../user/entities/user.entity';
 import { JwtAuthResponse } from './dto/jwt-auth-response.dto';
 import { ClientProfileService } from 'src/client-profile/client-profile.service';
 import { FreelancerProfileService } from 'src/freelancer-profile/freelancer-profile.service';
 import { PaymentService } from 'src/payment/payment.service';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { ClientProfile } from 'src/client-profile/entities/client-profile.entity';
+import { FreelancerProfile } from 'src/freelancer-profile/entities/freelancer-profile.entity';
+import { Mission } from 'src/mission/entities/mission.entity';
+import { Review } from 'src/review/entities/review.entity';
+import { Dispute, DisputeStatus } from 'src/dispute/entities/dispute.entity';
+import { SwitchRoleDto } from 'src/user/dto/switch-role.sto';
 
 @Injectable()
 export class AuthService {
@@ -22,6 +31,11 @@ export class AuthService {
     private readonly jwtService: JwtService,
      private readonly clientProfilesService: ClientProfileService,
     private readonly freelancerProfilesService: FreelancerProfileService,
+     @InjectRepository(User)
+    private readonly userRepo: Repository<User>,
+      @InjectRepository(Dispute)
+    private readonly disputeRepo: Repository<Dispute>,
+
   ) {}
 
   async validateUser(loginDto: LoginDto) {
@@ -43,6 +57,9 @@ export class AuthService {
     if (!user) {
       throw new UnauthorizedException('Invalid email or password');
     }
+    if (!user.isActive) {
+  throw new UnauthorizedException('Account is suspended');
+}
 
     const payload = {
       email: user.email,
@@ -107,4 +124,55 @@ await this.freelancerProfilesService.createProfileForUser(newUser, {
     const { password, ...result } = newUser;
     return result;
   }
+
+ async suspendUserAndResolveDispute(userId: number, disputeId: number): Promise<{ message: string }> {
+  const user = await this.userRepo.findOne({ where: { id: userId } });
+  if (!user) throw new NotFoundException('User not found');
+
+  const dispute = await this.disputeRepo.findOne({ where: { id: disputeId } });
+  if (!dispute) throw new NotFoundException('Dispute not found');
+
+  // Suspend user
+  user.isActive = false;
+  await this.userRepo.save(user);
+
+  // Resolve dispute
+  dispute.status = DisputeStatus.RESOLVED;  
+  dispute.resolution = `User has been suspended due to violation of terms.`;
+  await this.disputeRepo.save(dispute);
+
+  return { message: 'User suspended and dispute resolved successfully' };
 }
+
+async switchUserRole(userId: number, switchDto: SwitchRoleDto): Promise<{ user: User; access_token: string }> {
+    const user = await this.userRepo.findOne({ where: { id: userId } });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    if (user.currentRole === switchDto.newRole) {
+      throw new BadRequestException(`User already has the role '${switchDto.newRole}'`);
+    }
+
+    user.currentRole = switchDto.newRole;
+    const updatedUser = await this.userRepo.save(user);
+
+    // 🔐 Create a new JWT with the updated role
+    const payload = {
+      sub: updatedUser.id,
+      email: updatedUser.email,
+      role: updatedUser.currentRole,
+    };
+
+    const token = this.jwtService.sign(payload);
+
+    return {
+      user: updatedUser,
+      access_token: token,
+    };
+  }
+
+  
+}
+

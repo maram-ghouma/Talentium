@@ -40,7 +40,6 @@ function guestHome() {
         <JobCategories />
       </div>
       
-      <ContactForm />
     </div>
   );
 }

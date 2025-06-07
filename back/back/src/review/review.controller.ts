@@ -20,7 +20,7 @@ export class ReviewController {
     return this.reviewService.getReviewsClient(id ?? user.userId);
   }
   @UseGuards(AuthGuard('jwt'), RolesGuard)
-  @Get('admin')
+  @Roles('admin')
   @Get('top-rated-clients')
   async getTopRatedClients(@Query('limit') limit: number = 3) {
     const result = await this.reviewService.getTopRatedClients(limit);
