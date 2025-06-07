@@ -10,6 +10,7 @@
       case 'not_assigned':*/
       price: number;
       date: string;
+      userId?:string;
       clientId: string;
       client?: string;
       clientLogo?: string;
@@ -25,6 +26,7 @@
       selectedFreelancer?:{
         id: string;
         user:{
+          id:string;
           name:string;
           imageUrl:string;
         }

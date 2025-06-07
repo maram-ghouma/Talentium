@@ -4,7 +4,7 @@ import { X, Star } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import '../../../Styles/client/MissionDetails.css';
 import { useMutation, useQuery } from '@apollo/client';
-import { REMOVE_MISSION } from '../../../graphql/mission';
+import { REMOVE_MISSION, UPDATE_MISSION } from '../../../graphql/mission';
 import { useNavigate } from 'react-router-dom';
 import { ApplicationStatus, Mission } from '../../../types';
 import { GET_APPLICATIONS_BY_MISSION, UPDATE_APPLICATION_STATUS } from '../../../graphql/application';
@@ -18,6 +18,7 @@ interface Applicant {
   applicationId:string;
   message:string;
   resumePath:string;
+  userId?:string;
 }
 
 interface Developer {
@@ -112,7 +113,8 @@ const applicants: Applicant[] = applications
     status: app.status,
     applicationId: app.id,
     message: app.message,
-    resumePath:app.resumePath
+    resumePath:app.resumePath,
+    userId:app.freelancer.user.id,
   }));
 
 
@@ -162,6 +164,26 @@ const handleOpenResume = async () => {
   const blobUrl = window.URL.createObjectURL(blob);
   window.open(blobUrl, '_blank');
 };
+const [updateMission] = useMutation(UPDATE_MISSION);
+
+const handleMarkCompleted = async (missionId: string) => {
+  try {
+    await updateMission({
+      variables: {
+        updateMissionInput: {
+          id: missionId,
+          status: 'completed'
+        }
+      }
+    });
+  } catch (error) {
+    console.error("Error updating mission status:", error);
+  }
+};
+
+  const handlePay = (id: string) => {
+    navigate('/payment');
+  };
 
   return (
       <>
@@ -171,14 +193,14 @@ const handleOpenResume = async () => {
             <p>are you sure you want to delete this?</p>
             <div className="confirm-buttons">
               <button 
-                onClick={() => setShowApplicationInfo(false)}
+                onClick={() => setShowDeleteConfirm(false)}
                 style={{ backgroundColor: 'var(--slate)' }}
               >
                 No
               </button>
               <button 
                 onClick={() => {
-                  setShowApplicationInfo(false);
+                  setShowDeleteConfirm(false);
                   handleDelete(); 
                 }}
                 style={{ backgroundColor: 'var(--rose)' }}
@@ -366,15 +388,20 @@ const handleOpenResume = async () => {
                       </div>
                       <div className="d-flex align-items-center">
                       <a
-                        href={applicant.profileUrl}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          navigate(`/freelancer/profile/${applicant.userId}`);
+                        }}
                         className="me-3 small"
                         style={{
                           color: darkMode ? 'var(--powder)' : 'var(--navy-secondary)',
                           textDecoration: 'underline',
+                          cursor: 'pointer',
                         }}
                       >
                         View profile
                       </a>
+
                         <Button
                           variant="outline-primary"
                           size="sm"
@@ -435,10 +462,17 @@ const handleOpenResume = async () => {
                     </Col>
                     <Col md={4} className="d-flex flex-column justify-content-center align-items-end">
                       <a
-                        href='#'    
-                        className="text-decoration-none mb-3 small"
-                        style={{ color: darkMode ? 'var(--powder)' : 'var(--navy-secondary)' }}
-                      >{/*baddel lehna zeda*/}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          navigate(`/freelancer/profile/${assignedDeveloper?.user.id}`);
+                        }}    
+                        className="me-3 small"
+                        style={{
+                          color: darkMode ? 'var(--powder)' : 'var(--navy-secondary)',
+                          textDecoration: 'underline',
+                          cursor: 'pointer',
+                        }}
+                      >
                         View full profile
                       </a>
                       <Button
@@ -455,16 +489,24 @@ const handleOpenResume = async () => {
           )}
         </Modal.Body>
         <Modal.Footer className="border-top-0 d-flex justify-content-end" style={{ backgroundColor: darkMode ? 'var(--navy-secondary)' : '' }}>
-          <Button 
-            className="me-2"
-            onClick={() => setShowDeleteConfirm(true)}
-            style={{ 
-              backgroundColor: 'var(--rose)' ,
-              borderColor: 'var(--rose)' 
-            }}
-          >
-            Delete
-          </Button>
+          {mission.status === "not_assigned"  && (
+  <Button variant="danger" onClick={() => setShowDeleteConfirm(true)}>
+    Delete
+  </Button>
+)}
+
+{mission.status === "in_progress" && (
+  <Button variant="warning" onClick={() => handleMarkCompleted(mission.id)}>
+    Complete
+  </Button>
+)}
+
+{mission.status === "completed" && (
+  <Button variant="success" onClick={() => handlePay(mission.id)}>
+    Pay
+  </Button>
+)}
+
           <Button 
               onClick={() => {
     if (onModifyClick) {

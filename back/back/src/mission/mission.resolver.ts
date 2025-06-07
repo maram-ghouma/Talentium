@@ -29,8 +29,8 @@ export class MissionResolver {
   findAllMissions(@GqlCurrentUser() user : User) {
     console.log('User passed to findAll:', user);
 
-    return this.missionService.findAllNotMine(user);
-    //return this.missionService.findAllWithAI(user);
+    //return this.missionService.findAllNotMine(user);
+    return this.missionService.findAllWithAI(user);
   }
 
   @Query(() => Mission, { name: 'mission' })
@@ -47,5 +47,6 @@ export class MissionResolver {
 removeMission(@Args('id', { type: () => Int }) id: number): Promise<boolean> {
   return this.missionService.remove(id);
 }
+
 
 }
