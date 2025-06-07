@@ -9,9 +9,24 @@ import { Badge, BadgeType } from 'src/badge/entities/badge.entity';
 import { Mission } from 'src/mission/entities/mission.entity';
 import { CreateReviewDto } from './dto/create-review.dto';
 
+export interface ReviewedUser {
+  id: number;
+  name: string;
+  image: string;
+}
+
+export interface reviewMission{
+    id: number;
+    title: string;
+    description: string;
+    price: number;
+    client: ReviewedUser;
+    selectedFreelancer: ReviewedUser;
+}
 
 @Injectable()
 export class ReviewService {
+
   constructor(
     @InjectRepository(Review)
     private reviewRepository: Repository<Review>,
@@ -27,6 +42,46 @@ export class ReviewService {
     private readonly badgeRepository: Repository<Badge>,
     
   ) {}
+
+  async getReviewMissionById(missionId: number): Promise<reviewMission | null> {
+  const mission = await this.missionRepository.findOne({
+    where: { id: missionId },
+    relations: ['selectedFreelancer', 'selectedFreelancer.user', 'client', 'client.user']
+  });
+
+  if (!mission) {
+    return null;
+  }
+
+  // Get client and freelancer profiles with their users
+  const clientProfile = mission.client;
+  const freelancerProfile = mission.selectedFreelancer;
+
+  if (!clientProfile?.user || !freelancerProfile?.user) {
+    throw new Error('Informations manquantes sur le client ou le freelancer');
+  }
+
+  const client: ReviewedUser = {
+    id: clientProfile.id, // Return user ID, not profile ID
+    name: clientProfile.user.username || 'Client',
+    image: clientProfile.user.imageUrl || '',
+  };
+
+  const selectedFreelancer: ReviewedUser = {
+    id: freelancerProfile.id, // Return user ID, not profile ID
+    name: freelancerProfile.user.username || 'Freelancer',
+    image: freelancerProfile.user.imageUrl || '',
+  };
+
+  return {
+    id: mission.id,
+    title: mission.title,
+    description: mission.description,
+    price: mission.price,
+    client: client,
+    selectedFreelancer: selectedFreelancer,
+  };
+}
 
   async getReviewsFreelancer(userId: number): Promise<Review[]> {
    return this.reviewRepository
@@ -121,62 +176,93 @@ async getReviewsClient(userId: number): Promise<Review[]> {
 
 
 
-  // 1. CRÉER UNE ÉVALUATION
-  async createReview(
-   createReviewDto: CreateReviewDto
-  ) {
-    // Vérifier que la mission est terminée
-    const mission = await this.missionRepository.findOne({
-      where: { id: createReviewDto.missionId },
-      relations: ['client', 'selectedFreelancer']
-    });
+  async createReview(createReviewDto: CreateReviewDto) {
+  // Vérifier que la mission existe
+  const mission = await this.missionRepository.findOne({
+    where: { id: createReviewDto.missionId },
+    relations: ['client', 'client.user', 'selectedFreelancer', 'selectedFreelancer.user']
+  });
 
-    if (!mission || mission.status !== 'completed') {
-      throw new Error('La mission doit être terminée pour laisser un avis');
-    }
-
-    // Vérifier que le reviewer fait partie de la mission
-    const isClientReviewing = mission.client.id === createReviewDto.reviewerId;
-    const isFreelancerReviewing = mission.selectedFreelancer?.id === createReviewDto.reviewerId;
-
-    if (!isClientReviewing && !isFreelancerReviewing) {
-      throw new Error('Seuls les participants à la mission peuvent laisser un avis');
-    }
-
-    // Vérifier qu'il n'y a pas déjà d'avis pour cette mission par ce reviewer
-    const existingReview = await this.reviewRepository.findOne({
-      where: {
-        reviewer: { id: createReviewDto.reviewerId },
-        mission: { id: createReviewDto.missionId }
-      }
-    });
-
-    if (existingReview) {
-      throw new Error('Vous avez déjà laissé un avis pour cette mission');
-    }
-
-    const reviewer = await this.userRepository.findOne({ where: { id: createReviewDto.reviewerId } });
-    const reviewedUser = await this.userRepository.findOne({ where: { id: createReviewDto.reviewedUserId } });
-
-
-    const review = this.reviewRepository.create({
-        stars: createReviewDto.stars,
-        comment: createReviewDto.comment,
-        date: new Date().toISOString().split('T')[0], // Set the current date
-        reviewer: { id: createReviewDto.reviewerId },      
-        reviewedUser: { id: createReviewDto.reviewedUserId },
-        mission: { id: createReviewDto.missionId },               
-      });
-    
-    const savedReview = await this.reviewRepository.save(review);
-
-    // Après avoir créé l'avis, vérifier et attribuer les badges si c'est un freelancer
-    if (reviewedUser && reviewedUser.currentRole === 'freelancer') {
-      await this.updateFreelancerBadges(reviewedUser.id);
-    }
-
-    return savedReview;
+  if (!mission) {
+    throw new Error('Mission non trouvée');
   }
+
+  console.log('Mission:', mission);
+  console.log('createReviewDto:', createReviewDto);
+  
+  // Get the reviewer user to determine their role and profile
+  const reviewer = await this.clientProfileRepository.findOne({ 
+    where: { id: createReviewDto.reviewerId },
+    relations: ['user']
+  });
+
+  if (!reviewer) {
+    throw new Error('Utilisateur reviewer non trouvé');
+  }
+
+  // Check if the reviewer is the client or the freelancer of this mission
+  let isClientReviewing = false;
+  let isFreelancerReviewing = false;
+
+  // Check if reviewer is the client (compare user IDs)
+  if (mission.client?.id === reviewer.id) {
+    isClientReviewing = true;
+  }
+
+  // Check if reviewer is the selected freelancer (compare user IDs)
+  if (mission.selectedFreelancer?.id === reviewer.id) {
+    isFreelancerReviewing = true;
+  }
+
+  console.log('Mission client user ID:', mission.client?.id);
+  console.log('Mission selectedFreelancer user ID:', mission.selectedFreelancer?.id);
+  console.log('Reviewer user ID:', reviewer.id);
+  console.log('clientReviewing:', isClientReviewing);
+  console.log('freelancerReviewing:', isFreelancerReviewing);
+
+  if (!isClientReviewing && !isFreelancerReviewing) {
+    throw new Error('Seuls les participants à la mission peuvent laisser un avis');
+  }
+
+  
+  const existingReview = await this.reviewRepository.findOne({
+    where: {
+      reviewer: { id: createReviewDto.reviewerId },
+      mission: { id: createReviewDto.missionId }
+    }
+  });
+
+  if (existingReview) {
+    throw new Error('Vous avez déjà laissé un avis pour cette mission');
+  }
+
+  const reviewedUser = await this.freelancerProfileRepository.findOne({ 
+    where: { id: createReviewDto.reviewedUserId }, 
+    relations: ['user']
+  });
+
+  if (!reviewedUser) {
+    throw new Error('Utilisateur à évaluer non trouvé');
+  }
+
+  const review = this.reviewRepository.create({
+    stars: createReviewDto.stars,
+    comment: createReviewDto.comment,
+    date: new Date().toISOString().split('T')[0],
+    reviewer: { id: createReviewDto.reviewerId },      
+    reviewedUser: { id: createReviewDto.reviewedUserId },
+    mission: { id: createReviewDto.missionId },               
+  });
+
+  const savedReview = await this.reviewRepository.save(review);
+
+  // Après avoir créé l'avis, vérifier et attribuer les badges si c'est un freelancer
+  if (reviewedUser && reviewedUser.user.currentRole === 'freelancer') {
+    await this.updateFreelancerBadges(reviewedUser.id);
+  }
+
+  return savedReview;
+}
 
   // 2. CALCULER LA MOYENNE DES ÉVALUATIONS
   async calculateUserRating(userId: number) {
