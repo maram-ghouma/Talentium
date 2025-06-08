@@ -120,3 +120,9 @@ export const getClientName = async (): Promise<string | null> => {
     console.log('Client name response:', response.data);
     return response.data || 'error';
   }
+
+  export const CreateReportFreelancer = async (data ) => {
+  const  response = await api.post('/dispute/createFreelancer', data);
+
+  return response.data;
+};

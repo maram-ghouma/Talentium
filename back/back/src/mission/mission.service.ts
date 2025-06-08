@@ -1,13 +1,19 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Mission } from './entities/mission.entity';
+import { Mission } from 'src/mission/entities/mission.entity';
+import { Task, TaskStatus } from './entities/task.entity';
+import { CreateTaskDto } from './dto/create-task.dto';
 import { CreateMissionInput } from './dto/create-mission.input';
 import { UpdateMissionInput } from './dto/update-mission.input';
 import { User } from 'src/user/entities/user.entity';
 import {FreelancerProfile } from 'src/freelancer-profile/entities/freelancer-profile.entity';
 import { ClientProfile } from 'src/client-profile/entities/client-profile.entity';
 import { Review } from 'src/review/entities/review.entity';
+import { CreateDisputeDto } from 'src/dispute/dto/create-dispute.dto';
+import { Dispute, DisputeStatus } from 'src/dispute/entities/dispute.entity';
+import { NotificationService } from 'src/notification/notification.service';
+
 
 
 @Injectable()
@@ -15,6 +21,8 @@ export class MissionService {
   constructor(
     @InjectRepository(Mission)
     private missionRepository: Repository<Mission>,
+    @InjectRepository(Task)
+    private taskRepository: Repository<Task>,
 
     @InjectRepository(User)
     private userRepository: Repository<User>,
@@ -27,7 +35,49 @@ export class MissionService {
 
     @InjectRepository(Review)
     private reviewRepository: Repository<Review>,
+
+    private notificationService: NotificationService,
   ) {}
+
+  // Create a new mission
+  async createMaher(input: {
+    title: string;
+    description: string;
+    status?: 'not_assigned' | 'in_progress' | 'completed';
+    price: number;
+    date: string;
+    clientId?: number;
+    requiredSkills: string[];
+    deadline: Date;
+    budget: string;
+    clientName?: string;
+    progress?: number;
+    tasks?: { total: number; completed: number };
+  }): Promise<Mission> {
+    const mission = this.missionRepository.create({
+      title: input.title,
+      description: input.description,
+      status: input.status || 'not_assigned',
+      price: input.price,
+      date: input.date,
+      client: input.clientId ? { id: input.clientId } : undefined,
+      requiredSkills: input.requiredSkills,
+      deadline: input.deadline,
+      budget: input.budget,
+      clientName: input.clientName || 'john Client',
+      progress: input.progress || 0,
+      tasks: input.tasks || { total: 0, completed: 0 },
+      createdAt: new Date(),
+    });
+    return this.missionRepository.save(mission);
+  }
+
+  // Find all missions
+  async findAllMaher(): Promise<Mission[]> {
+    return this.missionRepository.find({
+      relations: ['client', 'preselectedFreelancers', 'selectedFreelancer', 'tasklist'],
+    });
+  }
 
 async create(createMissionInput: CreateMissionInput, user: any): Promise<Mission> {
   const { ...rest } = createMissionInput;
@@ -37,7 +87,7 @@ async create(createMissionInput: CreateMissionInput, user: any): Promise<Mission
     throw new Error('User not found');
   }
   const client = await this.clientProfileRepository.findOne({
-    where: { user: fullUser },
+    where: { user: { id: fullUser.id } },
   });
 
   if (!client) {
@@ -74,16 +124,100 @@ findAllNotMine(user: any): Promise<Mission[]> {
 
   
 
-  findOne(id: number): Promise<Mission | null> {
-    return this.missionRepository.findOne({ where: { id }, relations: ['client'] });
+  // Find one mission by ID
+  async findOne(id: number): Promise<Mission> {
+    const mission = await this.missionRepository.findOne({
+      where: { id },
+      relations: ['client', 'preselectedFreelancers', 'selectedFreelancer', 'tasklist'],
+    });
+    if (!mission) {
+      throw new NotFoundException(`Mission with ID ${id} not found`);
+    }
+    return mission;
   }
 
-  async update(id: number, updateMissionInput: UpdateMissionInput): Promise<Mission> {
-    const mission = await this.missionRepository.findOneBy({ id });
-    if (!mission) throw new Error('Mission not found');
+  // Update a mission
+  async update(
+    id: number,
+    input: {
+      title?: string;
+      description?: string;
+      status?: 'not_assigned' | 'in_progress' | 'completed';
+      price?: number;
+      date?: string;
+      clientId?: number;
+      requiredSkills?: string[];
+      deadline?: Date;
+      budget?: string;
+      clientName?: string;
+      progress?: number;
+      tasks?: { total: number; completed: number };
+      preselectedFreelancers?: any[];
+      selectedFreelancer?: any;
+    },
+    user: any, // Add the 'user' parameter to check authorization
+  ): Promise<Mission> {
+    const mission = await this.findOne(id);
 
-    Object.assign(mission, updateMissionInput);
-    return this.missionRepository.save(mission);
+    // Check if the user attempting the update is the client of the mission
+    const fullUser = await this.userRepository.findOne({ where: { id: user.userId } });
+    if (!fullUser) {
+      throw new Error('User not found');
+    }
+
+    const client = await this.clientProfileRepository.findOne({
+      where: { user: { id: fullUser.id } },
+      relations: ['user'],
+    });
+
+    if (!client || client.id !== mission.client.id) {
+      throw new ForbiddenException('Only the mission client can update this mission.');
+    }
+
+    // Check if the status is changing to 'completed'
+    const isStatusChangingToCompleted = input.status === 'completed' && mission.status !== 'completed';
+
+    Object.assign(mission, {
+      title: input.title || mission.title,
+      description: input.description || mission.description,
+      status: input.status || mission.status,
+      price: input.price || mission.price,
+      date: input.date || mission.date,
+      // Ensure client is updated correctly, or remains the same if not provided
+      client: input.clientId ? { id: input.clientId } : mission.client, 
+      requiredSkills: input.requiredSkills || mission.requiredSkills,
+      deadline: input.deadline || mission.deadline,
+      budget: input.budget || mission.budget,
+      clientName: input.clientName || mission.clientName,
+      progress: input.progress || mission.progress,
+      tasks: input.tasks || mission.tasks,
+      preselectedFreelancers: input.preselectedFreelancers || mission.preselectedFreelancers,
+      // Ensure selectedFreelancer is updated correctly, or remains the same if not provided
+      selectedFreelancer: input.selectedFreelancer || mission.selectedFreelancer,
+    });
+
+    const updatedMission = await this.missionRepository.save(mission);
+
+    // If the mission is now completed, notify the selected freelancer
+    if (isStatusChangingToCompleted && updatedMission.selectedFreelancer) {
+      try {
+        const freelancerUser = await this.userRepository.findOne({
+          where: { id: updatedMission.selectedFreelancer.user.id },
+        });
+
+        if (freelancerUser) {
+          await this.notificationService.createNotification({
+            userId: freelancerUser.id,
+            content: `The mission "${updatedMission.title}" has been marked as completed by the client! You can now request payment and leave a review.`,
+            type: 'mission_completed',
+          });
+        }
+      } catch (notificationError) {
+        console.error('Failed to send mission completion notification:', notificationError.message);
+      }
+    }
+
+    return updatedMission;
   }
 
 async remove(id: number): Promise<boolean> {
@@ -271,4 +405,68 @@ private computeSkillMatch(required: string[] | null, has: string[] | null): numb
 
 
 
+  // Get tasks for a mission (for Kanban board)
+  async getMissionTasks(missionId: number, userId: number): Promise<Task[]> {
+    const mission = await this.missionRepository.findOne({
+      where: { id: missionId },
+      relations: ['tasklist', 'client', 'selectedFreelancer'],  
+    });
+    if (!mission) {
+      throw new NotFoundException(`Mission with ID ${missionId} not found`);
+    }
+    if (mission.client?.id !== userId && mission.selectedFreelancer?.id !== userId) {
+      throw new ForbiddenException('Only the client or selected freelancer can access this mission');
+    }
+    console.log(`Fetching tasks for mission ID ${missionId} for user ID ${userId}`);
+    return mission.tasklist || [];
+  }
+
+  // Update a task's status
+  async updateTaskStatus(taskId: number, status: string, userId: number): Promise<Task> {
+    const validStatuses = ['NOT_STARTED', 'IN_PROGRESS', 'COMPLETED'];
+    if (!validStatuses.includes(status)) {
+      throw new NotFoundException(`Invalid status: ${status}. Must be NOT_STARTED, IN_PROGRESS, or COMPLETED`);
+    }
+    const task = await this.taskRepository.findOne({
+      where: { id: taskId },
+      relations: ['mission', 'mission.client', 'mission.selectedFreelancer'],
+    });
+    if (!task) {
+      throw new NotFoundException(`Task with ID ${taskId} not found`);
+    }
+    if (task.mission.client?.id !== userId && task.mission.selectedFreelancer?.id !== userId) {
+      throw new ForbiddenException('Only the client or selected freelancer can update this task');
+    }
+    task.status = status as TaskStatus;
+    return this.taskRepository.save(task);
+  }
+
+  async createTask(createTaskDto: CreateTaskDto): Promise<Task> {
+    const { title, description, missionId } = createTaskDto;
+
+    const mission = await this.missionRepository.findOne({
+      where: { id: missionId },
+    });
+
+    if (!mission) {
+      throw new NotFoundException('Mission not found');
+    }
+
+    const task = this.taskRepository.create({
+      title,
+      description,
+      mission,
+      status: TaskStatus.NOT_STARTED,
+    });
+
+    return this.taskRepository.save(task);
+  }
+
+  async deleteTask(taskId: string): Promise<void> {
+    const result = await this.taskRepository.delete(taskId);
+
+    if (result.affected === 0) {
+      throw new NotFoundException(`Task with ID "${taskId}" not found`);
+    }
+  }
 }

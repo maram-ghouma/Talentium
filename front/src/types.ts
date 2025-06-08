@@ -141,7 +141,7 @@
    
 
     export type WorkHistoryItem = {
-      id: string
+      id: number
   title: string
   client: ClientProfileType
   date: string

@@ -45,8 +45,8 @@ export class MissionResolver {
   @UseGuards(GqlAuthGuard,GqlRolesGuard)
   @Roles('client')
   @Mutation(() => Mission)
-  updateMission(@Args('updateMissionInput') updateMissionInput: UpdateMissionInput) {
-    return this.missionService.update(updateMissionInput.id, updateMissionInput);
+  updateMission(@Args('updateMissionInput') updateMissionInput: UpdateMissionInput, @GqlCurrentUser() user: User) {
+    return this.missionService.update(updateMissionInput.id, updateMissionInput, user);
   }
 @UseGuards(GqlAuthGuard,GqlRolesGuard)
 @Roles('client')

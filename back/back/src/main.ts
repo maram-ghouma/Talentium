@@ -4,6 +4,10 @@ import { UserService } from './user/user.service';
 import { seedAdmin } from './SeedAdmin';
 import * as express from 'express';
 import { join } from 'path';
+import * as dotenv from 'dotenv'; // Add dotenv import
+
+// Load .env file
+dotenv.config();
 //import { seed } from './seed';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { User } from './user/entities/user.entity';
