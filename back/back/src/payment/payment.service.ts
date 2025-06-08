@@ -52,7 +52,6 @@ async createEscrowPayment(missionId: number, clientId: number) {
   console.log(`Création du paiement pour la mission ${missionId} par le client ${clientId} et avec ${mission.selectedFreelancer.id} en tant que freelancer sélectionné`);
   
   try {
-    // Create PaymentIntent
     const paymentIntent = await this.stripe.paymentIntents.create({
       amount: mission.price * 100,
       currency: 'eur',
@@ -247,13 +246,78 @@ async createEscrowPayment(missionId: number, clientId: number) {
     const savedInvoice = await this.invoiceRepository.save(invoice);
 
     // Generate PDF asynchronously
-    this.generateInvoicePDF(savedInvoice).catch(error => {
+   /* this.generateInvoicePDF(savedInvoice).catch(error => {
       console.error('Error generating PDF:', error);
-    });
+    });*/
+    /*console.log(`Invoice generated with IDddddddddddddd: ${savedInvoice.id}`);
+    await this.generateInvoicePDFBuffer(savedInvoice).catch(error => {
+    console.error('Error generating PDF buffer:', error);
+  });*/
 
     return savedInvoice;
   }
 
+
+async generateInvoicePDFBuffer(inv: Invoice): Promise<{ buffer: Buffer; filename: string }> {
+
+const invoice = await this.invoiceRepository.findOne({
+  where: { id: inv.id },
+  relations: ['client', 'freelancer', 'mission', 'freelancer.user'],
+});
+if (!invoice) {
+  throw new Error('Invoice not found');
+}
+  return new Promise((resolve, reject) => {
+    const doc = new PDFDocument({ margin: 50 });
+    const chunks: Buffer[] = [];
+
+    doc.on('data', (chunk) => chunks.push(chunk));
+    doc.on('end', () => {
+      const buffer = Buffer.concat(chunks);
+      resolve({
+        buffer,
+        filename: `facture_${invoice.id}.pdf`
+      });
+    });
+    doc.on('error', reject);
+
+    doc
+      .fontSize(24)
+      .text('FACTURE', { align: 'center' })
+      .moveDown(1.5);
+
+    doc
+      .fontSize(12)
+      .text(`Facture n° : ${invoice.id}`)
+      .text(`Date : ${invoice.date}`)
+      .text(`Client : ${invoice.client?.username || 'N/A'}`)
+      .text(`Montant : ${parseFloat(typeof invoice.amount === 'string' ? invoice.amount : String(invoice.amount || 0)).toFixed(2)} €`)
+      .text(`Freelancer : ${invoice.freelancer?.user?.username || 'N/A'}`)
+      .moveDown();
+
+    doc
+      .moveTo(doc.x, doc.y)
+      .lineTo(doc.page.width - 50, doc.y)
+      .stroke()
+      .moveDown();
+
+    doc
+      .fontSize(14)
+      .text('Détails de la mission :', { underline: true })
+      .moveDown(0.5)
+      .fontSize(12)
+      .text(`Description : ${invoice.description}`)
+      .text(`Montant à payer : ${(typeof invoice.amount === 'string' ? parseFloat(invoice.amount) : Number(invoice.amount || 0)).toFixed(2)} €`)
+      .moveDown(2);
+
+    doc
+      .fontSize(10)
+      .fillColor('gray')
+      .text('Merci pour votre confiance.', { align: 'center' });
+
+    doc.end();
+  });
+}
   private async generateInvoicePDF(invoice: Invoice) {
   const load = await this.invoiceRepository.findOne({
     where: { id: invoice.id },
@@ -420,13 +484,11 @@ async createEscrowPayment(missionId: number, clientId: number) {
 }
 
 async retryPaymentSetup(missionId: number): Promise<CreateEscrowResponse> {
-  // Find the mission and create a new payment intent if needed
   const mission = await this.missionRepository.findOne({ where: { id: missionId } });
   if (!mission) {
     throw new Error('Mission not found');
   }
   
-  // Cancel the old payment intent if it exists and create a new one
   if (mission.paymentIntentId) {
     try {
       await this.stripe.paymentIntents.cancel(mission.paymentIntentId);
@@ -435,7 +497,6 @@ async retryPaymentSetup(missionId: number): Promise<CreateEscrowResponse> {
     }
   }
   
-  // Create new escrow payment
   return this.createEscrowPayment(missionId, mission.client.user.id);
 }
 }

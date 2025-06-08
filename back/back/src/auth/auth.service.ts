@@ -42,10 +42,19 @@ export class AuthService {
     const { email, password } = loginDto;
     const user = await this.userService.findByEmail(email);
 
-    if (!user) return null;
+    if (!user){
+      console.log("user not found");
+      return null;
+    } 
+    else console.log("user found", user);
 
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-    if (!isPasswordValid) return null;
+    //const isPasswordValid = await bcrypt.compare(password, user.password);
+    const isPasswordValid = password === user.password;
+    if (!isPasswordValid) {
+      console.log("wrong password");
+      return null;
+    }
+    else console.log("password is valid");
 
     const { password: _, ...result } = user;
     return result;
@@ -71,6 +80,9 @@ export class AuthService {
     const refreshToken = this.jwtService.sign(payload, {
       expiresIn: '3d',
     });
+    console.log("user logged in successfully", user);
+    console.log("accessToken", accessToken);
+    console.log("refreshToken", refreshToken);
 
     return {
       accessToken,

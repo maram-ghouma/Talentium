@@ -61,6 +61,42 @@ type FreelancerProfile {
   interviews: [Interview!]
 }
 
+type Message {
+  id: Int!
+  content: String!
+  timestamp: DateTime!
+  sender: User!
+  conversation: Conversation!
+  fileName: String
+  originalName: String
+  filePath: String
+}
+
+type Conversation {
+  id: Int!
+  isActive: Boolean!
+  startDate: DateTime!
+  mission: Mission!
+  participants: [User!]!
+  messages: [Message!]!
+}
+
+type Task {
+  id: Int!
+  title: String!
+  description: String!
+  status: TaskStatus!
+  mission: Mission!
+  createdAt: DateTime!
+}
+
+"""The status of a task"""
+enum TaskStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETED
+}
+
 type Dispute {
   id: ID!
   mission: Mission!
@@ -99,6 +135,7 @@ type Mission {
   paymentIntentId: String
   applications: [Application!]
   paymentStatus: PaymentStatus!
+  tasklist: [Task!]!
 }
 
 """
@@ -138,6 +175,7 @@ type User {
   imageUrl: String!
   currentRole: String!
   reviews: [Review!]
+  isActive: Boolean!
 }
 
 type Invoice {

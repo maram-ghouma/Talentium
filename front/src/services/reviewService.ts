@@ -65,6 +65,9 @@ export interface Badge {
 export async function getBadgesByUserId(userId: number): Promise<Badge[]> {
   try {
     const response = await api.get(`/user/badges/${userId}`);
+    if (response.data.length === 0) {
+      return [];
+    }
     return response.data;
 
   } catch (error) {

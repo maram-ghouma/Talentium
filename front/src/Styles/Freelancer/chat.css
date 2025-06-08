@@ -443,6 +443,30 @@
 .dark-mode .message-date-divider::after {
   background-color: var(--navy-lighter);
 }
+/* Style for non-image file links */
+.message-file {
+  color: #1a73e8; /* Blue link color, similar to Facebook */
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.message-file:hover {
+  text-decoration: underline;
+}
+
+/* Style for images in messages */
+.message-image {
+  display: block;
+  margin: 5px 0;
+  max-width: 200px; /* Ensure consistency with inline style */
+  border-radius: 8px;
+  border: 1px solid #ddd; /* Optional: subtle border */
+}
+
+/* Ensure message content aligns properly */
+.message-content {
+  word-break: break-word; /* Prevent long filenames from overflowing */
+}
 
 /* Mobile responsiveness */
 @media (max-width: 768px) {
@@ -462,4 +486,74 @@
   .chat-main {
     height: calc(100vh - 400px);
   }
+}
+
+/* Styles/Freelancer/chat.css */
+
+/* Image overlay for full-screen image view */
+.image-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.85); /* Semi-transparent black background */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000; /* Above other content */
+  cursor: pointer; /* Click anywhere to close */
+}
+
+/* Full-screen image */
+.image-overlay-content {
+  max-width: 90vw; /* Limit width to 90% of viewport */
+  max-height: 90vh; /* Limit height to 90% of viewport */
+  object-fit: contain; /* Maintain aspect ratio */
+  border-radius: 8px;
+}
+
+/* Close button for overlay */
+.image-overlay-close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  color: white;
+  transition: background 0.2s;
+}
+
+.image-overlay-close:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Existing styles (ensure these are still present) */
+.message-file {
+  color: #1a73e8;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.message-file:hover {
+  text-decoration: underline;
+}
+
+.message-image {
+  display: block;
+  margin: 5px 0;
+  max-width: 200px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+
+.message-content {
+  word-break: break-word;
 }
