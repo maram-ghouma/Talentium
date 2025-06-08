@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useDrag } from 'react-dnd';
-import './KanbanBoard.css';
+import './kanban.css';
 
 export interface Task {
   id: string;
