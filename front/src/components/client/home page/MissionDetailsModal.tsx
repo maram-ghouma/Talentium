@@ -63,6 +63,11 @@ const MissionDetailsModal: React.FC<MissionDetailsModalProps> = ({
   const assignedDeveloper=mission.selectedFreelancer;
 const [stats, setStats] = useState<FreelancerStats | null>(null);
 
+  const handlekanbanClick = (e: React.MouseEvent) => {
+  e.stopPropagation(); 
+  navigate(`/kanban/${mission.id}`);
+};
+
 useEffect(() => {
   const fetchStats = async () => {
     if (!assignedDeveloper?.user?.id) return;

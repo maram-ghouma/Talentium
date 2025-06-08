@@ -5,6 +5,7 @@ import { CreateUserDto } from '../user/dto/create-user.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { CurrentUser } from './decorators/current-user.decorator';
 import { UserService } from 'src/user/user.service';
+import { Response } from 'express';
 import { SwitchRoleDto } from 'src/user/dto/switch-role.sto';
 import { User } from 'src/user/entities/user.entity';
 import { ClientProfileService } from 'src/client-profile/client-profile.service';

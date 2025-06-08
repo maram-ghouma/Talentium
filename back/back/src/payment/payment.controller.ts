@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Body, Param, Query, ParseIntPipe, UseGuards } from '@nestjs/common';
+import { Controller, Post, Get, Body, Param, Query, ParseIntPipe, UseGuards, Res } from '@nestjs/common';
 import { PaymentService } from './payment.service';
 import { Mission, PaymentStatus } from '../mission/entities/mission.entity';
 import { Invoice } from '../invoice/entities/invoice.entity';
@@ -197,5 +197,23 @@ async getInvoice(@Body() body): Promise<Invoice> {
   } catch (error) {
     console.error('Error getting invoice:', error);
     handleStripeError(error);
+  }
+}
+@Post('invoice/download')
+async downloadInvoicePDF(@Body() body, @Res() res: any) {
+  try {
+    const invoice = await this.paymentService.generateInvoice(body.missionId, body.amount, body.description);
+    const { buffer, filename } = await this.paymentService.generateInvoicePDFBuffer(invoice);
+    
+    res.set({
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': `attachment; filename="${filename}"`,
+      'Content-Length': buffer.length.toString(),
+    });
+    
+    res.send(buffer);
+  } catch (error) {
+    console.error('Error downloading invoice:', error);
+    res.status(500).json({ message: 'Error generating invoice PDF' });
   }
 }}

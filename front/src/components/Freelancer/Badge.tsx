@@ -30,29 +30,32 @@ const BadgeDisplay = ({ userid }) => {
   const [badges, setBadges] = useState<Badge[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  let message = "Work on missions to get a BADGE !";
+
   const fetchUserBadges = async () => {
-    
       const response = await getBadgesByUserId(userid);
       if (response.length === 0) {
-        throw new Error("Work on missions to get a BADGE !");
+          message = "no badges , work harder to get one !";
+          setBadges([]);
+          return [];
+
       }
       setBadges(response);
-   
-      
+      return message;
   };
   useEffect(() => {
     fetchUserBadges().catch(err => {
-      console.error("Error fetching badges:", err);
       setError("Work on missions to get a BADGE !");
     }).finally(() => setLoading(false));
   }, [userid]);
 
  
   
-console.log("Badges fetched:", badges);
+//console.log("Badges fetched:", badges);
   return (
     <div className="flex flex-wrap gap-2 mb-4" style={{ borderRadius: '8px', padding: '10px', backgroundColor: '#f9fafb' }}>
-      {badges.map((badge, index) => (
+      {message && <div className="text-gray-600 text-sm mb-2">{message}</div>}
+     {badges.map((badge, index) => (
         console.log("Badge:", badge),
         <div
           key={index}
