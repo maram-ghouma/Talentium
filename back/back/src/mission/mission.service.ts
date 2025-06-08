@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Mission } from './entities/mission.entity';
@@ -8,6 +8,8 @@ import { User } from 'src/user/entities/user.entity';
 import {FreelancerProfile } from 'src/freelancer-profile/entities/freelancer-profile.entity';
 import { ClientProfile } from 'src/client-profile/entities/client-profile.entity';
 import { Review } from 'src/review/entities/review.entity';
+import { CreateDisputeDto } from 'src/dispute/dto/create-dispute.dto';
+import { Dispute, DisputeStatus } from 'src/dispute/entities/dispute.entity';
 
 
 @Injectable()

@@ -147,46 +147,7 @@ export const chatConversations: ChatConversation[] = [
 
 // Adapting work history
 export const workHistory: WorkHistoryItem[] = [
-  {
-    id: "work-1",
-    title: "Brand Identity Design",
-    date: "Feb 2024",
-    description: "Created a comprehensive brand identity including logo, color scheme, and typography for an organic food company.",
-    review: {
-      comment: "Alex delivered exceptional work! The brand identity perfectly captures our company values.",
-      reviewer: {
-        id: "client-3",
-        username: "Green Earth Foods",
-        role: "Client",
-        email: "client3@example.com"
-      },
-      stars: 5.0,
-      date: "2024-02-28",
-      id: "review-1",
-      reviewee: {
-        id: "user-1",
-        username: "Alex Morgan",
-        role: "Freelancer",
-        email: "alex.morgan@example.com"
-      }
-    },
-    client: {
-      id: 3,
-      user: {
-        id: "client-3",
-        username: "Green Earth Foods",
-        role: "Client",
-        email: "client3@example.com"
-      },
-      industry: "Food & Beverage",
-      linkedIn: "https://linkedin.com/company/green-earth-foods",
-      phoneNumber: "+1 (555) 987-6543",
-      country: "USA",
-      bio: "We are committed to providing organic and sustainable food options."
-    },
-    requiredSkills: ["Branding", "Logo Design", "Typography"],
-  },
- 
+  
 ]
 
 // Creating user profile

@@ -6,12 +6,18 @@ import { Dispute, DisputeStatus } from './entities/dispute.entity';
 import { In, Not, Repository } from 'typeorm';
 import { FreelancerProfile } from 'src/freelancer-profile/entities/freelancer-profile.entity';
 import { ClientProfile } from 'src/client-profile/entities/client-profile.entity';
+import { Mission } from 'src/mission/entities/mission.entity';
+import { User } from 'src/user/entities/user.entity';
 
 @Injectable()
 export class DisputeService {
    constructor(
     @InjectRepository(Dispute)
     private disputeRepository: Repository<Dispute>,
+    @InjectRepository(Mission)
+    private missionRepository: Repository<Mission>,
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
   ) {}
   
   async getDisputeStats() {
@@ -75,6 +81,35 @@ export class DisputeService {
     ],
   });
   return disputes;
+}
+async createDisputeFreelancer(createDisputeDto: CreateDisputeDto, userId: number): Promise<Dispute> {
+  const { missionId, reason } = createDisputeDto;
+
+  const mission = await this.missionRepository.findOne({
+    where: { id: missionId },
+    relations: ['disputes'],
+  });
+
+  if (!mission) {
+    throw new NotFoundException('Mission not found');
+  }
+const user = await this.userRepository.findOne({
+    where: { id: userId },
+  });
+
+  if (!user) {
+    throw new NotFoundException('User not found');
+  }
+
+  const dispute = this.disputeRepository.create({
+    reason,
+    status: DisputeStatus.OPEN,
+    openedAt: new Date(),
+    openedBy: user,
+    mission: mission, // ✅ Link the mission
+  });
+
+  return this.disputeRepository.save(dispute);
 }
 
 

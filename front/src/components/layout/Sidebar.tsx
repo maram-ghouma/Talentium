@@ -66,7 +66,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const FreelancerMenuItems = [
     { icon: Home, label: 'Home', path: "/Freelancer" },
     { icon: User, label: 'Profile', path: "/Freelancer/editProfile" },
-    { icon: Bell, label: 'Notifications', badge: 3, path: "/Freelancer" },
+    { icon: Bell, label: 'Notifications', badge: 3, path: "/notifications" },
     { icon: MessageSquare, label: 'Chat', badge: 2, path: "/Freelancer/chat" },
     { icon: History, label: 'Work History', path: "/Freelancer/history" },
     { icon: CalendarCheck, label: 'Schedule', path: "/freelancer/interviews" },

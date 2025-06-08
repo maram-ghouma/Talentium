@@ -241,3 +241,32 @@
     grid-template-columns: 1fr;
   }
 }
+.report-button {
+  background-color: #ffe5e5; /* light red background */
+  color: #d00000;            /* deep red text */
+  border: 1px solid #d00000;
+  padding: 10px 20px;
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.report-button:hover {
+  background-color: #ffd6d6; /* slightly darker on hover */
+  color: #b30000;
+}
+
+.report-button:active {
+  transform: scale(0.98);
+}
+
+.report-button:focus {
+  outline: none;
+  box-shadow: rgba(208, 0, 0, 0.3);
+}

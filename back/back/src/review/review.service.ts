@@ -247,8 +247,8 @@ async getReviewsClient(userId: number): Promise<Review[]> {
     stars: createReviewDto.stars,
     comment: createReviewDto.comment,
     date: new Date().toISOString().split('T')[0],
-    reviewer: { id: createReviewDto.reviewerId },      
-    reviewedUser: { id: createReviewDto.reviewedUserId },
+    reviewer: { id: reviewer.user.id },  
+    reviewedUser: { id: reviewedUser.user.id }, 
     mission: { id: createReviewDto.missionId },               
   });
 

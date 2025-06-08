@@ -49,7 +49,7 @@ const NotFoundPage: React.FC = () => {
         navigate('/client');
         break;
       case 'admin':
-        navigate('/admin/dashboard');
+        navigate('/admin');
         break;
       default:
         navigate('/');

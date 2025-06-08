@@ -301,6 +301,7 @@ const handleSavePersonal = async () => {
             
            
           </div>
+          
         </div>
       </div>
         </div>
@@ -629,7 +630,7 @@ const handleSavePersonal = async () => {
                 <div className="stat-icon" style={{ backgroundColor: 'rgba(13, 202, 240, 0.1)' }}>
                   <Award size={24} color="#0dcaf0" />
                 </div>
-                <div className="stat-value">{stats?.averageRating}</div>
+                <div className="stat-value">{Math.floor(stats?.averageRating ?? 0)}</div>
                 <div className="stat-label" style={{paddingTop:'10px'}}>Average Rating</div>
               </Card.Body>
             </Card>

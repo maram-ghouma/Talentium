@@ -102,7 +102,7 @@ const { id } = useParams();
     
     >
       {/* Pass darkMode state to the ClientProfile component */}
-      <ClientProfile stats={Stats} reviews={Reviews} missions={mission} profile={profile} darkMode={isDarkMode} />
+      <ClientProfile  stats={Stats} reviews={Reviews} missions={mission} profile={profile} darkMode={isDarkMode} />
     </MainLayout>
   );
 };
