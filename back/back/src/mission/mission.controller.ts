@@ -21,7 +21,7 @@ import { Request } from 'express';
 import * as jsonwebtoken from 'jsonwebtoken';
 import { CreateTaskDto } from './dto/create-task.dto';
 
-@Controller('missions')
+@Controller('mission')
 export class MissionController {
   constructor(private readonly missionService: MissionService) {}
   @UseGuards(AuthGuard('jwt'))

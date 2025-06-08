@@ -245,6 +245,7 @@ const handleSavePersonal = async () => {
               </a>
             )}
             
+            
       </div>
         </div>
       </div>
@@ -256,7 +257,7 @@ const handleSavePersonal = async () => {
 
         {/* Public Info */}
 <Card className="mb-4 card">
-  <Card.Body>
+  <Card.Body> 
     <div className="profile-header">
       <h5 className="mb-0">Public Information</h5>
       {isEditable && (
