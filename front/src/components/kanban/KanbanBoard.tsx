@@ -34,7 +34,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ missionId }) => {
     const fetchTasks = async () => {
       try {
         setLoading(true);
-        const response = await api.get(`missions/kanban/${missionId}`);
+        const response = await api.get(`mission/kanban/${missionId}`);
         // Map backend data to frontend Task interface
         const mappedTasks: Task[] = response.data.map((task: any) => ({
           id: task.id.toString(), // Convert number to string

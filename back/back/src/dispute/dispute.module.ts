@@ -6,7 +6,6 @@ import { Dispute } from './entities/dispute.entity';
 import { MissionModule } from 'src/mission/mission.module';
 import { MissionService } from 'src/mission/mission.service';
 import { Mission } from 'src/mission/entities/mission.entity';
-import { User } from 'src/user/entities/user.entity';
 import { NotificationModule } from '../notification/notification.module'; // Import the module
 import {User} from '../user/entities/user.entity'; // Import User entity if needed
 import { UserModule } from '../user/user.module'; // Import UserModule if you need to use UserService or UserRepository

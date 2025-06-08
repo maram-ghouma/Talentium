@@ -126,7 +126,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { icon: Bell, label: 'Notifications', badge: unreadNotificationCount, path: "/notifications" }, // Dynamic badge
     { icon: CalendarCheck, label: 'Schedule', path: "/client/interviews" },
     { icon: MessageSquare, label: 'Chat', badge: totalUnreadChat, path: "/client/chat" }, // Dynamic badge for chat
-    { icon: History, label: 'History', path: "" },
   ];
 
   // Admin menu items
@@ -141,7 +140,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const FreelancerMenuItems = [
     { icon: Home, label: 'Home', path: "/Freelancer" },
     { icon: User, label: 'Profile', path: "/Freelancer/editProfile" },
-    { icon: Bell, label: 'Notifications', badge: unreadNotificationCount, path: "/Freelancer" }, // Dynamic badge
+    { icon: Bell, label: 'Notifications', badge: unreadNotificationCount, path: "/notifications" }, // Dynamic badge
     { icon: MessageSquare, label: 'Chat', badge: totalUnreadChat, path: "/Freelancer/chat" }, // Dynamic badge for chat
     { icon: History, label: 'Work History', path: "/Freelancer/history" },
     { icon: CalendarCheck, label: 'Schedule', path: "/freelancer/interviews" },

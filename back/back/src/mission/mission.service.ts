@@ -87,7 +87,7 @@ async create(createMissionInput: CreateMissionInput, user: any): Promise<Mission
     throw new Error('User not found');
   }
   const client = await this.clientProfileRepository.findOne({
-    where: { user: fullUser },
+    where: { user: { id: fullUser.id } },
   });
 
   if (!client) {
@@ -166,7 +166,7 @@ findAllNotMine(user: any): Promise<Mission[]> {
     }
 
     const client = await this.clientProfileRepository.findOne({
-      where: { user: fullUser },
+      where: { user: { id: fullUser.id } },
       relations: ['user'],
     });
 
