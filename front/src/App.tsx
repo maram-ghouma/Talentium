@@ -48,6 +48,7 @@ import DisputeForm from './components/dispute/dispute';
 import NotificationContainer from './components/realtime_notification/NotificationContainer';
 import { useNotifications } from './hooks/useNotifications';
 import FreelancerKanban from './Pages/Freelancer/FreelancerKanban';
+import Kanban from './Pages/kanban'
 
 function App() {
   return (
@@ -79,7 +80,7 @@ function App() {
   <Route path="/client/profile" element ={<ClientProfilePage/>}/>
   <Route path="/client/profile/:id" element ={<ClientProfilePage/>}/>
   <Route path="/client/chat" element={<ClientChat />} />
-  <Route path="/kanban/:id" element={<ClientKanban />} />
+  <Route path="/kanban/:id" element={<Kanban />} />
   <Route path="/jalons" element ={<JalonsPage/>}/>
     
   <Route path="/signup" element={<SignUpPage />} />
