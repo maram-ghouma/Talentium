@@ -10,6 +10,8 @@ import { User } from 'src/user/entities/user.entity';
 import {FreelancerProfile } from 'src/freelancer-profile/entities/freelancer-profile.entity';
 import { ClientProfile } from 'src/client-profile/entities/client-profile.entity';
 import { Review } from 'src/review/entities/review.entity';
+import { CreateDisputeDto } from 'src/dispute/dto/create-dispute.dto';
+import { Dispute, DisputeStatus } from 'src/dispute/entities/dispute.entity';
 import { NotificationService } from 'src/notification/notification.service';
 
 
@@ -85,7 +87,7 @@ async create(createMissionInput: CreateMissionInput, user: any): Promise<Mission
     throw new Error('User not found');
   }
   const client = await this.clientProfileRepository.findOne({
-    where: { user: fullUser },
+    where: { user: { id: fullUser.id } },
   });
 
   if (!client) {
@@ -164,7 +166,7 @@ findAllNotMine(user: any): Promise<Mission[]> {
     }
 
     const client = await this.clientProfileRepository.findOne({
-      where: { user: fullUser },
+      where: { user: { id: fullUser.id } },
       relations: ['user'],
     });
 

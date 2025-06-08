@@ -48,8 +48,8 @@ export class AuthService {
     } 
     else console.log("user found", user);
 
-    //const isPasswordValid = await bcrypt.compare(password, user.password);
-    const isPasswordValid = password === user.password;
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    //const isPasswordValid = password === user.password;
     if (!isPasswordValid) {
       console.log("wrong password");
       return null;
