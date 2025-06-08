@@ -7,6 +7,7 @@ import MissionDetailsModal from '../home page/MissionDetailsModal';
 import '../../../Styles/client/profile.css';
 import { CreateMission } from '../home page/CreateMission';
 import { updateClientProfile } from '../../../services/userService';
+import { useNavigate } from 'react-router-dom';
 
 interface ClientProfileProps {
   darkMode?: boolean;
@@ -70,7 +71,11 @@ const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 
   
 
+const navigate = useNavigate();
 
+const handleClick = () => {
+    navigate('/client');
+  };
 const handleSavePersonal = async () => {
   try {
     const formPayload = new FormData();
@@ -486,7 +491,7 @@ const handleSavePersonal = async () => {
     <div className="profile-header d-flex justify-content-between align-items-center">
       <h5 className="mb-0">Recent Missions</h5>
       {isEditable && (
-        <Button variant="outline-primary" size="sm" onClick={() => setShowCreateMission(true)}>
+        <Button variant="outline-primary" size="sm" onClick={(handleClick)}>
           See more
         </Button>
       )}

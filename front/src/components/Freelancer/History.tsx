@@ -89,7 +89,7 @@ const History: React.FC<HistoryProps> = ({ historyItems }) => {
           </div>
             ))
         ) : (
-          <div className="no-missions-message" style={{ margin: '100px 0 200px ', padding: '10px', textAlign: 'center', backgroundColor: 'var(--rose)', color: 'var(--navy-primary)', fontWeight: 'bold' }}>No missions yet</div>
+          <div className="no-missions-message" style={{ margin: '100px 0 200px ', padding: '10px', textAlign: 'center', color: 'var(--navy-primary)', fontWeight: 'bold' }}>No missions yet</div>
         )}
       </div>
     </div>

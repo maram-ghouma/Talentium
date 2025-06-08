@@ -64,7 +64,7 @@ const Rankings: React.FC<RankingsProps> = ({
                 <div className="ranking-header">
                   <span className="ranking-number">#{index + 1}</span>
                   <span className="rating">
-                    <Star size={16} className="star-icon" />
+                    <Star size={10} className="star-icon" />
                     {client.averageRating}
                   </span>
                 </div>
