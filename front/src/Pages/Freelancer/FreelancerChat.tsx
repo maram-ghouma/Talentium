@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { MainLayout } from '../../components/layout/MainLayout';
-import Chat from '../../components/Freelancer/chat';
+import Chat from '../../components/Chat/chat';
 
 const FreelancerChat: React.FC = () => {
 

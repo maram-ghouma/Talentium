@@ -63,6 +63,11 @@ const MissionDetailsModal: React.FC<MissionDetailsModalProps> = ({
   const assignedDeveloper=mission.selectedFreelancer;
 const [stats, setStats] = useState<FreelancerStats | null>(null);
 
+  const handlekanbanClick = (e: React.MouseEvent) => {
+  e.stopPropagation(); 
+  navigate(`/kanban/${mission.id}`);
+};
+
 useEffect(() => {
   const fetchStats = async () => {
     if (!assignedDeveloper?.user?.id) return;
@@ -692,6 +697,81 @@ const handleMarkCompleted = async (missionId: string) => {
                   </Row>
                 </Card.Body>
               </Card>
+             <Card
+  style={{
+    backgroundColor: darkMode ? 'var(--navy-secondary)' : 'white',
+    border: darkMode ? '1px solid var(--slate)' : undefined,
+  }}
+>
+  <Card.Body>
+    <Row>
+      <Col md={8}>
+        <div className="d-flex align-items-center mb-3">
+          <div className="me-3">
+            <img
+              src={assignedDeveloper?.user.imageUrl}
+              className="rounded-circle"
+              style={{ width: '40px', height: '40px', objectFit: 'cover' }}
+            />
+          </div>
+          <div>
+            <h5 className="mb-0">{assignedDeveloper?.user.username}</h5>
+            <div className="d-flex align-items-center">
+              <Star size={16} className="text-warning me-1" />
+              <span className="text-muted">{stats?.averageRating} / 5.0</span>
+            </div>
+          </div>
+        </div>
+        <div className="mb-2">
+          <h6 className="text-muted">Specialty</h6>
+          <p>{assignedDeveloper?.skills}</p>
+        </div>
+        <div>
+          <h6 className="text-muted">Completed Projects</h6>
+          <p>{assignedDeveloper?.selectedMissions?.length ?? 0}</p>
+        </div>
+      </Col>
+
+      <Col md={4} className="d-flex flex-column align-items-end justify-content-between">
+        {/* View profile - top right */}
+        <a
+          onClick={(e) => {
+            e.preventDefault();
+            navigate(`/freelancer/profile/${assignedDeveloper?.user.id}`);
+          }}
+          className="small mb-3"
+          style={{
+            color: darkMode ? 'var(--powder)' : 'var(--navy-secondary)',
+            textDecoration: 'underline',
+            cursor: 'pointer',
+            alignSelf: 'flex-end',
+          }}
+        >
+          View full profile
+        </a>
+
+        {/* Buttons - bottom right */}
+        <div className="d-flex flex-column align-items-end gap-2 w-100">
+          <Button variant="outline-secondary" size="sm" className="w-50" onClick={(e) => {
+            e.preventDefault();
+            navigate(`/client/chat`);
+          }}>
+            Contact 
+          </Button>
+          <Button
+            variant="outline-secondary"
+            size="sm"
+            className="w-50"
+            onClick={handlekanbanClick}
+          >
+            Progress
+          </Button>
+        </div>
+      </Col>
+    </Row>
+  </Card.Body>
+</Card>
+
             </>
           )}
         </Modal.Body>

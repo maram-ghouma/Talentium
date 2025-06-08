@@ -55,7 +55,6 @@ export class ReviewService {
     return null;
   }
 
-  // Get client and freelancer profiles with their users
   const clientProfile = mission.client;
   const freelancerProfile = mission.selectedFreelancer;
   
@@ -65,13 +64,13 @@ export class ReviewService {
   }
 
   const client: ReviewedUser = {
-    id: clientProfile.id, // Return user ID, not profile ID
+    id: clientProfile.id, 
     name: clientProfile.user.username || 'Client',
     image: clientProfile.user.imageUrl || '',
   };
 
   const selectedFreelancer: ReviewedUser = {
-    id: freelancerProfile.id, // Return user ID, not profile ID
+    id: freelancerProfile.id, 
     name: freelancerProfile.user.username || 'Freelancer',
     image: freelancerProfile.user.imageUrl || '',
   };
@@ -146,19 +145,20 @@ async getReviewsClient(userId: number): Promise<Review[]> {
 
   async getTopRatedFreelancers(limit: number = 3) {
   const topFreelancers = await this.reviewRepository
-     .createQueryBuilder('review')
-  .select('reviewedUser.id', 'userId')
-  .addSelect('AVG(review.stars)', 'avgRating')
-  .innerJoin('review.reviewedUser', 'reviewedUser')    // the reviewed user
-  .innerJoin('review.mission', 'mission')              // the mission related to review
-  .innerJoin('mission.selectedFreelancer', 'freelancer')       // the freelancer for the mission
-  .innerJoin('freelancer.user', 'freelancerUser')      // user entity for freelancer if applicable
-  .where('reviewedUser.id = freelancerUser.id')        // ensure reviewed user is the freelancer for the mission
-  .groupBy('reviewedUser.id')
-  .orderBy('avgRating', 'DESC')
-  .limit(limit)
-  .getRawMany();
-  // Enrich with user and freelancer profile
+
+    .createQueryBuilder('review')
+    .select('review.reviewedUserId', 'userId')
+    .addSelect('AVG(review.stars)', 'avgRating')
+    .innerJoin(FreelancerProfile, 'freelancer', 'freelancer.userId = review.reviewedUserId')
+    .groupBy('review.reviewedUserId')
+    .orderBy('avgRating', 'DESC')
+    .limit(limit)
+    .getRawMany();
+
+  
+
+    
+
   const enriched = await Promise.all(
     topFreelancers.map(async (entry) => {
       const profile = await this.freelancerProfileRepository.findOne({
@@ -180,7 +180,6 @@ async getReviewsClient(userId: number): Promise<Review[]> {
 
 
   async createReview(createReviewDto: CreateReviewDto) {
-  // Vérifier que la mission existe
   const mission = await this.missionRepository.findOne({
     where: { id: createReviewDto.missionId },
     relations: ['client', 'client.user', 'selectedFreelancer', 'selectedFreelancer.user']
@@ -192,7 +191,6 @@ async getReviewsClient(userId: number): Promise<Review[]> {
 
  
   
-  // Get the reviewer user to determine their role and profile
   const reviewer = await this.clientProfileRepository.findOne({ 
     where: { id: createReviewDto.reviewerId },
     relations: ['user']
@@ -202,16 +200,13 @@ async getReviewsClient(userId: number): Promise<Review[]> {
     throw new Error('Utilisateur reviewer non trouvé');
   }
 
-  // Check if the reviewer is the client or the freelancer of this mission
   let isClientReviewing = false;
   let isFreelancerReviewing = false;
 
-  // Check if reviewer is the client (compare user IDs)
   if (mission.client?.id === reviewer.id) {
     isClientReviewing = true;
   }
 
-  // Check if reviewer is the selected freelancer (compare user IDs)
   if (mission.selectedFreelancer?.id === reviewer.id) {
     isFreelancerReviewing = true;
   }
@@ -249,12 +244,12 @@ async getReviewsClient(userId: number): Promise<Review[]> {
     date: new Date().toISOString().split('T')[0],
     reviewer: { id: reviewer.user.id },  
     reviewedUser: { id: reviewedUser.user.id }, 
+
     mission: { id: createReviewDto.missionId },               
   });
 
   const savedReview = await this.reviewRepository.save(review);
 
-  // Après avoir créé l'avis, vérifier et attribuer les badges si c'est un freelancer
   if (reviewedUser && reviewedUser.user.currentRole === 'freelancer') {
     await this.updateFreelancerBadges(reviewedUser.id);
   }

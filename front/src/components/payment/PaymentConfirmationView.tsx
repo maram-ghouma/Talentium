@@ -39,7 +39,55 @@ const PaymentConfirmationView = ({ missions }: { missions: MissionLight[]; }) =>
     cvc: '',
     name: ''
   });
+  const handleInvoice = async (event: React.FormEvent) => {
+  event.preventDefault();
   
+  if (!selectedMission) return;
+
+  setLoading(true);
+  
+  try {
+    const invoice = await paymentService.generateInvoice(
+        Number(selectedMission.id),
+        Number(selectedMission.price),
+        `Mission ${selectedMission.title} Payment by ${companyName}`,
+      );
+    // Use fetch to download PDF directly
+    const response = await fetch('/payment/invoice/download', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('token')}` // Adjust based on your auth
+      },
+      body: JSON.stringify({
+        missionId: Number(selectedMission.id),
+        amount: Number(selectedMission.price),
+        description: `Mission ${selectedMission.title} Payment by ${companyName}`
+      })
+    });
+
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+    // Download the PDF
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `facture_${selectedMission.id}.pdf`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+      
+  } catch (error: any) {
+    console.error('Error generating invoice:', error);
+    const message = error.response?.data?.message || 'Une erreur inattendue est survenue.';
+    alert(message);
+  } finally {
+    setLoading(false);
+  }
+};
+/*
   const handleInvoice = async (event: React.FormEvent) => {
     event.preventDefault();
     
@@ -53,6 +101,12 @@ const PaymentConfirmationView = ({ missions }: { missions: MissionLight[]; }) =>
         Number(selectedMission.price),
         `Mission ${selectedMission.title} Payment by ${companyName}`,
       );
+      await paymentService.generateInvoicePdf(
+        Number(selectedMission.id),
+        Number(selectedMission.price),
+        `Mission ${selectedMission.title} Payment by ${companyName}`,
+      );
+      
       console.log('Invoice generated:', invoice);
     } catch (error:any) {
       console.error('Error generating invoice:', error);
@@ -62,7 +116,7 @@ const PaymentConfirmationView = ({ missions }: { missions: MissionLight[]; }) =>
       setLoading(false);
     }
 
-  };
+  };*/
 
   const handleCardInputChange = (field: string, value: string) => {
     setCardDetails(prev => ({
