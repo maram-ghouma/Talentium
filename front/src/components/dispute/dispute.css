@@ -1,0 +1,319 @@
+/* DisputeForm CSS Styles */
+
+.dispute-form-container {
+  max-width: 672px; /* max-w-2xl */
+  margin-left: auto;
+  margin-right: auto;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.dispute-form-header {
+  padding: 16px 24px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.dispute-form-header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.dispute-form-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #111827;
+  margin: 0;
+}
+
+.dispute-form-close-btn {
+  padding: 8px;
+  background-color: transparent;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background-color 0.15s ease-in-out;
+}
+
+.dispute-form-close-btn:hover {
+  background-color: #f3f4f6;
+}
+
+.dispute-form-close-icon {
+  width: 20px;
+  height: 20px;
+  color: #6b7280;
+}
+
+.dispute-form-body {
+  padding: 24px;
+}
+
+.dispute-form-space {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Form Group Styles */
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 8px;
+}
+
+/* Input Styles */
+.form-input, .form-select, .form-textarea {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  font-size: 14px;
+  transition: all 0.15s ease-in-out;
+  box-sizing: border-box;
+}
+
+.form-input:focus, .form-select:focus, .form-textarea:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+.form-input:disabled, .form-select:disabled, .form-textarea:disabled {
+  background-color: #f9fafb;
+  color: #6b7280;
+  cursor: not-allowed;
+}
+
+/* Error States */
+.form-input.error, .form-select.error, .form-textarea.error {
+  border-color: #fca5a5;
+}
+
+.form-input.error:focus, .form-select.error:focus, .form-textarea.error:focus {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
+}
+
+/* Textarea Specific */
+.form-textarea {
+  resize: vertical;
+  min-height: 96px; /* rows={4} equivalent */
+}
+
+.form-textarea.small {
+  min-height: 72px; /* rows={3} equivalent */
+}
+
+/* Error Message */
+.error-message {
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  color: #dc2626;
+}
+
+.error-icon {
+  width: 16px;
+  height: 16px;
+  margin-right: 4px;
+}
+
+/* Character Counter */
+.form-footer {
+  margin-top: 4px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.character-count {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+/* Status Radio Grid */
+.status-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.status-option {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+}
+
+.status-option:hover {
+  border-color: #d1d5db;
+}
+
+.status-option.selected {
+  border-color: #3b82f6;
+  background-color: #eff6ff;
+}
+
+.status-radio {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.status-content {
+  display: flex;
+  align-items: center;
+}
+
+/* Status Badges */
+.status-badge {
+  padding: 4px 8px;
+  font-size: 12px;
+  font-weight: 500;
+  border-radius: 12px;
+}
+
+.status-badge.open {
+  background-color: #dbeafe;
+  color: #1e40af;
+}
+
+.status-badge.in-review {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+.status-badge.resolved {
+  background-color: #dcfce7;
+  color: #166534;
+}
+
+.status-badge.rejected {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+/* Form Actions */
+.form-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  padding-top: 16px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+  text-decoration: none;
+  border: 1px solid transparent;
+}
+
+.btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  color: #374151;
+  background-color: white;
+  border-color: #d1d5db;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background-color: #f9fafb;
+}
+
+.btn-primary {
+  color: white;
+  background-color: #2563eb;
+  border-color: transparent;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background-color: #1d4ed8;
+}
+
+.btn-icon {
+  width: 16px;
+  height: 16px;
+  margin-right: 8px;
+}
+
+/* Loading Spinner */
+.loading-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid white;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-right: 8px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 640px) {
+  .dispute-form-container {
+    margin: 16px;
+    max-width: none;
+  }
+  
+  .dispute-form-header {
+    padding: 12px 16px;
+  }
+  
+  .dispute-form-body {
+    padding: 16px;
+  }
+  
+  .status-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .form-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .btn {
+    justify-content: center;
+  }
+}

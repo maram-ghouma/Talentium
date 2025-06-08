@@ -8,7 +8,6 @@ import { User } from 'src/user/entities/user.entity';
 import { Badge, BadgeType } from 'src/badge/entities/badge.entity';
 import { Mission } from 'src/mission/entities/mission.entity';
 import { CreateReviewDto } from './dto/create-review.dto';
-import { NotificationService } from 'src/notification/notification.service'; // Import NotificationService
 import { FreelancerProfileService } from 'src/freelancer-profile/freelancer-profile.service';
 
 export interface ReviewedUser {
@@ -42,7 +41,6 @@ export class ReviewService {
     private readonly missionRepository: Repository<Mission>,
     @InjectRepository(Badge)
     private readonly badgeRepository: Repository<Badge>,
-    private notificationService: NotificationService,
     private readonly freelancerProfileService: FreelancerProfileService,
 
   ) {}
@@ -192,9 +190,7 @@ async getReviewsClient(userId: number): Promise<Review[]> {
   }
 
  
-  let isClientReviewing = false;
-  let isFreelancerReviewing = false;
-
+  
   const reviewer = await this.clientProfileRepository.findOne({ 
     where: { id: createReviewDto.reviewerId },
     relations: ['user']
@@ -204,8 +200,8 @@ async getReviewsClient(userId: number): Promise<Review[]> {
     throw new Error('Utilisateur reviewer non trouvé');
   }
 
-  
-  
+  let isClientReviewing = false;
+  let isFreelancerReviewing = false;
 
   if (mission.client?.id === reviewer.id) {
     isClientReviewing = true;
@@ -331,7 +327,6 @@ async getReviewsClient(userId: number): Promise<Review[]> {
   }
 
   /*async calculateUserRating(userId: number) {
->>>>>>> origin/main
     const reviews = await this.reviewRepository.find({
       where: { reviewedUser: { id: userId } }
     });

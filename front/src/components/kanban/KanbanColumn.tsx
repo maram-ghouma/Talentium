@@ -2,6 +2,7 @@ import React, { useState, useEffect} from 'react';
 import { useDrop } from 'react-dnd';
 import  TaskCard  from './TaskCard';
 import { Plus } from 'lucide-react';
+import './kanban.css';
 
 
 interface Task {
