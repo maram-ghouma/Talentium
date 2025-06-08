@@ -52,7 +52,6 @@ async createEscrowPayment(missionId: number, clientId: number) {
   console.log(`Création du paiement pour la mission ${missionId} par le client ${clientId} et avec ${mission.selectedFreelancer.id} en tant que freelancer sélectionné`);
   
   try {
-    // Create PaymentIntent
     const paymentIntent = await this.stripe.paymentIntents.create({
       amount: mission.price * 100,
       currency: 'eur',
@@ -420,13 +419,11 @@ async createEscrowPayment(missionId: number, clientId: number) {
 }
 
 async retryPaymentSetup(missionId: number): Promise<CreateEscrowResponse> {
-  // Find the mission and create a new payment intent if needed
   const mission = await this.missionRepository.findOne({ where: { id: missionId } });
   if (!mission) {
     throw new Error('Mission not found');
   }
   
-  // Cancel the old payment intent if it exists and create a new one
   if (mission.paymentIntentId) {
     try {
       await this.stripe.paymentIntents.cancel(mission.paymentIntentId);
@@ -435,7 +432,6 @@ async retryPaymentSetup(missionId: number): Promise<CreateEscrowResponse> {
     }
   }
   
-  // Create new escrow payment
   return this.createEscrowPayment(missionId, mission.client.user.id);
 }
 }
