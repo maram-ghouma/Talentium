@@ -57,6 +57,7 @@ export class AuthController {
       return clientProfile ? clientProfile.companyName : 'Client not found';
     }
     
+    
     @UseGuards(AuthGuard('jwt'))
     @Roles('admin')
 @Patch('suspend')

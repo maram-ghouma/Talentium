@@ -189,13 +189,33 @@ async getReviewsClient(userId: number): Promise<Review[]> {
     throw new Error('Mission non trouvée');
   }
 
- 
-  
-  const reviewer = await this.clientProfileRepository.findOne({ 
+  let reviewer;
+  let reviewedUser;
+  //from client lel freelancer
+  if(createReviewDto.type=='client'){
+  reviewer = await this.clientProfileRepository.findOne({
     where: { id: createReviewDto.reviewerId },
     relations: ['user']
   });
-
+  reviewedUser = await this.freelancerProfileRepository.findOne({
+    where: { id: createReviewDto.reviewedUserId },
+    relations: ['user']
+  });
+}
+  //from freelancer lel client
+  else if(createReviewDto.type=='freelancer'){
+  reviewer = await this.freelancerProfileRepository.findOne({
+    where: { id: createReviewDto.reviewerId },
+    relations: ['user']
+  });
+  reviewedUser = await this.clientProfileRepository.findOne({
+    where: { id: createReviewDto.reviewedUserId },
+    relations: ['user']
+  });
+}
+  if (!reviewedUser) {
+    throw new Error('Utilisateur à évaluer non trouvé');
+  }
   if (!reviewer) {
     throw new Error('Utilisateur reviewer non trouvé');
   }
@@ -228,15 +248,8 @@ async getReviewsClient(userId: number): Promise<Review[]> {
   if (existingReview) {
     throw new Error('Vous avez déjà laissé un avis pour cette mission');
   }
-
-  const reviewedUser = await this.freelancerProfileRepository.findOne({ 
-    where: { id: createReviewDto.reviewedUserId }, 
-    relations: ['user']
-  });
-
-  if (!reviewedUser) {
-    throw new Error('Utilisateur à évaluer non trouvé');
-  }
+  
+  
 
   const review = this.reviewRepository.create({
     stars: createReviewDto.stars,
@@ -252,6 +265,7 @@ async getReviewsClient(userId: number): Promise<Review[]> {
 
   const savedReview = await this.reviewRepository.save(review);
 
+  
   if (reviewedUser && reviewedUser.user.currentRole === 'freelancer') {
     await this.updateFreelancerBadges(reviewedUser.id);
   }

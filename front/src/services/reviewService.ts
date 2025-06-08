@@ -17,6 +17,7 @@ export interface reviewData {
   reviewerId: number;
     stars: number;
     comment: string;
+    type: 'client' | 'freelancer';
 
 }
 export interface reviewMission{

@@ -2,6 +2,7 @@ import { Star } from "lucide-react";
 import { useEffect, useState } from "react";
 import './reviewComponent.css';
 import { createReview, getReviewMissionById, reviewMission } from "../../services/reviewService";
+import { getUser } from "../../services/userService";
 
 interface ReviewComponentProps {
   missionId: number;
@@ -12,7 +13,17 @@ const ReviewComponent: React.FC<ReviewComponentProps> = ({ missionId }) => {
   const [comment, setComment] = useState('');
   const [hoveredStar, setHoveredStar] = useState(0);
   const [selectedMission, setSelectedMission] = useState<reviewMission | null>(null);
+  const [user,setUSer] = useState<any>(null);
 
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const userData = await getUser();
+      setUSer(userData);
+    };
+
+    fetchUser();
+  }, []);
   useEffect(() => {
     const fetchMission = async () => {
       const mission = await getReviewMissionById(missionId);
@@ -27,18 +38,38 @@ const handleSubmitReview = async () => {
       if (!selectedMission || !selectedMission.selectedFreelancer || typeof selectedMission.selectedFreelancer.id !== 'number') {
         return;
       }
+      if(user.currentRole=='client'){
+        console.log("user role is client");
+      const reviewData = {
+        stars: rating,
+        comment,
+        missionId,
+        type:user.currentRole,
+        reviewedUserId: selectedMission.selectedFreelancer.id,
+        reviewerId: selectedMission.client.id, 
+      };
+          await createReview(reviewData);
+          window.location.href = '/client'; 
+
+}
+      else if(user.currentRole=='freelancer'){
+        console.log("user role is freelancer");
 
       const reviewData = {
         stars: rating,
         comment,
         missionId,
-        
-        reviewedUserId: selectedMission.selectedFreelancer.id,
-        reviewerId: selectedMission.client.id, 
+        type:user.currentRole,
+        reviewedUserId: selectedMission.client.id,
+        reviewerId: selectedMission.selectedFreelancer.id, 
       };
+            await createReview(reviewData);
+            window.location.href = '/Freelancer'; 
 
-      await createReview(reviewData);
-      window.location.href = '/client'; 
+
+      }
+
+      //window.location.href = '/client'; 
 
     } catch (error: any) {
       if (error.message.includes('mission')) {
