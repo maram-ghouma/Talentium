@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Modal, ListGroup, Card, Button, Badge, Row, Col } from 'react-bootstrap';
 import { X, Star } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
@@ -8,6 +8,7 @@ import { REMOVE_MISSION, UPDATE_MISSION } from '../../../graphql/mission';
 import { useNavigate } from 'react-router-dom';
 import { ApplicationStatus, Mission } from '../../../types';
 import { GET_APPLICATIONS_BY_MISSION, UPDATE_APPLICATION_STATUS } from '../../../graphql/application';
+import { getFreelancerStats } from '../../../services/userService';
 
 interface Applicant {
   id: string;
@@ -19,6 +20,13 @@ interface Applicant {
   message:string;
   resumePath:string;
   userId?:string;
+}
+
+interface FreelancerStats{
+  averageRating:number;
+  totalMissions: number;
+  missiosnInProgress:number;
+  completedMissions:number;
 }
 
 interface Developer {
@@ -53,6 +61,23 @@ const MissionDetailsModal: React.FC<MissionDetailsModalProps> = ({
   darkMode = false,
 }) => {
   const assignedDeveloper=mission.selectedFreelancer;
+const [stats, setStats] = useState<FreelancerStats | null>(null);
+
+useEffect(() => {
+  const fetchStats = async () => {
+    if (!assignedDeveloper?.user?.id) return;
+
+    try {
+      const data = await getFreelancerStats(assignedDeveloper.user.id);
+      setStats(data);
+    } catch (err) {
+      throw new Error('Failed to load stats');
+    } 
+  };
+  
+  fetchStats();
+}, [assignedDeveloper]);
+
   const navigate = useNavigate();
   const [openModifyAfterClose, setOpenModifyAfterClose] = useState(false);
   const getStatusBadgeVariant = (status: string) => {
@@ -86,6 +111,9 @@ const [showApplicationInfo, setShowApplicationInfo] = useState(false);
 const [selectedApplicant, setSelectedApplicant] = useState<Applicant | null>(null);
 const [localStatus, setLocalStatus] = useState(mission.status);
 
+
+
+
 const handleDelete = () => {
   removeMission({
     variables: { id: mission.id },
@@ -105,19 +133,50 @@ const { loading, error, data } = useQuery(GET_APPLICATIONS_BY_MISSION, {
 
 const applications = data?.applicationsByMission || [];
 
-const applicants: Applicant[] = applications
-  .filter(app => app.status !== 'REJECTED')
-  .map(app => ({
-    id: app.freelancer.id,
-    name: app.freelancer.user.username,
-    imageUrl: app.freelancer.user.imageUrl || '#',
-    profileUrl: `#`,
-    status: app.status,
-    applicationId: app.id,
-    message: app.message,
-    resumePath:app.resumePath,
-    userId:app.freelancer.user.id,
-  }));
+const applicants: Applicant[] = useMemo(() => {
+  return (data?.applicationsByMission || [])
+    .filter(app => app.status !== 'REJECTED')
+    .map(app => ({
+      id: app.freelancer.id,
+      name: app.freelancer.user.username,
+      imageUrl: app.freelancer.user.imageUrl || '#',
+      profileUrl: `#`,
+      status: app.status,
+      applicationId: app.id,
+      message: app.message,
+      resumePath: app.resumePath,
+      userId: app.freelancer.user.id,
+    }));
+}, [data]);
+
+const [statsMap, setStatsMap] = useState<Record<string, FreelancerStats>>({});
+
+useEffect(() => {
+  const fetchAllStats = async () => {
+    const result: Record<string, FreelancerStats> = {};
+
+    await Promise.all(
+      applicants.map(async (app) => {
+        const id = app.userId?.toString();
+        if (!id) return;
+
+        try {
+          const stats = await getFreelancerStats(app.userId);
+          result[id] = stats;
+        } catch (err) {
+          console.error(`Failed to load stats for user ${id}`, err);
+        }
+      })
+    );
+
+    setStatsMap(result);
+  };
+
+  if (applicants.length > 0) {
+    fetchAllStats();
+  }
+}, [applicants]);
+
 
 
   const [updateStatus] = useMutation(UPDATE_APPLICATION_STATUS);
@@ -385,7 +444,12 @@ const handleMarkCompleted = async (missionId: string) => {
                           <h6 className="mb-0">{applicant.name}</h6>
                           <div className="d-flex align-items-center">
                             <Star size={14} className="text-warning me-1" />
-                            <span className="text-muted small">5.0 / 5.0</span>
+                            <span className="text-muted small">
+                              {statsMap[(applicant.userId||'0')]?.averageRating != null
+                                ? `${statsMap[(applicant.userId||'0')].averageRating} / 5.0`
+                                : "No rating yet"}
+                            </span>
+
                           </div>
                         </div>
                       </div>
@@ -450,7 +514,7 @@ const handleMarkCompleted = async (missionId: string) => {
                           <h5 className="mb-0">{assignedDeveloper?.user.username}</h5>
                           <div className="d-flex align-items-center">
                             <Star size={16} className="text-warning me-1" />
-                            <span className="text-muted">5.0 / 5.0</span>{/*  baddel lehne!!!!!!!!!!!!!!!!!!!!!!!!!!!!!(w fi lokhra) */}
+                            <span className="text-muted">{stats?.averageRating} / 5.0</span>{/*  baddel lehne!!!!!!!!!!!!!!!!!!!!!!!!!!!!!(w fi lokhra) */}
                           </div>
                         </div>
                       </div>
