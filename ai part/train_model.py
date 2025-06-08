@@ -79,7 +79,22 @@ class PredictionRequest(BaseModel):
 def train_model():
     df = pd.read_csv('training_dataset.csv')
     known_industries = df['industry'].unique().tolist()
+    if 'Other' not in known_industries:
+        known_industries.append('Other')
     df['industry'] = df['industry'].apply(lambda x: x if x in known_industries else 'Other')
+    if 'Other' not in df['industry'].values:
+        dummy_row = {
+            'skill_match_score': 0,
+            'has_worked_with_client_before': 0,
+            'was_preselected': 0,
+            'price': 0,
+            'industry': 'Other',
+            'times_worked_with_client': 0,
+            'label': 0,
+            'mission_id': -1,
+            'freelancer_id': -1
+        }
+        df = pd.concat([df, pd.DataFrame([dummy_row])], ignore_index=True)
     le = LabelEncoder()
     df['industry'] = le.fit_transform(df['industry'])
     X = df.drop(columns=['label', 'mission_id', 'freelancer_id'])

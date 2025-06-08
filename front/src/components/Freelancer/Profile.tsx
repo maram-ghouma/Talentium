@@ -60,7 +60,7 @@ useEffect(() => {
       email: profile.user.email ?? '',
       phone: profile.phoneNumber ?? '',
       linkedin: profile.linkedIn ?? '',
-      avatar: profile.user.imageUrl ?? '',
+      avatar: profile?.user?.imageUrl ?? '',
       skills: profile.skills ?? [],
       stripeAccountId: profile.stripeAccountId ?? '',
     });
@@ -177,7 +177,7 @@ const handleSavePersonal = async () => {
 
           <div className="position-relative mb-3 mx-auto" style={{ width: '80px', height: '80px' }}>
             <img
-              src={formData.avatar}
+              src={formData?.avatar}
               alt={formData.name}
               className="rounded-circle"
               style={{ width: '80px', height: '80px', objectFit: 'cover' }}
@@ -674,7 +674,7 @@ const handleSavePersonal = async () => {
 <Card className="card">
   <Card.Body>
     <div className="profile-header">
-      <h5 className="mb-0">Client Reviews</h5>
+      <h5 className="mb-0">Reviews</h5>
     </div>
 
     {reviews && reviews.length > 0 ? (
@@ -682,13 +682,13 @@ const handleSavePersonal = async () => {
                     <div key={review.id} className="review-card mb-3 pb-3">
                       <div className="d-flex align-items-start">
                         <img
-                          src={review.reviewer.imageUrl}
-                          alt={review.reviewer.username}
+                          src={review.reviewer?.imageUrl}
+                          alt={review.reviewer?.username}
                           className="rounded-circle me-3"
                           style={{ width: '48px', height: '48px', objectFit: 'cover' }}
                         />
                         <div>
-                          <h6 className="mb-1">{review.reviewer.username}</h6>
+                          <h6 className="mb-1">{review.reviewer?.username}</h6>
                           <div className="mb-2">
                             {[...Array(5)].map((_, i) => (
                               <Star
@@ -699,7 +699,7 @@ const handleSavePersonal = async () => {
                               />
                             ))}
                           </div>
-                          <p className="mb-0 text-muted">{review.comment}</p>
+                          <p className="mb-0 text-muted">{review?.comment}</p>
                         </div>
                       </div>
                     </div>

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Profile as ProfileType } from '../../types';
 import { MainLayout } from '../../components/layout/MainLayout';
 import Profile from '../../components/Freelancer/Profile';
-import { getFreelancerMissions, getFreelancerProfile, getFreelancerReviews, getFreelancerStats } from '../../services/userService';
+import { getFreelancerMissions, getFreelancerProfile, getFreelancerReviews, getFreelancerStats, getMyStatsFreelancer } from '../../services/userService';
 import { useNavigate, useParams } from 'react-router-dom';
 
 
@@ -79,7 +79,7 @@ const { id } = useParams();
     useEffect(() => {
           const fetchStats = async () => {
             try {
-              const data = await getFreelancerStats(userId);
+              const data = await getMyStatsFreelancer();
               setStats(data);
             } catch (err) {
               setError('Failed to load Stats');

@@ -1,7 +1,12 @@
 import React from 'react';
 import { Users, Briefcase } from 'lucide-react';
 import '../../Styles/Guest.css'
+import { useNavigate } from 'react-router-dom';
 const RoleSelector = () => {
+  const navigate = useNavigate();
+  const handleClick = () => {
+    navigate(`/signup`);
+  };
   return (
     <div className="container my-5 py-5">
       <h2 className="text-center mb-4" style={{ color: 'var(--navy-primary)' }}>Choose Your Path</h2>
@@ -10,7 +15,7 @@ const RoleSelector = () => {
           <Users size={48} style={{ color: 'var(--navy-primary)' }} />
           <h3 className="mt-3" style={{ color: 'var(--navy-primary)' }}>Hire Talent</h3>
           <p className="text-muted">Find the perfect freelancer for your project</p>
-          <button className="btn w-100" style={{ backgroundColor: 'var(--navy-primary)', color: 'white' }}>
+          <button onClick={handleClick}className="btn w-100" style={{ backgroundColor: 'var(--navy-primary)', color: 'white' }}>
             Post a Job
           </button>
         </div>
@@ -18,7 +23,7 @@ const RoleSelector = () => {
           <Briefcase size={48} style={{ color: 'var(--navy-primary)' }} />
           <h3 className="mt-3" style={{ color: 'var(--navy-primary)' }}>Find Work</h3>
           <p className="text-muted">Browse jobs that match your expertise</p>
-          <button className="btn w-100" style={{ backgroundColor: 'var(--rose)', color: 'white' }}>
+          <button  onClick={handleClick} className="btn w-100" style={{ backgroundColor: 'var(--rose)', color: 'white' }}>
             Find Jobs
           </button>
         </div>

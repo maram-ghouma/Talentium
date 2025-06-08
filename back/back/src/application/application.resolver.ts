@@ -9,29 +9,37 @@ import { GqlCurrentUser } from 'src/auth/decorators/gql-current-user.decorator';
 import { GqlAuthGuard } from 'src/auth/gql-auth-guard';
 import { UpdateApplicationInput } from './dto/update-application.input';
 import { FreelancerProfile } from 'src/freelancer-profile/entities/freelancer-profile.entity';
+import { Roles } from 'src/auth/decorators/role.decorator';
+import { GqlRolesGuard } from 'src/auth/guards/GqlRoleGuard';
 
 @Resolver(() => Application)
 export class ApplicationResolver {
   constructor(private readonly applicationService: ApplicationService) {}
 
+  @UseGuards(GqlAuthGuard,GqlRolesGuard)
+  @Roles('freelancer')
   @Mutation(() => Application)
-  @UseGuards(GqlAuthGuard)
   async createApplication(
     @Args('createApplicationInput') createApplicationInput: CreateApplicationInput,
     @GqlCurrentUser() freelancer :any 
   ): Promise<Application> {
     return this.applicationService.create(createApplicationInput,  freelancer);
   }
+
+  @UseGuards(GqlAuthGuard,GqlRolesGuard)
+  @Roles('client')
   @Query(() => [Application], { name: 'applications' })
-  @UseGuards(GqlAuthGuard)
   findAll(): Promise<Application[]> {
     return this.applicationService.findAll();
   }
+
+  @UseGuards(GqlAuthGuard,GqlRolesGuard)
+  @Roles('client')
   @Query(() => [Application], { name: 'applicationsByMission' })
-  @UseGuards(GqlAuthGuard)
   findByMission(@Args('missionId') missionId: string): Promise<Application[]> {
     return this.applicationService.findByMission(missionId);
   }
+
   @Query(() => [Application], { name: 'myApplicationsByMission' })
   @UseGuards(GqlAuthGuard)
   findMineByMission(@Args('missionId') missionId: string,@GqlCurrentUser() user:any): Promise<Application[]> {
@@ -64,6 +72,9 @@ export class ApplicationResolver {
   removeApplication(@Args('id') id: string): Promise<boolean> {
     return this.applicationService.remove(id);
   }
+
+    @UseGuards(GqlAuthGuard,GqlRolesGuard)
+    @Roles('client')
   @Mutation(() => Application)
   async updateApplicationStatus(
     @Args('applicationId', { type: () => ID }) applicationId: string,
@@ -72,8 +83,9 @@ export class ApplicationResolver {
     return this.applicationService.updateApplicationStatus(applicationId, newStatus);
   }
 
+    @UseGuards(GqlAuthGuard,GqlRolesGuard)
+    @Roles('client')
   @Query(() => [FreelancerProfile])
-  @UseGuards(GqlAuthGuard)
   getFreelancersWhoAppliedToMyMissions(@GqlCurrentUser() user:any) {
   return this.applicationService.getFreelancersByClient(user.userId);
 }

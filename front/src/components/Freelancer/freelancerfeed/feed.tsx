@@ -23,21 +23,52 @@ interface HomePageProps {
 export const Feed: React.FC<HomePageProps> = ({ isDarkMode, toggleDarkMode, isSidebarOpen,searchQuery,  filters, sortOption }) => {
   const [showCreateMission, setShowCreateMission] = useState(false);
   const [selectedMission, setSelectedMission] = useState<Mission | null>(null);
-   const { data, loading, error,refetch } = useQuery(GET_ALL_MISSIONS);
+  const [page, setPage] = useState(1);
+const pageSize = 12;
+   const { data, loading, error, refetch } = useQuery(GET_ALL_MISSIONS, {
+  variables: { page, pageSize },
+});
   const [missions, setMissions] = useState<Mission[]>([]);
   const [showDetails, setShowDetails] = useState(false);
 const [showModify, setShowModify] = useState(false);
+ 
 
+/*
   useEffect(() => {
     if (data && data.allMissions) {
       setMissions(data.allMissions);
     }
-  }, [data]);
+  }, [data]);*/
+useEffect(() => {
+  if (data && data.allMissions) {
+    const mappedMissions: Mission[] = data.allMissions.filter((m: any) => m.status === "not_assigned").map((m: any) => ({
+      id: m.id,
+      userId:m.client.user.id,
+      title: m.title,
+      description: m.description,
+      status: m.status, 
+      price: m.price,
+      date: m.date,
+      clientId: m.client.id,
+      client: m.client,
+      clientLogo: m.client.user.imageUrl,
+      requiredSkills: m.requiredSkills ?? [],
+      deadline: m.deadline,
+      budget: m.budget,
+      createdAt: m.createdAt ? new Date(m.createdAt) : undefined,
+      clientName: m.client.user.username,
+    }));
+    setMissions(mappedMissions);
+  }
+}, [data]);
+
+
 
 const filteredMissions = React.useMemo(() => {
   let result = [...missions];
   
   if (searchQuery) {
+    setPage(1);
     const query = searchQuery.toLowerCase();
     result = result.filter(mission => 
       mission.title.toLowerCase().includes(query) || 
@@ -46,6 +77,7 @@ const filteredMissions = React.useMemo(() => {
   }
   
   if (filters.status) {
+    setPage(1);
     result = result.filter(mission => {
       switch(filters.status) {
         case 'in_progress':
@@ -61,6 +93,7 @@ const filteredMissions = React.useMemo(() => {
   }
   
   if (filters.dateRange && filters.dateRange !== 'all') {
+    setPage(1);
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     
@@ -90,6 +123,7 @@ const filteredMissions = React.useMemo(() => {
   }
   
   if (sortOption) {
+    setPage(1);
     result.sort((a, b) => {
       switch(sortOption) {
         case 'newest': 
@@ -113,6 +147,12 @@ const filteredMissions = React.useMemo(() => {
   
   return result;
 }, [missions, searchQuery, filters.status, filters.dateRange, sortOption]); 
+const totalPages = Math.ceil(filteredMissions.length / pageSize);
+
+const paginatedMissions = React.useMemo(() => {
+  const start = (page - 1) * pageSize;
+  return filteredMissions.slice(start, start + pageSize);
+}, [filteredMissions, page, pageSize]);
 
   const handleOpenDetails = (mission: Mission) => {
     setSelectedMission(mission);
@@ -131,7 +171,7 @@ const filteredMissions = React.useMemo(() => {
           <p>{searchQuery||filters||sortOption? 'no matching missions':'no missions exist yet.'}</p>
         ) : (
       <div className="row g-4">
-        {filteredMissions.map((mission) => (
+        {paginatedMissions.map((mission) => (
           <div key={mission.id} className="col-12 col-md-6 col-lg-4">
             <MissionCard
               mission={mission} 
@@ -148,10 +188,12 @@ const filteredMissions = React.useMemo(() => {
         mission={{
           id: selectedMission.id,
           price:selectedMission.price,
-          clientId: '1',
-          clientName:'john Client',
+          clientId: selectedMission.clientId,
+          clientLogo:selectedMission.clientLogo,
+          clientName:selectedMission.clientName,
+          userId:selectedMission.userId,
           tasks: {
-        total: 2,
+        total: 0,
         completed: 0
       },
           date: selectedMission.date,
@@ -168,6 +210,30 @@ const filteredMissions = React.useMemo(() => {
           darkMode={isDarkMode}
         />
       )}
+      <div className="d-flex justify-content-center align-items-center my-4 gap-3" style={{ marginBottom: '0.5rem' }}>
+  <button 
+    className="btn btn-sm rounded-pill px-4"
+    style={{ backgroundColor: 'var(--slate)', color: 'white', border: 'none' ,marginBottom: '0.5rem'}}
+    disabled={page === 1} onClick={() => setPage(p => Math.max(p - 1, 1))}
+  >
+    ← Previous
+  </button>
+
+  <span className="fw-semibold fs-6" style={{ marginBottom: '0.5rem' }}>
+    Page <strong>{page}</strong> of <strong>{totalPages || 1}</strong>
+  </span>
+
+  <button 
+    className="btn btn-sm rounded-pill px-4"
+    style={{ backgroundColor: 'var(--slate)', color: 'white', border: 'none' ,marginBottom: '0.5rem'}}
+    disabled={page === totalPages || totalPages === 0} onClick={() => setPage(p => Math.min(p + 1, totalPages))}
+  >
+    Next →
+  </button>
+</div>
+
+
     </div>
+    
   );
 };
