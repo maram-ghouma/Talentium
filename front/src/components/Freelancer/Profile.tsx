@@ -8,6 +8,7 @@ import { updateClientProfile, updateFreelancerProfile } from '../../services/use
 import MissionDetailsModal from '../client/home page/MissionDetailsModal';
 import { CreateMission } from '../client/home page/CreateMission';
 import BadgeDisplay from './Badge';
+import { useNavigate } from 'react-router-dom';
 
 interface ClientProfileProps {
   darkMode?: boolean;
@@ -89,9 +90,11 @@ const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
   }
 };
 
-  
+  const navigate = useNavigate();
 
-
+const handleClick = () => {
+    navigate('/freelancer/history');
+  };
 const handleSavePersonal = async () => {
   try {
     const formPayload = new FormData();
@@ -298,6 +301,7 @@ const handleSavePersonal = async () => {
             
            
           </div>
+          
         </div>
       </div>
         </div>
@@ -626,7 +630,7 @@ const handleSavePersonal = async () => {
                 <div className="stat-icon" style={{ backgroundColor: 'rgba(13, 202, 240, 0.1)' }}>
                   <Award size={24} color="#0dcaf0" />
                 </div>
-                <div className="stat-value">{stats?.averageRating}</div>
+                <div className="stat-value">{Math.floor(stats?.averageRating ?? 0)}</div>
                 <div className="stat-label" style={{paddingTop:'10px'}}>Average Rating</div>
               </Card.Body>
             </Card>
@@ -641,7 +645,7 @@ const handleSavePersonal = async () => {
               <h5 className="mb-0">Recent Missions</h5>
                           { isEditable && (
 
-              <Button variant="outline-primary" size="sm" onClick={() => setShowCreateMission(true)} >see more </Button>
+              <Button variant="outline-primary" size="sm" onClick={handleClick} >see more </Button>
                           )}
               </div>
             

@@ -1,5 +1,3 @@
-// src/services/axiosConfig.ts
-
 import axios from 'axios';
 
 const api = axios.create({
@@ -9,16 +7,17 @@ const api = axios.create({
   },
 });
 
-// Add a request interceptor to attach token
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('authToken'); // or sessionStorage
+    const token = localStorage.getItem('authToken');
+    console.log('Sending token:', token); // Debug
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
   (error) => {
+    console.error('Request interceptor error:', error);
     return Promise.reject(error);
   }
 );

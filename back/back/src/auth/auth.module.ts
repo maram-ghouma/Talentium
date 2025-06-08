@@ -21,7 +21,7 @@ import { Dispute } from 'src/dispute/entities/dispute.entity';
   imports: [ 
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.register({
-      secret: process.env.JWT_SECRET || 'defaultSecretKey', 
+      secret: 'temporary_secretkey',
       signOptions: { expiresIn: '3d' }, 
     }),
     UserModule,

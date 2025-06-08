@@ -147,46 +147,7 @@ export const chatConversations: ChatConversation[] = [
 
 // Adapting work history
 export const workHistory: WorkHistoryItem[] = [
-  {
-    id: "work-1",
-    title: "Brand Identity Design",
-    date: "Feb 2024",
-    description: "Created a comprehensive brand identity including logo, color scheme, and typography for an organic food company.",
-    review: {
-      comment: "Alex delivered exceptional work! The brand identity perfectly captures our company values.",
-      reviewer: {
-        id: "client-3",
-        username: "Green Earth Foods",
-        role: "Client",
-        email: "client3@example.com"
-      },
-      stars: 5.0,
-      date: "2024-02-28",
-      id: "review-1",
-      reviewee: {
-        id: "user-1",
-        username: "Alex Morgan",
-        role: "Freelancer",
-        email: "alex.morgan@example.com"
-      }
-    },
-    client: {
-      id: 3,
-      user: {
-        id: "client-3",
-        username: "Green Earth Foods",
-        role: "Client",
-        email: "client3@example.com"
-      },
-      industry: "Food & Beverage",
-      linkedIn: "https://linkedin.com/company/green-earth-foods",
-      phoneNumber: "+1 (555) 987-6543",
-      country: "USA",
-      bio: "We are committed to providing organic and sustainable food options."
-    },
-    requiredSkills: ["Branding", "Logo Design", "Typography"],
-  },
- 
+  
 ]
 
 // Creating user profile
@@ -228,3 +189,107 @@ export const interviews: Interview[] = [
     remindMe: true
   }
 ]
+
+
+interface Task {
+  id: string;
+  title: string;
+  description?: string;
+  status: 'not-started' | 'in-progress' | 'completed';
+  assignedTo?: string;
+  priority?: 'low' | 'medium' | 'high';
+  dueDate?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+// Mock tasks data
+export const mockTasks: Task[] = [
+  {
+    id: 'task-1',
+    title: 'Design Homepage Wireframe',
+    description: 'Create wireframes for the homepage layout including header, hero section, features, and footer.',
+    status: 'completed',
+    assignedTo: 'user-1',
+    priority: 'high',
+    dueDate: '2025-04-15',
+    createdAt: '2025-04-10T10:00:00Z',
+    updatedAt: '2025-04-12T15:30:00Z'
+  },
+  {
+    id: 'task-2',
+    title: 'Develop Homepage HTML/CSS',
+    description: 'Convert approved wireframes into responsive HTML/CSS for the homepage.',
+    status: 'in-progress',
+    assignedTo: 'user-2',
+    priority: 'high',
+    dueDate: '2025-04-20',
+    createdAt: '2025-04-12T09:00:00Z',
+    updatedAt: '2025-04-16T11:45:00Z'
+  },
+  {
+    id: 'task-3',
+    title: 'Implement About Us Page',
+    description: 'Develop the About Us page based on approved designs including team section and company history.',
+    status: 'not-started',
+    assignedTo: 'user-2',
+    priority: 'medium',
+    dueDate: '2025-04-25',
+    createdAt: '2025-04-12T14:20:00Z',
+    updatedAt: '2025-04-12T14:20:00Z'
+  },
+  {
+    id: 'task-4',
+    title: 'Optimize Images',
+    description: 'Compress and optimize all website images for improved performance.',
+    status: 'not-started',
+    assignedTo: 'user-3',
+    priority: 'low',
+    dueDate: '2025-04-22',
+    createdAt: '2025-04-13T08:45:00Z',
+    updatedAt: '2025-04-13T08:45:00Z'
+  },
+  {
+    id: 'task-5',
+    title: 'Cross-browser Testing',
+    description: 'Test website functionality across Chrome, Firefox, Safari, and Edge browsers.',
+    status: 'not-started',
+    assignedTo: 'user-1',
+    priority: 'medium',
+    dueDate: '2025-05-01',
+    createdAt: '2025-04-14T13:15:00Z',
+    updatedAt: '2025-04-14T13:15:00Z'
+  },
+  {
+    id: 'task-6',
+    title: 'Create Contact Form',
+    description: 'Develop contact form with validation and email functionality.',
+    status: 'in-progress',
+    assignedTo: 'user-3',
+    priority: 'high',
+    dueDate: '2025-04-18',
+    createdAt: '2025-04-11T16:30:00Z',
+    updatedAt: '2025-04-15T10:20:00Z'
+  },
+  {
+    id: 'task-7',
+    title: 'SEO Optimization',
+    description: 'Implement meta tags, descriptions, and other SEO best practices.',
+    status: 'in-progress',
+    assignedTo: 'user-4',
+    priority: 'medium',
+    dueDate: '2025-04-29',
+    createdAt: '2025-04-15T09:00:00Z',
+    updatedAt: '2025-04-17T14:10:00Z'
+  },
+  {
+    id: 'task-8',
+    title: 'Client Review Meeting',
+    description: 'Present current progress to client and gather feedback.',
+    status: 'completed',
+    assignedTo: 'user-1',
+    priority: 'high',
+    dueDate: '2025-04-16',
+    createdAt: '2025-04-10T11:30:00Z',
+    updatedAt: '2025-04-16T18:00:00Z'
+  }
+];

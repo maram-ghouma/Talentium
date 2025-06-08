@@ -37,7 +37,7 @@ const Rankings: React.FC<RankingsProps> = ({
                   <span className="ranking-number">#{index + 1}</span>
                   <span className="rating">
                     <Star size={16} className="star-icon" />
-                    {freelancer.averageRating}
+                    {Math.floor(freelancer?.averageRating ?? 0)}
                   </span>
                 </div>
                 <h3>{freelancer.username}</h3>
@@ -64,8 +64,8 @@ const Rankings: React.FC<RankingsProps> = ({
                 <div className="ranking-header">
                   <span className="ranking-number">#{index + 1}</span>
                   <span className="rating">
-                    <Star size={16} className="star-icon" />
-                    {client.averageRating}
+                    <Star size={10} className="star-icon" />
+                    {Math.floor(client?.averageRating ?? 0)}
                   </span>
                 </div>
                 <h3>{client.username}</h3>
