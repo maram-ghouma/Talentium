@@ -39,7 +39,10 @@ export class UserController {
     return this.userService.remove(+id);
   }
 
-  
+  @Get('/badges/:id')
+  findBadgesByUserId(@Param('id') id: number) {
+    return this.userService.findBadgesByUserId(id);
+  }
 
   
 

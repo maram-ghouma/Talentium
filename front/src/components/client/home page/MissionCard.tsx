@@ -2,6 +2,8 @@ import React from 'react';
 import { Clock, DollarSign, Circle } from 'lucide-react';
 import { Mission } from '../../../types';
 import '../../../Styles/client/missionCard.css';
+import { useNavigate } from 'react-router-dom';
+
 
 interface MissionCardProps {
   mission: Mission;
@@ -10,6 +12,12 @@ interface MissionCardProps {
 }
 
 export const MissionCard: React.FC<MissionCardProps> = ({ mission, isDarkMode, onClick }) => {
+  const navigate = useNavigate();
+  const handleReviewClick = (e: React.MouseEvent) => {
+  e.stopPropagation(); // Prevent triggering the card's onClick
+  navigate(`/reviews/${mission.id}`);
+};
+
   const statusColors = {
     not_assigned: '#F59E0B',
     in_progress: '#3B82F6',
@@ -41,6 +49,13 @@ export const MissionCard: React.FC<MissionCardProps> = ({ mission, isDarkMode, o
           <DollarSign size={16} />
           <span>{mission.price}</span>
         </div>
+        {mission.status=="completed"&&(
+            <button 
+              className="review-btn"
+              onClick={handleReviewClick}
+            >
+              Review
+            </button>)}
       </div>
     </div>
   );

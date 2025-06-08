@@ -9,6 +9,7 @@ import { Badge, BadgeType } from 'src/badge/entities/badge.entity';
 import { Mission } from 'src/mission/entities/mission.entity';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { NotificationService } from 'src/notification/notification.service'; // Import NotificationService
+import { FreelancerProfileService } from 'src/freelancer-profile/freelancer-profile.service';
 
 export interface ReviewedUser {
   id: number;
@@ -42,6 +43,8 @@ export class ReviewService {
     @InjectRepository(Badge)
     private readonly badgeRepository: Repository<Badge>,
     private notificationService: NotificationService,
+    private readonly freelancerProfileService: FreelancerProfileService,
+
   ) {}
 
   async getReviewMissionById(missionId: number): Promise<reviewMission | null> {
@@ -54,22 +57,22 @@ export class ReviewService {
     return null;
   }
 
-  // Get client and freelancer profiles with their users
   const clientProfile = mission.client;
   const freelancerProfile = mission.selectedFreelancer;
+  
 
   if (!clientProfile?.user || !freelancerProfile?.user) {
     throw new Error('Informations manquantes sur le client ou le freelancer');
   }
 
   const client: ReviewedUser = {
-    id: clientProfile.id, // Return user ID, not profile ID
+    id: clientProfile.id, 
     name: clientProfile.user.username || 'Client',
     image: clientProfile.user.imageUrl || '',
   };
 
   const selectedFreelancer: ReviewedUser = {
-    id: freelancerProfile.id, // Return user ID, not profile ID
+    id: freelancerProfile.id, 
     name: freelancerProfile.user.username || 'Freelancer',
     image: freelancerProfile.user.imageUrl || '',
   };
@@ -144,19 +147,20 @@ async getReviewsClient(userId: number): Promise<Review[]> {
 
   async getTopRatedFreelancers(limit: number = 3) {
   const topFreelancers = await this.reviewRepository
-     .createQueryBuilder('review')
-  .select('reviewedUser.id', 'userId')
-  .addSelect('AVG(review.stars)', 'avgRating')
-  .innerJoin('review.reviewedUser', 'reviewedUser')    // the reviewed user
-  .innerJoin('review.mission', 'mission')              // the mission related to review
-  .innerJoin('mission.selectedFreelancer', 'freelancer')       // the freelancer for the mission
-  .innerJoin('freelancer.user', 'freelancerUser')      // user entity for freelancer if applicable
-  .where('reviewedUser.id = freelancerUser.id')        // ensure reviewed user is the freelancer for the mission
-  .groupBy('reviewedUser.id')
-  .orderBy('avgRating', 'DESC')
-  .limit(limit)
-  .getRawMany();
-  // Enrich with user and freelancer profile
+
+    .createQueryBuilder('review')
+    .select('review.reviewedUserId', 'userId')
+    .addSelect('AVG(review.stars)', 'avgRating')
+    .innerJoin(FreelancerProfile, 'freelancer', 'freelancer.userId = review.reviewedUserId')
+    .groupBy('review.reviewedUserId')
+    .orderBy('avgRating', 'DESC')
+    .limit(limit)
+    .getRawMany();
+
+  
+
+    
+
   const enriched = await Promise.all(
     topFreelancers.map(async (entry) => {
       const profile = await this.freelancerProfileRepository.findOne({
@@ -178,15 +182,52 @@ async getReviewsClient(userId: number): Promise<Review[]> {
 
 
   async createReview(createReviewDto: CreateReviewDto) {
-    // Vérifier que la mission existe
-    const mission = await this.missionRepository.findOne({
-      where: { id: createReviewDto.missionId },
-      relations: ['client', 'client.user', 'selectedFreelancer', 'selectedFreelancer.user'],
-    });
+  const mission = await this.missionRepository.findOne({
+    where: { id: createReviewDto.missionId },
+    relations: ['client', 'client.user', 'selectedFreelancer', 'selectedFreelancer.user']
+  });
 
-    if (!mission) {
-      throw new Error('Mission non trouvée');
+  if (!mission) {
+    throw new Error('Mission non trouvée');
+  }
+
+ 
+  let isClientReviewing = false;
+  let isFreelancerReviewing = false;
+
+  const reviewer = await this.clientProfileRepository.findOne({ 
+    where: { id: createReviewDto.reviewerId },
+    relations: ['user']
+  });
+
+  if (!reviewer) {
+    throw new Error('Utilisateur reviewer non trouvé');
+  }
+
+  
+  
+
+  if (mission.client?.id === reviewer.id) {
+    isClientReviewing = true;
+  }
+
+  if (mission.selectedFreelancer?.id === reviewer.id) {
+    isFreelancerReviewing = true;
+  }
+;
+
+
+  if (!isClientReviewing && !isFreelancerReviewing) {
+    throw new Error('Seuls les participants à la mission peuvent laisser un avis');
+  }
+
+  
+  const existingReview = await this.reviewRepository.findOne({
+    where: {
+      reviewer: { id: createReviewDto.reviewerId },
+      mission: { id: createReviewDto.missionId }
     }
+  });
 
     console.log('Mission:', mission);
     console.log('createReviewDto:', createReviewDto);
@@ -235,15 +276,10 @@ async getReviewsClient(userId: number): Promise<Review[]> {
     }
 
 
-    // Check if the reviewer is the client or the freelancer of this mission
-    let isClientReviewing = false;
-    let isFreelancerReviewing = false;
-
     // Check if reviewer is the client of the mission
     if (mission.client?.user?.id === reviewerUser.id) {
         isClientReviewing = true;
     }
-
     // Check if reviewer is the selected freelancer of the mission
     if (mission.selectedFreelancer?.user?.id === reviewerUser.id) {
         isFreelancerReviewing = true;
@@ -260,17 +296,6 @@ async getReviewsClient(userId: number): Promise<Review[]> {
       throw new Error('Seuls les participants à la mission peuvent laisser un avis');
     }
 
-    // Check if a review already exists from this reviewer for this mission
-    const existingReview = await this.reviewRepository.findOne({
-      where: {
-        reviewer: { id: reviewerUser.id }, // Make sure to use reviewer's User ID here
-        mission: { id: createReviewDto.missionId },
-      },
-    });
-
-    if (existingReview) {
-      throw new Error('Vous avez déjà laissé un avis pour cette mission');
-    }
 
     const review = this.reviewRepository.create({
       stars: createReviewDto.stars,
@@ -305,8 +330,8 @@ async getReviewsClient(userId: number): Promise<Review[]> {
     return savedReview;
   }
 
-  // 2. CALCULER LA MOYENNE DES ÉVALUATIONS
-  async calculateUserRating(userId: number) {
+  /*async calculateUserRating(userId: number) {
+>>>>>>> origin/main
     const reviews = await this.reviewRepository.find({
       where: { reviewedUser: { id: userId } }
     });
@@ -329,49 +354,39 @@ async getReviewsClient(userId: number): Promise<Review[]> {
       }))
     };
   }
-
-  // 3. LOGIQUE D'ATTRIBUTION DES BADGES POUR FREELANCERS
+*/
   async updateFreelancerBadges(freelancerId: number) {
+    
     const freelancer = await this.freelancerProfileRepository.findOne({
-      where: { id: freelancerId },
-      relations: ['selectedMissions', 'user', 'user.badges']
+      where: { user: { id: freelancerId } },
+      relations: ['user', 'user.badges']
     });
 
     if (!freelancer) {
       throw new Error('Profil freelancer non trouvé');
     }
 
-    // Compter les missions terminées
-    const completedMissions = freelancer.selectedMissions.filter(
-      mission => mission.status === 'completed'
-    ).length;
-
-    // Calculer la note moyenne
-    const ratingData = await this.calculateUserRating(freelancerId);
+    //const ratingData = await this.calculateUserRating(freelancerId);
+    const ratingData =await this.freelancerProfileService.getFreelancerStats(freelancerId);
     const averageRating = ratingData.averageRating;
-
-    // Logique d'attribution des badges
+    const completedMissions = ratingData.completedMissions || 0;
+    
     const badgesToAssign: BadgeType[] = [];
 
-    // BEGINNER: 1 mission terminée
     if (completedMissions >= 1) {
       badgesToAssign.push(BadgeType.BEGINNER);
     }
 
-    // ADVANCED: Plus de 10 missions terminées + note >= 4.0
     if (completedMissions > 10 && averageRating >= 4.0) {
       badgesToAssign.push(BadgeType.ADVANCED);
     }
 
-    // CERTIFIED: Plus de 50 missions terminées + note >= 4.5
     if (completedMissions > 50 && averageRating >= 4.5) {
       badgesToAssign.push(BadgeType.CERTIFIED);
     }
 
-    // Récupérer les badges existants
     const existingBadgeTypes = freelancer.user.badges.map(badge => badge.type);
 
-    // Ajouter seulement les nouveaux badges
     for (const badgeType of badgesToAssign) {
       if (!existingBadgeTypes.includes(badgeType)) {
         const badge = await this.badgeRepository.findOne({
@@ -384,7 +399,6 @@ async getReviewsClient(userId: number): Promise<Review[]> {
       }
     }
 
-    // Sauvegarder les modifications
     await this.userRepository.save(freelancer.user);
 
     return {
@@ -395,7 +409,7 @@ async getReviewsClient(userId: number): Promise<Review[]> {
     };
   }
 
-  // 4. OBTENIR LES ÉVALUATIONS D'UN UTILISATEUR
+  
   async getUserReviews(userId: number, page: number = 1, limit: number = 10) {
     const [reviews, total] = await this.reviewRepository.findAndCount({
       where: { reviewedUser: { id: userId } },
@@ -430,8 +444,8 @@ async getReviewsClient(userId: number): Promise<Review[]> {
     };
   }
 
-  // 5. OBTENIR LE PROFIL COMPLET AVEC STATISTIQUES
-  async getFreelancerProfileWithStats(freelancerId: number) {
+  
+ /* async getFreelancerProfileWithStats(freelancerId: number) {
     const freelancer = await this.freelancerProfileRepository.findOne({
       where: { user: { id: freelancerId } },
       relations: ['user', 'user.badges', 'selectedMissions']
@@ -467,5 +481,5 @@ async getReviewsClient(userId: number): Promise<Review[]> {
       },
       recentReviews: (ratingData.reviews ?? []).slice(0, 5) // 5 avis les plus récents
     };
-  }
+  }*/
 }

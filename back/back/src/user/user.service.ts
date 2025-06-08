@@ -16,7 +16,20 @@ export class UserService extends GenericService  {
   ) {
     super(userRepo);
   }
-  
+  async findBadgesByUserId(userId: number) {
+    const user = await this.userRepo.findOne({ where: { id: userId }, relations: ['badges'] });
+    if (!user) {
+      throw new NotFoundException(`User with ID ${userId} not found`);
+    }
+    if (user.badges.length === 0) {
+      throw new NotFoundException(`No badges found for user with ID ${userId}`);
+    }
+
+    return user.badges;
+
+  }
+
+
   async findByEmail(email: string): Promise<User | null> {
     return this.userRepo.findOne({ where: { email } });
   }

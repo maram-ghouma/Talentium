@@ -1,34 +1,53 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Param, Body, ParseIntPipe } from '@nestjs/common';
 import { BadgeService } from './badge.service';
-import { CreateBadgeDto } from './dto/create-badge.dto';
-import { UpdateBadgeDto } from './dto/update-badge.dto';
+import { Badge, BadgeType } from './entities/badge.entity';
 
-@Controller('badge')
+@Controller('badges')
 export class BadgeController {
   constructor(private readonly badgeService: BadgeService) {}
 
-  @Post()
-  create(@Body() createBadgeDto: CreateBadgeDto) {
-    return this.badgeService.create(createBadgeDto);
-  }
-
   @Get()
-  findAll() {
+  async findAll(): Promise<Badge[]> {
     return this.badgeService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.badgeService.findOne(+id);
+  async findOne(@Param('id', ParseIntPipe) id: number): Promise<Badge> {
+    return this.badgeService.findOne(id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateBadgeDto: UpdateBadgeDto) {
-    return this.badgeService.update(+id, updateBadgeDto);
+  @Get('type/:type')
+  async findByType(@Param('type') type: BadgeType): Promise<Badge> {
+    return this.badgeService.findByType(type);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.badgeService.remove(+id);
+  @Post('setup')
+  async setupBadges(): Promise<Badge[]> {
+    return this.badgeService.createPredefinedBadges();
+  }
+
+  @Post('assign')
+  async assignBadge(
+    @Body() assignBadgeDto: { userId: number; badgeType: BadgeType }
+  ): Promise<Badge> {
+    return this.badgeService.assignBadgeToUser(
+      assignBadgeDto.userId,
+      assignBadgeDto.badgeType
+    );
+  }
+ @Get('assign/:userId')
+async getAssignedBadges(@Param('userId', ParseIntPipe) userId: number): Promise<Badge> {
+  return this.badgeService.assignBadgeToUser(userId, BadgeType.CERTIFIED);
+}
+
+  @Post('remove')
+  async removeBadge(
+    @Body() removeBadgeDto: { userId: number; badgeType: BadgeType }
+  ): Promise<{ message: string }> {
+    await this.badgeService.removeBadgeFromUser(
+      removeBadgeDto.userId,
+      removeBadgeDto.badgeType
+    );
+    return { message: 'Badge removed successfully' };
   }
 }
