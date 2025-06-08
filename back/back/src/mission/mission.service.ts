@@ -409,12 +409,13 @@ private computeSkillMatch(required: string[] | null, has: string[] | null): numb
   async getMissionTasks(missionId: number, userId: number): Promise<Task[]> {
     const mission = await this.missionRepository.findOne({
       where: { id: missionId },
-      relations: ['tasklist', 'client', 'selectedFreelancer'],  
+      relations: ['tasklist', 'client', 'selectedFreelancer','client.user','selectedFreelancer.user'],  
     });
     if (!mission) {
       throw new NotFoundException(`Mission with ID ${missionId} not found`);
     }
-    if (mission.client?.id !== userId && mission.selectedFreelancer?.id !== userId) {
+    
+    if (mission.client?.user.id !== userId && mission.selectedFreelancer?.user.id !== userId) {
       throw new ForbiddenException('Only the client or selected freelancer can access this mission');
     }
     console.log(`Fetching tasks for mission ID ${missionId} for user ID ${userId}`);
@@ -429,12 +430,12 @@ private computeSkillMatch(required: string[] | null, has: string[] | null): numb
     }
     const task = await this.taskRepository.findOne({
       where: { id: taskId },
-      relations: ['mission', 'mission.client', 'mission.selectedFreelancer'],
+      relations: ['mission', 'mission.client', 'mission.selectedFreelancer','mission.client.user','mission.selectedFreelancer.user'],
     });
     if (!task) {
       throw new NotFoundException(`Task with ID ${taskId} not found`);
     }
-    if (task.mission.client?.id !== userId && task.mission.selectedFreelancer?.id !== userId) {
+    if (task.mission.client?.user.id !== userId && task.mission.selectedFreelancer?.user.id !== userId) {
       throw new ForbiddenException('Only the client or selected freelancer can update this task');
     }
     task.status = status as TaskStatus;

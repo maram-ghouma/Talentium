@@ -11,11 +11,12 @@ import { UploadScalar } from './upload.scalar';
 import { FreelancerProfileModule } from 'src/freelancer-profile/freelancer-profile.module';
 import { Mission } from 'src/mission/entities/mission.entity';
 import { NotificationModule } from 'src/notification/notification.module';
+import { ConversationModule } from 'src/conversation/conversation.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Application,User,FreelancerProfile,Mission]),
-    NotificationModule,
+    NotificationModule,ConversationModule,
     MulterModule.register({
       limits: {
         fileSize: 5 * 1024 * 1024, 
