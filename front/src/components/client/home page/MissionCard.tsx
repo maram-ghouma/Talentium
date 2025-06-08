@@ -49,6 +49,12 @@ export const MissionCard: React.FC<MissionCardProps> = ({ mission, isDarkMode, o
           <DollarSign size={16} />
           <span>{mission.price}</span>
         </div>
+        <button 
+  className="review-btn"
+  onClick={handleReviewClick}
+>
+  Review
+</button>
       </div>
     </div>
   );
