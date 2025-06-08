@@ -138,6 +138,7 @@ type User {
   imageUrl: String!
   currentRole: String!
   reviews: [Review!]
+  isActive: Boolean!
 }
 
 type Invoice {
