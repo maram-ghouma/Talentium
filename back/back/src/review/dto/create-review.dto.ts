@@ -4,5 +4,6 @@ export class CreateReviewDto {
     reviewerId: number;
     reviewedUserId: number;
     missionId: number;
+    type: 'client' | 'freelancer';
 }
 
