@@ -106,7 +106,7 @@ const { id } = useParams();
          usertype="freelancer"
    
        >
-        <Profile stats={Stats} reviews={Reviews} missions={mission} profile={profile} isEditable={true} />
+        <Profile  stats={Stats} reviews={Reviews} missions={mission} profile={profile} isEditable={true} />
 
     </MainLayout>
   );

@@ -5,10 +5,14 @@ import { UpdateDisputeDto } from './dto/update-dispute.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from 'src/auth/guards/RoleGuard';
 import { Roles } from 'src/auth/decorators/role.decorator';
+import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
+import { Dispute } from './entities/dispute.entity';
+import { MissionService } from 'src/mission/mission.service';
 
 @Controller('dispute')
 export class DisputeController {
-  constructor(private readonly disputeService: DisputeService) {}
+  constructor(private readonly disputeService: DisputeService
+  ) {}
 
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles('admin')
@@ -37,5 +41,15 @@ export class DisputeController {
     @Body('disputeId') disputeId: number,
   ) {
     return this.disputeService.resolveDispute(+disputeId, resolution);
+  }
+
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles('freelancer','client')
+  @Post('createFreelancer')
+  async create(
+    @Body() createDisputeDto: CreateDisputeDto,
+    @CurrentUser() user: any,
+  ): Promise<Dispute> {
+    return this.disputeService.createDisputeFreelancer(createDisputeDto, user.userId);
   }
 }

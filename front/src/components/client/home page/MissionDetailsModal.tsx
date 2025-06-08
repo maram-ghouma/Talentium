@@ -8,7 +8,7 @@ import { REMOVE_MISSION, UPDATE_MISSION } from '../../../graphql/mission';
 import { useNavigate } from 'react-router-dom';
 import { ApplicationStatus, Mission } from '../../../types';
 import { GET_APPLICATIONS_BY_MISSION, UPDATE_APPLICATION_STATUS } from '../../../graphql/application';
-import { getFreelancerStats } from '../../../services/userService';
+import { CreateReportFreelancer, getFreelancerStats } from '../../../services/userService';
 
 interface Applicant {
   id: string;
@@ -185,7 +185,37 @@ useEffect(() => {
 
 
   const [updateStatus] = useMutation(UPDATE_APPLICATION_STATUS);
-
+    const [showModal, setShowModal] = useState(false);
+      const [reason, setReason] = useState('');
+      const [isSubmitting, setIsSubmitting] = useState(false);
+ const handleOpenModal = () => setShowModal(true);
+    const handleCloseModal = () => {
+      setShowModal(false);
+      setReason('');
+    };
+const handleReportClick = () => {
+handleOpenModal();
+}
+    const handleSubmitReport = async (itemId: number) => {
+      if (!reason.trim()) {
+        alert('Please enter a reason');
+        return;
+      }
+  
+      setIsSubmitting(true);
+      try {
+        await CreateReportFreelancer({ missionId: itemId, reason: reason });
+        alert('Report submitted successfully');
+        handleCloseModal();
+        window.location.reload();
+      } catch (error) {
+        console.error('Failed to submit report:', error);
+        alert('Error submitting report');
+      } finally {
+        setIsSubmitting(false);
+      }
+    };
+  
 const handlePreselect = async (applicationId) => {
   try {
     await updateStatus({
@@ -500,81 +530,219 @@ const handleMarkCompleted = async (missionId: string) => {
           ) : (
             <>
               <h5 className="mb-3">Assigned Developer</h5>
+              <Card style={{ 
+                backgroundColor: darkMode ? 'var(--navy-secondary)' : 'white',
+                border: darkMode ? '1px solid var(--slate)' : undefined
+              }}>
+               <Card.Body>
+  <Row>
+    <Col md={8}>
+      <div className="d-flex align-items-center mb-3">
+        <div className="me-3">
+          <img
+            src={assignedDeveloper?.user.imageUrl}
+            className="rounded-circle"
+            style={{ width: '40px', height: '40px', objectFit: 'cover' }}
+          />
+        </div>
+        <div>
+          <h5 className="mb-0">{assignedDeveloper?.user.username}</h5>
+          <div className="d-flex align-items-center">
+            <Star size={16} className="text-warning me-1" />
+            <span className="text-muted">{Math.floor(stats?.averageRating ?? 0) || 0} / 5.0</span>
+          </div>
+        </div>
+      </div>
+      <div className="mb-2">
+        <h6 className="text-muted">Specialty</h6>
+        <p>{assignedDeveloper?.skills}</p>
+      </div>
+      <div>
+        <h6 className="text-muted">Completed Projects</h6>
+        <p>{assignedDeveloper?.selectedMissions?.length ?? 0}</p>
+      </div>
+    </Col>
+    <Col md={4} className="d-flex flex-column justify-content-center align-items-end">
+      <a
+        onClick={(e) => {
+          e.preventDefault();
+          navigate(`/freelancer/profile/${assignedDeveloper?.user.id}`);
+        }}    
+        className="me-3 small"
+        style={{
+          color: darkMode ? 'var(--powder)' : 'var(--navy-secondary)',
+          textDecoration: 'underline',
+          cursor: 'pointer',
+        }}
+      >
+        View full profile
+      </a>
+      <Button
+        variant="outline-secondary"
+        size="sm"
+      >
+        Contact Developer
+      </Button>
+      <Button
+        variant="danger"
+        style={{ marginTop: '10px' }}
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          handleReportClick();
+        }}
+        size="sm"
+      >
+        Report 
+      </Button>
+    </Col>
+  </Row>
+
+  
+</Card.Body>
+              </Card>
              <Card
   style={{
     backgroundColor: darkMode ? 'var(--navy-secondary)' : 'white',
     border: darkMode ? '1px solid var(--slate)' : undefined,
   }}
 >
-  <Card.Body>
-    <Row>
-      <Col md={8}>
-        <div className="d-flex align-items-center mb-3">
-          <div className="me-3">
-            <img
-              src={assignedDeveloper?.user.imageUrl}
-              className="rounded-circle"
-              style={{ width: '40px', height: '40px', objectFit: 'cover' }}
-            />
-          </div>
-          <div>
-            <h5 className="mb-0">{assignedDeveloper?.user.username}</h5>
-            <div className="d-flex align-items-center">
-              <Star size={16} className="text-warning me-1" />
-              <span className="text-muted">{stats?.averageRating} / 5.0</span>
-            </div>
-          </div>
-        </div>
-        <div className="mb-2">
-          <h6 className="text-muted">Specialty</h6>
-          <p>{assignedDeveloper?.skills}</p>
-        </div>
-        <div>
-          <h6 className="text-muted">Completed Projects</h6>
-          <p>{assignedDeveloper?.selectedMissions?.length ?? 0}</p>
-        </div>
-      </Col>
-
-      <Col md={4} className="d-flex flex-column align-items-end justify-content-between">
-        {/* View profile - top right */}
-        <a
-          onClick={(e) => {
-            e.preventDefault();
-            navigate(`/freelancer/profile/${assignedDeveloper?.user.id}`);
-          }}
-          className="small mb-3"
-          style={{
-            color: darkMode ? 'var(--powder)' : 'var(--navy-secondary)',
-            textDecoration: 'underline',
-            cursor: 'pointer',
-            alignSelf: 'flex-end',
-          }}
-        >
-          View full profile
-        </a>
-
-        {/* Buttons - bottom right */}
-        <div className="d-flex flex-column align-items-end gap-2 w-100">
-          <Button variant="outline-secondary" size="sm" className="w-50" onClick={(e) => {
-            e.preventDefault();
-            navigate(`/client/chat`);
-          }}>
-            Contact 
-          </Button>
-          <Button
-            variant="outline-secondary"
-            size="sm"
-            className="w-50"
-            onClick={handlekanbanClick}
-          >
-            Progress
-          </Button>
-        </div>
-      </Col>
-    </Row>
-  </Card.Body>
+  
 </Card>
-
+{/* Modal moved outside and improved */}
+  {showModal && (
+    <div
+      style={{
+        position: 'fixed',
+        top: 0, 
+        left: 0, 
+        right: 0, 
+        bottom: 0,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        zIndex: 9999 // Increased z-index
+      }}
+      onClick={(e) => {
+        // Only close if clicking the backdrop itself
+        if (e.target === e.currentTarget) {
+          handleCloseModal();
+        }
+      }}
+    >
+      <div
+        style={{
+          background: 'white',
+          borderRadius: '8px',
+          minWidth: '400px',
+          maxWidth: '500px',
+          maxHeight: '80vh',
+          overflowY: 'auto',
+          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+          position: 'relative' // Added for better positioning
+        }}
+        onClick={(e) => e.stopPropagation()} // Prevent event bubbling
+      >
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          padding: '20px',
+          borderBottom: '1px solid #eee'
+        }}>
+          <h3 style={{ margin: 0 }}>Enter your reason</h3>
+          <button
+            type="button" // Added explicit type
+            style={{
+              background: 'none',
+              border: 'none',
+              fontSize: '24px',
+              cursor: 'pointer',
+              color: '#666',
+              padding: '0',
+              width: '30px',
+              height: '30px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              handleCloseModal();
+            }}
+          >
+            ×
+          </button>
+        </div>
+        <div style={{ padding: '20px' }}>
+          <textarea
+            rows={4}
+            value={reason}
+            onChange={(e) => setReason(e.target.value)}
+            placeholder="Write resolution details here..."
+            style={{
+              width: '100%',
+              border: '1px solid #ddd',
+              borderRadius: '4px',
+              padding: '10px',
+              resize: 'vertical',
+              boxSizing: 'border-box',
+              fontFamily: 'inherit'
+            }}
+          />
+        </div>
+        <div style={{
+          display: 'flex',
+          justifyContent: 'flex-end',
+          gap: '10px',
+          padding: '20px',
+          borderTop: '1px solid #eee'
+        }}>
+          <button
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              handleSubmitReport(Number(mission.id));
+            }}
+            disabled={isSubmitting}
+            style={{
+              padding: '8px 16px',
+              borderRadius: '4px',
+              border: 'none',
+              cursor: isSubmitting ? 'not-allowed' : 'pointer',
+              fontWeight: 500,
+              backgroundColor: isSubmitting ? '#6c757d' : '#28a745',
+              color: 'white'
+            }}
+          >
+            {isSubmitting ? 'Submitting...' : 'Submit'}
+          </button>
+          <button
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              handleCloseModal();
+            }}
+            style={{
+              padding: '8px 16px',
+              borderRadius: '4px',
+              border: 'none',
+              cursor: 'pointer',
+              fontWeight: 500,
+              backgroundColor: '#6c757d',
+              color: 'white'
+            }}
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  )}
             </>
           )}
         </Modal.Body>

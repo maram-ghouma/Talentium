@@ -41,6 +41,7 @@ import FreelancerEditProfile from './Pages/Freelancer/FreelancerEditProfile';
 import JalonsPage from './Pages/PaymentPage/JalonsPage';
 import NotFoundPage from './components/layout/NotFound';
 import ReviewPage from './Pages/Review/ReviewPage';
+import DisputeForm from './components/dispute/dispute';
 
 
 
@@ -81,8 +82,10 @@ function App() {
   <Route path="/client/chat" element={<ClientChat />} />
   <Route path="/kanban/:id" element={<Kanban />} />
   <Route path="/jalons" element ={<JalonsPage/>}/>
-
+    
   <Route path="/signup" element={<SignUpPage />} />
+      <Route path="/disputeForm" element={<DisputeForm />}/>
+
   <Route path="/signin" element={<SignInPage />} />
   <Route path="/payment" element={<PaymentPage />} />
   <Route path="/notifications" element={<NotificationsPage />} />

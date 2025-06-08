@@ -229,5 +229,13 @@ export const paymentService = {
       amount,
       description
     });
+  },
+  generateInvoicePdf(missionId: number, amount:number, description: string): Promise<Invoice> {
+    return api.post('/payment/invoice/download', {
+      missionId,
+      amount,
+      description
+    });
   }
+  
 };

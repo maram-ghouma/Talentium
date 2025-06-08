@@ -15,6 +15,39 @@
     box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
   }
   
+  .review-btn {
+  background-color: var(--navy-primary, #2C3850);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  min-width: 70px;
+}
+
+.review-btn:hover {
+  background-color: var(--navy-secondary, #1a2332);
+  transform: translateY(-1px);
+}
+
+.review-btn:active {
+  transform: translateY(0);
+}
+
+/* Dark mode styles */
+.dark-mode .review-btn {
+  background-color: var(--powder, #C5D8E5);
+  color: var(--navy-primary, #2C3850);
+}
+
+.dark-mode .review-btn:hover {
+  background-color: #b0c9d8;
+}
+  
   .mission-header2 {
     display: flex;
     justify-content: space-between;

@@ -103,7 +103,6 @@ useEffect(() => {
          toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
          onSearch={handleSearch}
          usertype="freelancer"
-        
        >
         <Profile stats={Stats} reviews={Reviews} missions={mission} profile={profile} isEditable={false} />
 
