@@ -36,7 +36,7 @@ export class ApplicationService {
   }
 
   const freelancer = await this.freelancerProfileRepository.findOne({
-    where: { user: fullUser },
+    where: { user: {id:fullUser.id} },
   });
 
   if (!freelancer) {
