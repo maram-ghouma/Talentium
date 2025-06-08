@@ -58,7 +58,7 @@ export class BadgeService implements OnModuleInit {
 
   async findAll(): Promise<Badge[]> {
     return this.badgeRepository.find({
-      relations: ['users'], // Include users if needed
+      relations: ['users'],
     });
   }
 
