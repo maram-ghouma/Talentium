@@ -6,4 +6,3 @@ export class CreateReviewDto {
     missionId: number;
     type: 'client' | 'freelancer';
 }
-
