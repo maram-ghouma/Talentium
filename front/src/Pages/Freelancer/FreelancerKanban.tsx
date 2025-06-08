@@ -21,8 +21,8 @@ const FreelancerKanban: React.FC = () => {
       toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
       onSearch={handleSearch}
       usertype="freelancer"
-      profileName="Freelancer"
-      profileRole=""
+      //profileName="Freelancer"
+      //profileRole=""
     >
       <KanbanBoard missionId={missionId ?? ''} />
     </MainLayout>

@@ -1,5 +1,5 @@
 import React, { ReactNode, useEffect, useState } from 'react';
-import { Sun, Moon, User } from 'lucide-react'; // Added User import
+import { Sun, Moon, User } from 'lucide-react';
 import { Sidebar } from './Sidebar';
 import { SearchBar } from './SearchBar';
 import '../../Styles/layout.css';
@@ -14,8 +14,8 @@ interface MainLayoutProps {
   pageTitle?: string;
   hideSearchBar?: boolean;
   onSearch?: (query: string) => void;
-  profileName: string;
-  profileRole: string;
+  //profileName: string;
+  //profileRole: string;
   onFilter?: (filters: any) => void; 
   onSort?: (sortOption: string) => void; 
   usertype: 'admin' | 'client' | 'freelancer';
@@ -29,8 +29,8 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
   isSidebarOpen,
   toggleSidebar,
   pageTitle,
-  profileName,
-  profileRole,
+  //profileName,
+  //profileRole,
   hideSearchBar = false,
   onSearch = (query) => console.log(query),
   usertype,

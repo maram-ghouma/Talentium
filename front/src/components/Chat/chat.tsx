@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Search, Send, Paperclip, Image, Smile, MoreVertical, Phone, Video, X } from 'lucide-react';
+import { Search, Send, Paperclip, Video, X } from 'lucide-react';
 import '../../Styles/Freelancer/chat.css';
 import { ChatService, Contact, ChatMessage } from '../../services/Chat/chat.service'; 
 import { SocketService } from '../../services/Chat/socket.service'; 
@@ -254,19 +254,10 @@ const Chat: React.FC = () => {
               />
               <div className="chat-header-info">
                 <div className="chat-header-name">{selectedConversation.name}</div>
-                <div className="chat-header-status online">
-                  {selectedConversation.isActive ? 'Online' : 'Offline'}
-                </div>
               </div>
               <div className="chat-header-actions">
-                <button className="chat-header-btn" aria-label="Phone call">
-                  <Phone size={16} />
-                </button>
                 <button className="chat-header-btn" aria-label="Video call">
                   <Video size={16} />
-                </button>
-                <button className="chat-header-btn" aria-label="More options">
-                  <MoreVertical size={16} />
                 </button>
               </div>
             </div>
@@ -349,12 +340,6 @@ const Chat: React.FC = () => {
                     style={{ display: 'none' }}
                     onChange={handleFileSelect}
                   />
-                  <button className="chat-input-action-btn" aria-label="Attach image">
-                    <Image size={20} />
-                  </button>
-                  <button className="chat-input-action-btn" aria-label="Add emoji">
-                    <Smile size={20} />
-                  </button>
                 </div>
                 <textarea
                   className="chat-input"

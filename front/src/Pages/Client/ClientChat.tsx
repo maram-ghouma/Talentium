@@ -18,8 +18,8 @@ const ClientChat: React.FC = () => {
       toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
       onSearch={handleSearch}
       usertype="client"
-      profileName="Client"
-      profileRole=""
+      //profileName="Client"
+      //profileRole=""
     >
       <Chat />
     </MainLayout>

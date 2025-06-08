@@ -10,6 +10,8 @@ import { User } from 'src/user/entities/user.entity';
 import {FreelancerProfile } from 'src/freelancer-profile/entities/freelancer-profile.entity';
 import { ClientProfile } from 'src/client-profile/entities/client-profile.entity';
 import { Review } from 'src/review/entities/review.entity';
+import { NotificationService } from 'src/notification/notification.service';
+
 
 
 @Injectable()
@@ -31,6 +33,8 @@ export class MissionService {
 
     @InjectRepository(Review)
     private reviewRepository: Repository<Review>,
+
+    private notificationService: NotificationService,
   ) {}
 
   // Create a new mission
@@ -131,30 +135,54 @@ findAllNotMine(user: any): Promise<Mission[]> {
   }
 
   // Update a mission
-  async update(id: number, input: {
-    title?: string;
-    description?: string;
-    status?: 'not_assigned' | 'in_progress' | 'completed';
-    price?: number;
-    date?: string;
-    clientId?: number;
-    requiredSkills?: string[];
-    deadline?: Date;
-    budget?: string;
-    clientName?: string;
-    progress?: number;
-    tasks?: { total: number; completed: number };
-    preselectedFreelancers?: any[];
-    selectedFreelancer?: any;
-  }): Promise<Mission> {
+  async update(
+    id: number,
+    input: {
+      title?: string;
+      description?: string;
+      status?: 'not_assigned' | 'in_progress' | 'completed';
+      price?: number;
+      date?: string;
+      clientId?: number;
+      requiredSkills?: string[];
+      deadline?: Date;
+      budget?: string;
+      clientName?: string;
+      progress?: number;
+      tasks?: { total: number; completed: number };
+      preselectedFreelancers?: any[];
+      selectedFreelancer?: any;
+    },
+    user: any, // Add the 'user' parameter to check authorization
+  ): Promise<Mission> {
     const mission = await this.findOne(id);
+
+    // Check if the user attempting the update is the client of the mission
+    const fullUser = await this.userRepository.findOne({ where: { id: user.userId } });
+    if (!fullUser) {
+      throw new Error('User not found');
+    }
+
+    const client = await this.clientProfileRepository.findOne({
+      where: { user: fullUser },
+      relations: ['user'],
+    });
+
+    if (!client || client.id !== mission.client.id) {
+      throw new ForbiddenException('Only the mission client can update this mission.');
+    }
+
+    // Check if the status is changing to 'completed'
+    const isStatusChangingToCompleted = input.status === 'completed' && mission.status !== 'completed';
+
     Object.assign(mission, {
       title: input.title || mission.title,
       description: input.description || mission.description,
       status: input.status || mission.status,
       price: input.price || mission.price,
       date: input.date || mission.date,
-      client: input.clientId ? { id: input.clientId } : mission.client,
+      // Ensure client is updated correctly, or remains the same if not provided
+      client: input.clientId ? { id: input.clientId } : mission.client, 
       requiredSkills: input.requiredSkills || mission.requiredSkills,
       deadline: input.deadline || mission.deadline,
       budget: input.budget || mission.budget,
@@ -162,9 +190,32 @@ findAllNotMine(user: any): Promise<Mission[]> {
       progress: input.progress || mission.progress,
       tasks: input.tasks || mission.tasks,
       preselectedFreelancers: input.preselectedFreelancers || mission.preselectedFreelancers,
+      // Ensure selectedFreelancer is updated correctly, or remains the same if not provided
       selectedFreelancer: input.selectedFreelancer || mission.selectedFreelancer,
     });
-    return this.missionRepository.save(mission);
+
+    const updatedMission = await this.missionRepository.save(mission);
+
+    // If the mission is now completed, notify the selected freelancer
+    if (isStatusChangingToCompleted && updatedMission.selectedFreelancer) {
+      try {
+        const freelancerUser = await this.userRepository.findOne({
+          where: { id: updatedMission.selectedFreelancer.user.id },
+        });
+
+        if (freelancerUser) {
+          await this.notificationService.createNotification({
+            userId: freelancerUser.id,
+            content: `The mission "${updatedMission.title}" has been marked as completed by the client! You can now request payment and leave a review.`,
+            type: 'mission_completed',
+          });
+        }
+      } catch (notificationError) {
+        console.error('Failed to send mission completion notification:', notificationError.message);
+      }
+    }
+
+    return updatedMission;
   }
 
 async remove(id: number): Promise<boolean> {

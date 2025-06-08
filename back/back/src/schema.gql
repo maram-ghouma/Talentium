@@ -61,23 +61,6 @@ type FreelancerProfile {
   interviews: [Interview!]
 }
 
-type Dispute {
-  id: ID!
-  mission: Mission!
-  openedBy: User!
-  reason: String!
-  status: DisputeStatus!
-  openedAt: DateTime!
-  resolution: String
-}
-
-enum DisputeStatus {
-  OPEN
-  IN_REVIEW
-  RESOLVED
-  REJECTED
-}
-
 type Message {
   id: Int!
   content: String!
@@ -88,11 +71,6 @@ type Message {
   originalName: String
   filePath: String
 }
-
-"""
-A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
-"""
-scalar DateTime
 
 type Conversation {
   id: Int!
@@ -119,6 +97,23 @@ enum TaskStatus {
   COMPLETED
 }
 
+type Dispute {
+  id: ID!
+  mission: Mission!
+  openedBy: User!
+  reason: String!
+  status: DisputeStatus!
+  openedAt: DateTime!
+  resolution: String
+}
+
+enum DisputeStatus {
+  OPEN
+  IN_REVIEW
+  RESOLVED
+  REJECTED
+}
+
 type Mission {
   id: Int!
   title: String!
@@ -134,16 +129,13 @@ type Mission {
   clientName: String!
   progress: Int!
   tasks: TaskStats!
-<<<<<<< HEAD
-  tasklist: [Task!]!
-=======
   preselectedFreelancers: FreelancerProfile
   selectedFreelancer: FreelancerProfile
   disputes: [Dispute!]!
   paymentIntentId: String
   applications: [Application!]
   paymentStatus: PaymentStatus!
->>>>>>> origin/main
+  tasklist: [Task!]!
 }
 
 """
@@ -183,6 +175,7 @@ type User {
   imageUrl: String!
   currentRole: String!
   reviews: [Review!]
+  isActive: Boolean!
 }
 
 type Invoice {

@@ -1,6 +1,6 @@
 // src/services/notification.service.ts
 import { EventEmitter } from 'events';
-import {Socket, io} from 'socket.io-client';
+import { Socket, io } from 'socket.io-client';
 import api from '../axiosConfig';
 import { NotificationProps } from '../../components/realtime_notification/notification';
 
@@ -18,9 +18,9 @@ export class NotificationService {
   private notificationsEmitter = new EventEmitter();
   private notifications: NotificationProps[] = [];
 
-  constructor(userId: number) {
+  constructor(token: string) {
     this.socket = io('http://localhost:3000/notifications', {
-      query: { userId: userId.toString() },
+      auth: { token }, // Send JWT token in auth
     });
     this.setupSocketListeners();
   }
@@ -58,6 +58,10 @@ export class NotificationService {
         duration: 5000,
       }));
       this.notificationsEmitter.emit('update', [...this.notifications]);
+    });
+
+    this.socket.on('error', (error: { message: string }) => {
+      console.error('[NotificationService] Socket error:', error.message);
     });
   }
 

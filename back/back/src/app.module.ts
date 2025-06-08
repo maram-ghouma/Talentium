@@ -44,6 +44,7 @@ import { InterviewModule } from './interview/interview.module';
     UserModule,
     FreelancerProfileModule,
     ClientProfileModule,
+    NotificationModule,
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env',
@@ -80,7 +81,6 @@ import { InterviewModule } from './interview/interview.module';
       installSubscriptionHandlers: true,
     }),
     ConversationModule,
-    NotificationModule,
     InvoiceModule,
     DisputeModule,
     BadgeModule,
@@ -89,6 +89,6 @@ import { InterviewModule } from './interview/interview.module';
    InterviewModule,
   ],
   controllers: [AppController, ChatController],
-  providers: [AppService, ChatGateway, ChatService, ],
+  providers: [AppService, ChatGateway, ChatService],
 })
 export class AppModule {}

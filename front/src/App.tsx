@@ -49,14 +49,8 @@ import { useNotifications } from './hooks/useNotifications';
 import FreelancerKanban from './Pages/Freelancer/FreelancerKanban';
 
 function App() {
-  const { notifications, removeNotification, addNotification } = useNotifications();
-
   return (
     <>
-    <NotificationContainer 
-        notifications={notifications} 
-        onDismiss={removeNotification} 
-      />
     <DndProvider backend={HTML5Backend}>
         <Routes>
           <Route path="/admin/clients" element={<ClientsList />} />

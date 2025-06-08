@@ -1,58 +1,41 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, forwardRef, Inject } from '@nestjs/common'; // Add forwardRef, Inject
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Notification } from './entities/notification.entity';
-import { User } from 'src/user/entities/user.entity';
 
 @Injectable()
 export class NotificationService {
   constructor(
     @InjectRepository(Notification)
-    private notificationRepo: Repository<Notification>,
-    @InjectRepository(User)
-    private userRepo: Repository<User>,
+    private notificationRepository: Repository<Notification>,
   ) {}
 
-  async createNotification({
-    type,
-    content,
-    userId,
-  }: {
-    type: string;
-    content: string;
-    userId: number;
-  }): Promise<Notification> {
-    const user = await this.userRepo.findOne({ where: { id: userId } });
-    if (!user) {
-      throw new Error('User not found');
-    }
-
-    const notification = this.notificationRepo.create({
-      type,
-      content,
-      userId,
+  async createNotification(data: { userId: number; content: string; type: string }): Promise<Notification> {
+    const notification = this.notificationRepository.create({
+      userId: data.userId,
+      content: data.content,
+      type: data.type,
       isRead: false,
       timestamp: new Date(),
-      user,
     });
-    console.log('[NotificationService] Creating notification:', notification);
-    return this.notificationRepo.save(notification);
+
+    return await this.notificationRepository.save(notification);
   }
 
   async getUnreadNotifications(userId: number): Promise<Notification[]> {
-    console.log('[NotificationService] Fetching unread notifications for user:', userId);
-    return this.notificationRepo.find({
+    return this.notificationRepository.find({
       where: { userId, isRead: false },
       order: { timestamp: 'DESC' },
     });
-    
   }
 
-  async markNotificationAsRead(notificationId: number, userId: number): Promise<void> {
-    await this.notificationRepo.update(
-      { id: notificationId, userId },
-      { isRead: true },
-    );
-    console.log('[NotificationService] Marked notification as read:', notificationId);
+  async markNotificationAsRead(id: number, userId: number): Promise<void> {
+    const notification = await this.notificationRepository.findOne({ where: { id, userId } });
+    if (!notification) {
+      throw new Error('Notification not found or not authorized');
+    }
+
+    notification.isRead = true;
+    await this.notificationRepository.save(notification);
   }
 }
