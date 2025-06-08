@@ -70,7 +70,8 @@ function App() {
           
   <Route path="/reviews" element={<ReviewPage  />} />
 
-  <Route path="/admin/reports" element={<ReportsInterface />} />
+  <Route path="/
+  admin/reports" element={<ReportsInterface />} />
   <Route path="/client" element ={<ClientHome/>}/>
     <Route path="/client/editProfile" element ={<ClientEditProfile/>}/>
   <Route path="/client/interviews" element ={<ClientInterviewSchedule/>}/>
