@@ -37,6 +37,7 @@ import FreelancerEditProfile from './Pages/Freelancer/FreelancerEditProfile';
 import JalonsPage from './Pages/PaymentPage/JalonsPage';
 import NotFoundPage from './components/layout/NotFound';
 import ReviewPage from './Pages/Review/ReviewPage';
+import DisputeForm from './components/dispute/dispute';
 
 
 
@@ -68,8 +69,10 @@ function App() {
   <Route path="/client/profile" element ={<ClientProfilePage/>}/>
   <Route path="/client/profile/:id" element ={<ClientProfilePage/>}/>
   <Route path="/jalons" element ={<JalonsPage/>}/>
-
+    
   <Route path="/signup" element={<SignUpPage />} />
+      <Route path="/disputeForm" element={<DisputeForm />}/>
+
   <Route path="/signin" element={<SignInPage />} />
   <Route path="/payment" element={<PaymentPage />} />
   <Route path="/notifications" element={<NotificationsPage />} />
