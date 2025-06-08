@@ -1,13 +1,14 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Modal, ListGroup, Card, Button, Badge, Row, Col } from 'react-bootstrap';
 import { X, Star } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import '../../../Styles/client/MissionDetails.css';
 import { useMutation, useQuery } from '@apollo/client';
-import { REMOVE_MISSION } from '../../../graphql/mission';
+import { REMOVE_MISSION, UPDATE_MISSION } from '../../../graphql/mission';
 import { useNavigate } from 'react-router-dom';
 import { ApplicationStatus, Mission } from '../../../types';
 import { GET_APPLICATIONS_BY_MISSION, UPDATE_APPLICATION_STATUS } from '../../../graphql/application';
+import { getFreelancerStats } from '../../../services/userService';
 
 interface Applicant {
   id: string;
@@ -18,6 +19,14 @@ interface Applicant {
   applicationId:string;
   message:string;
   resumePath:string;
+  userId?:string;
+}
+
+interface FreelancerStats{
+  averageRating:number;
+  totalMissions: number;
+  missiosnInProgress:number;
+  completedMissions:number;
 }
 
 interface Developer {
@@ -52,6 +61,23 @@ const MissionDetailsModal: React.FC<MissionDetailsModalProps> = ({
   darkMode = false,
 }) => {
   const assignedDeveloper=mission.selectedFreelancer;
+const [stats, setStats] = useState<FreelancerStats | null>(null);
+
+useEffect(() => {
+  const fetchStats = async () => {
+    if (!assignedDeveloper?.user?.id) return;
+
+    try {
+      const data = await getFreelancerStats(assignedDeveloper.user.id);
+      setStats(data);
+    } catch (err) {
+      throw new Error('Failed to load stats');
+    } 
+  };
+  
+  fetchStats();
+}, [assignedDeveloper]);
+
   const navigate = useNavigate();
   const [openModifyAfterClose, setOpenModifyAfterClose] = useState(false);
   const getStatusBadgeVariant = (status: string) => {
@@ -83,6 +109,11 @@ const MissionDetailsModal: React.FC<MissionDetailsModalProps> = ({
 const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 const [showApplicationInfo, setShowApplicationInfo] = useState(false);
 const [selectedApplicant, setSelectedApplicant] = useState<Applicant | null>(null);
+const [localStatus, setLocalStatus] = useState(mission.status);
+
+
+
+
 const handleDelete = () => {
   removeMission({
     variables: { id: mission.id },
@@ -102,18 +133,50 @@ const { loading, error, data } = useQuery(GET_APPLICATIONS_BY_MISSION, {
 
 const applications = data?.applicationsByMission || [];
 
-const applicants: Applicant[] = applications
-  .filter(app => app.status !== 'REJECTED')
-  .map(app => ({
-    id: app.freelancer.id,
-    name: app.freelancer.user.username,
-    imageUrl: app.freelancer.user.imageUrl || '#',
-    profileUrl: `#`,
-    status: app.status,
-    applicationId: app.id,
-    message: app.message,
-    resumePath:app.resumePath
-  }));
+const applicants: Applicant[] = useMemo(() => {
+  return (data?.applicationsByMission || [])
+    .filter(app => app.status !== 'REJECTED')
+    .map(app => ({
+      id: app.freelancer.id,
+      name: app.freelancer.user.username,
+      imageUrl: app.freelancer.user.imageUrl || '#',
+      profileUrl: `#`,
+      status: app.status,
+      applicationId: app.id,
+      message: app.message,
+      resumePath: app.resumePath,
+      userId: app.freelancer.user.id,
+    }));
+}, [data]);
+
+const [statsMap, setStatsMap] = useState<Record<string, FreelancerStats>>({});
+
+useEffect(() => {
+  const fetchAllStats = async () => {
+    const result: Record<string, FreelancerStats> = {};
+
+    await Promise.all(
+      applicants.map(async (app) => {
+        const id = app.userId?.toString();
+        if (!id) return;
+
+        try {
+          const stats = await getFreelancerStats(app.userId);
+          result[id] = stats;
+        } catch (err) {
+          console.error(`Failed to load stats for user ${id}`, err);
+        }
+      })
+    );
+
+    setStatsMap(result);
+  };
+
+  if (applicants.length > 0) {
+    fetchAllStats();
+  }
+}, [applicants]);
+
 
 
   const [updateStatus] = useMutation(UPDATE_APPLICATION_STATUS);
@@ -162,6 +225,27 @@ const handleOpenResume = async () => {
   const blobUrl = window.URL.createObjectURL(blob);
   window.open(blobUrl, '_blank');
 };
+const [updateMission] = useMutation(UPDATE_MISSION);
+
+const handleMarkCompleted = async (missionId: string) => {
+  try {
+    await updateMission({
+      variables: {
+        updateMissionInput: {
+          id: missionId,
+          status: 'completed'
+        }
+      }
+    });
+    setLocalStatus('completed');
+  } catch (error) {
+    console.error("Error updating mission status:", error);
+  }
+};
+
+  const handlePay = (id: string) => {
+    navigate('/payment');
+  };
 
   return (
       <>
@@ -171,14 +255,14 @@ const handleOpenResume = async () => {
             <p>are you sure you want to delete this?</p>
             <div className="confirm-buttons">
               <button 
-                onClick={() => setShowApplicationInfo(false)}
+                onClick={() => setShowDeleteConfirm(false)}
                 style={{ backgroundColor: 'var(--slate)' }}
               >
                 No
               </button>
               <button 
                 onClick={() => {
-                  setShowApplicationInfo(false);
+                  setShowDeleteConfirm(false);
                   handleDelete(); 
                 }}
                 style={{ backgroundColor: 'var(--rose)' }}
@@ -360,21 +444,31 @@ const handleOpenResume = async () => {
                           <h6 className="mb-0">{applicant.name}</h6>
                           <div className="d-flex align-items-center">
                             <Star size={14} className="text-warning me-1" />
-                            <span className="text-muted small">5.0 / 5.0</span>
+                            <span className="text-muted small">
+                              {statsMap[(applicant.userId||'0')]?.averageRating != null
+                                ? `${statsMap[(applicant.userId||'0')].averageRating} / 5.0`
+                                : "No rating yet"}
+                            </span>
+
                           </div>
                         </div>
                       </div>
                       <div className="d-flex align-items-center">
                       <a
-                        href={applicant.profileUrl}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          navigate(`/freelancer/profile/${applicant.userId}`);
+                        }}
                         className="me-3 small"
                         style={{
                           color: darkMode ? 'var(--powder)' : 'var(--navy-secondary)',
                           textDecoration: 'underline',
+                          cursor: 'pointer',
                         }}
                       >
                         View profile
                       </a>
+
                         <Button
                           variant="outline-primary"
                           size="sm"
@@ -417,10 +511,10 @@ const handleOpenResume = async () => {
                         />
                       </div>
                         <div>
-                          <h5 className="mb-0">{assignedDeveloper?.user.name}</h5>
+                          <h5 className="mb-0">{assignedDeveloper?.user.username}</h5>
                           <div className="d-flex align-items-center">
                             <Star size={16} className="text-warning me-1" />
-                            <span className="text-muted">5.0 / 5.0</span>{/*  baddel lehne!!!!!!!!!!!!!!!!!!!!!!!!!!!!!(w fi lokhra) */}
+                            <span className="text-muted">{stats?.averageRating} / 5.0</span>{/*  baddel lehne!!!!!!!!!!!!!!!!!!!!!!!!!!!!!(w fi lokhra) */}
                           </div>
                         </div>
                       </div>
@@ -435,10 +529,17 @@ const handleOpenResume = async () => {
                     </Col>
                     <Col md={4} className="d-flex flex-column justify-content-center align-items-end">
                       <a
-                        href='#'    
-                        className="text-decoration-none mb-3 small"
-                        style={{ color: darkMode ? 'var(--powder)' : 'var(--navy-secondary)' }}
-                      >{/*baddel lehna zeda*/}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          navigate(`/freelancer/profile/${assignedDeveloper?.user.id}`);
+                        }}    
+                        className="me-3 small"
+                        style={{
+                          color: darkMode ? 'var(--powder)' : 'var(--navy-secondary)',
+                          textDecoration: 'underline',
+                          cursor: 'pointer',
+                        }}
+                      >
                         View full profile
                       </a>
                       <Button
@@ -455,16 +556,24 @@ const handleOpenResume = async () => {
           )}
         </Modal.Body>
         <Modal.Footer className="border-top-0 d-flex justify-content-end" style={{ backgroundColor: darkMode ? 'var(--navy-secondary)' : '' }}>
-          <Button 
-            className="me-2"
-            onClick={() => setShowDeleteConfirm(true)}
-            style={{ 
-              backgroundColor: 'var(--rose)' ,
-              borderColor: 'var(--rose)' 
-            }}
-          >
-            Delete
-          </Button>
+          {localStatus === "not_assigned"  && (
+  <Button variant="danger" onClick={() => setShowDeleteConfirm(true)}>
+    Delete
+  </Button>
+)}
+
+{localStatus === "in_progress" && (
+  <Button variant="warning" onClick={() => handleMarkCompleted(mission.id)}>
+    Complete
+  </Button>
+)}
+
+{localStatus === "completed" && (
+  <Button variant="success" onClick={() => handlePay(mission.id)}>
+    Pay
+  </Button>
+)}
+
           <Button 
               onClick={() => {
     if (onModifyClick) {

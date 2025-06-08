@@ -1,4 +1,4 @@
-.mission-card {
+.mission-card2 {
     background: white;
     border-radius: 12px;
     padding: 1.5rem;
@@ -10,20 +10,20 @@
     border: 1px solid rgba(44, 56, 80, 0.1);
   }
   
-  .mission-card:hover {
+  .mission-card2:hover {
     transform: translateY(-2px);
     box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
   }
   
-  .mission-header {
+  .mission-header2 {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    margin-bottom: 1rem;
+    margin-bottom: 0.25rem;
     min-height: 50px;
   }
   
-  .mission-title {
+  .mission-title2 {
     font-size: 1.25rem;
     font-weight: 600;
     color: var(--navy-primary);
@@ -34,7 +34,7 @@
     max-width: 85%;
   }
   
-  .mission-status {
+  .mission-status2 {
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -43,7 +43,7 @@
     color: var(--slate);
   }
   
-  .mission-description {
+  .mission-description2 {
     color: var(--navy-secondary);
     margin-bottom: 1rem;
     display: -webkit-box;
@@ -51,40 +51,8 @@
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
-  .review-btn {
-  background-color: var(--navy-primary, #2C3850);
-  color: white;
-  border: none;
-  border-radius: 6px;
-  padding: 6px 12px;
-  font-size: 0.8rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  white-space: nowrap;
-  min-width: 70px;
-}
-
-.review-btn:hover {
-  background-color: var(--navy-secondary, #1a2332);
-  transform: translateY(-1px);
-}
-
-.review-btn:active {
-  transform: translateY(0);
-}
-
-/* Dark mode styles */
-.dark-mode .review-btn {
-  background-color: var(--powder, #C5D8E5);
-  color: var(--navy-primary, #2C3850);
-}
-
-.dark-mode .review-btn:hover {
-  background-color: #b0c9d8;
-}
   
-  .mission-footer {
+  .mission-footer2 {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -93,16 +61,16 @@
     margin-top: auto;
   }
   
-  .dark-mode .mission-card {
+  .dark-mode .mission-card2 {
     background: var(--navy-secondary);
     border-color: rgba(197, 216, 229, 0.1);
   }
   
-  .dark-mode .mission-title {
+  .dark-mode .mission-title2 {
     color: var(--powder);
   }
   
-  .dark-mode .mission-description {
+  .dark-mode .mission-description2 {
     color: var(--slate);
   }
   

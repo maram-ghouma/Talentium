@@ -79,21 +79,31 @@ export const signOut = () => {
   window.location.href = '/';
 };
 
-export const getFreelancerStats = async (id?: number | null) => {
-  const endpoint = id ? `/freelancer-profile/stats?id=${id}` : '/freelancer-profile/stats';
+export const getMyStatsFreelancer = async () => {
+  const endpoint = `/freelancer-profile/MyStats` ;
   const response = await api.get(endpoint);
+  return response.data; 
+};
+export const getFreelancerStats = async (id ) => {
+  const  response = await api.get('/freelancer-profile/stats', { params: { id } });
+
   return response.data;
 };
-export const getClientStats = async (id?: number | null) => {
-  const endpoint = id ? `/client-profile/stats?id=${id}` : '/client-profile/stats';
+export const getMyStats = async () => {
+  const endpoint = `/client-profile/MyStats` ;
   const response = await api.get(endpoint);
+  return response.data; 
+};
+export const getClientStats = async (id ) => {
+  const  response = await api.get('/client-profile/stats', { params: { id } });
+
   return response.data;
 };
 
 export const SwitchProfile = async (newRole) => {
   const response = await api.patch('/auth/switch-role', { newRole });
   if (newRole === 'freelancer') {
-    window.location.href = '/Freelancer/dashboard';
+    window.location.href = '/Freelancer';
   }
   else if (newRole === 'client') {
     window.location.href = '/Client';

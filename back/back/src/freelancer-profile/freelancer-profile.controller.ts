@@ -56,13 +56,17 @@ export class FreelancerProfileController {
         imageUrl: imagePath, 
       });
     }
-
-    @UseGuards(AuthGuard('jwt'), RolesGuard)
+ @UseGuards(AuthGuard('jwt'),RolesGuard)
+  @Roles('freelancer')
+    @Get('Mystats')
+  async getMyStats(@CurrentUser() user: any) {
+    return this.freelancerProfileService.getFreelancerStats(user.userId);
+  }
+   @UseGuards(AuthGuard('jwt'))
     @Get('stats')
-    async getStats(@CurrentUser() user: any, @Query('id') id?: number) {
-      const userId = id ?? user.userId;
-      return this.freelancerProfileService.getFreelancerStats(userId);
-    }
+  async getStats(@Query('id') id: number) {
+    return this.freelancerProfileService.getFreelancerStats(id);
+  }
     @UseGuards(AuthGuard('jwt'), RolesGuard)
     @Roles('admin')
     @Get('AllFreelancers')

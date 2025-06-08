@@ -193,7 +193,9 @@ async findAllWithAI(user: any): Promise<Mission[]> {
     throw new Error('Freelancer profile not found');
   }
 
-  const missions = await this.findAllNotMine(user);
+  const missionss = await this.findAllNotMine(user);
+  const missions = missionss.filter(mission => mission.status == 'not_assigned');
+
 
   const predictionData = await Promise.all(
     missions.map(async (mission) => {
@@ -234,6 +236,7 @@ async findAllWithAI(user: any): Promise<Mission[]> {
   );
 
   try {
+    console.log(JSON.stringify({ data: predictionData }));
     const response = await fetch('http://localhost:8000/predict', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -245,6 +248,7 @@ async findAllWithAI(user: any): Promise<Mission[]> {
     }
 
     const predictions = await response.json();
+    console.log(predictions);
 
     const missionsWithPredictions = missions.map((mission, index) => ({
       ...mission,
@@ -257,11 +261,14 @@ async findAllWithAI(user: any): Promise<Mission[]> {
   }
 }
 
-private computeSkillMatch(required: string[], has: string[]): number {
-  if (!required || required.length === 0) return 0;
+private computeSkillMatch(required: string[] | null, has: string[] | null): number {
+  if (!required || required.length === 0 || !has || has.length === 0) return 0;
   const intersection = required.filter((skill) => has.includes(skill));
   return intersection.length / required.length;
 }
+
+
+
 
 
 }

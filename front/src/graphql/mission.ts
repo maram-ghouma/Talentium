@@ -45,6 +45,7 @@ export const GET_MISSIONS = gql`
       selectedFreelancer{
           id
           user{
+          id
             username
             imageUrl
           }
@@ -78,11 +79,49 @@ export const GET_ALL_MISSIONS = gql`
         total
         completed
       }
+      client{
+        id
+        user{
+        id
+          username
+          imageUrl
+        }
+      }
     
     }
   }
 `;
-
+/*
+export const GET_ALL_MISSIONS = gql`
+  query GetAllMissions($page: Int!, $pageSize: Int!) {
+    paginatedMissionsWithAI(page: $page, pageSize: $pageSize) {
+      data {
+        id
+        title
+        description
+        status
+        price
+        date
+        deadline
+        budget
+        createdAt
+        client {
+          id
+          user {
+          id
+            username
+            imageUrl
+          }
+        }
+        requiredSkills 
+        
+      }
+      total
+      page
+      pageCount
+    }
+  }
+`;*/
 export const GET_MISSION = gql`
   query GetMission($id: Int!) {
     mission(id: $id) {

@@ -171,21 +171,45 @@
     padding: 0 1rem;
     margin-bottom: 1rem;
   }
-  
   .sidebar-button {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 0.75rem;
-    border: none;
-    background: transparent;
-    border-radius: 8px;
-    transition: all 0.3s ease;
-    margin-bottom: 0.5rem;
-    color: var(--navy-primary);
-    text-align: left;
-  }
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 0.5rem 0.75rem; /* Reduced from larger padding */
+  margin: 0.5rem 0; /* Reduced margin */
+  border-radius: 6px; /* Slightly smaller radius */
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: var(--navy-primary);
+  transition: all 0.2s ease;
+  font-size: 0.875rem; /* About 14px */
+}
+
+.icon-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px; /* Reduced container size */
+  height: 24px;
+  position: relative;
+}
+
+.sidebar-button .button-label {
+  margin-left: 0.75rem; /* Reduced spacing */
+  font-size: 1rem; /* About 13px */
+  white-space: nowrap;
+}
+
+.badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  font-size: 0.625rem; /* About 10px */
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+}
   
   .sidebar-button:hover {
     background: rgba(58, 75, 109, 0.1);

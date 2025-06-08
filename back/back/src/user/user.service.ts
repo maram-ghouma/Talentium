@@ -36,20 +36,5 @@ export class UserService extends GenericService  {
   async findById(userId: number): Promise<User | null> {
     return this.userRepo.findOne({ where: { id: userId } });
   }
-  // user.service.ts
-async switchUserRole(userId: number, switchDto: SwitchRoleDto): Promise<User> {
-  const user = await this.userRepo.findOne({ where: { id: userId } });
-
-  if (!user) {
-    throw new NotFoundException('User not found');
-  }
-
-  if (user.currentRole === switchDto.newRole) {
-    throw new BadRequestException(`User already has the role '${switchDto.newRole}'`);
-  }
-
-  user.currentRole = switchDto.newRole;
-  return await this.userRepo.save(user);
-}
 
 }
