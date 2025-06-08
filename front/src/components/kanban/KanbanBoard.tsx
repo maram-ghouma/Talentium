@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import KanbanColumn from './KanbanColumn';
 import api from '../../services/axiosConfig'; 
+import './KanbanBoard.css';
 
 export interface Task {
   id: string;

@@ -1,0 +1,113 @@
+/* Main Container */
+.mission-kanban-page {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+/* Header */
+.mission-header {
+  margin-bottom: var(--spacing-4);
+}
+.mission-title {
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--navy-primary);
+}
+.mission-description {
+  color: var(--slate);
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+/* Board Layout */
+.kanban-board {
+  display: grid;
+  grid-template-columns: repeat(3, 340px);
+  grid-gap: var(--spacing-4);
+  min-height: 70vh;
+}
+
+/* Column Styles */
+.kanban-column {
+  background-color: #f0f4f8;
+  border-radius: var(--border-radius);
+  padding: var(--spacing-3);
+}
+.column-drop-target {  /* Drag-target highlight */
+  background-color: #e8eef4;
+  box-shadow: var(--shadow-md);
+}
+.column-header {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.05);
+}
+.column-title {
+  font-weight: 600;
+  color: var(--navy-secondary);
+}
+.column-count {  /* Task counter badge */
+  background-color: var(--slate);
+  color: white;
+  border-radius: 12px;
+  padding: 2px 8px;
+}
+.tasks-container {  /* Task list wrapper */
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+}
+
+/* Base Card */
+.task-card {
+  background: white;
+  border-radius: var(--border-radius);
+  border-left: 4px solid var(--navy-primary);
+  cursor: grab;
+  transition: all 0.2s ease;
+}
+.task-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+.task-card:active {
+  cursor: grabbing;
+}
+
+/* States */
+.task-dragging {  /* During drag */
+  box-shadow: var(--shadow-lg);
+  border: 2px dashed var(--navy-secondary);
+}
+.task-title {
+  font-weight: 600;
+  color: var(--navy-primary);
+}
+.task-description {
+  color: var(--slate);
+  font-size: 14px;
+}
+
+/* Add Task Button */
+.add-task-btn {
+  background-color: white;
+  border: 2px dashed var(--slate);
+  color: var(--navy-secondary);
+}
+.add-task-btn:hover {
+  border-color: var(--navy-secondary);
+}
+
+/* Border colors for task states */
+.task-card.success { border-left-color: var(--success); }  /* Green */
+.task-card.warning { border-left-color: var(--warning); }  /* Yellow */
+.task-card.error { border-left-color: var(--error); }      /* Red */
+
+/* Hidden in responsive modes */
+@media (max-width: 768px) {
+  .kanban-board {
+    grid-template-columns: repeat(3, 260px);
+  }
+}
