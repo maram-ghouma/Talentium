@@ -1,26 +1,26 @@
-import React, { useState, useEffect } from 'react';
-import { Sun, Moon } from 'lucide-react';
-import { Mission } from './types';
+import React from 'react';
 import { Route, Routes } from 'react-router-dom';
-
+import { DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
 
 import SignUpPage from './Pages/SignUpPage/SignUpPage';
 import SignInPage from './Pages/SignInPage/SignInPage';
 import PaymentPage from './Pages/PaymentPage/PaymentPage';
 import NotificationsPage from './Pages/NotificationsPage/NotificationsPage';
 
-
-
 import AdminDashboard from './Pages/Admin/AdminDashboard';
 import FreelancersList from './Pages/Admin/FreelancersList';
-import ClientHome from './Pages/Client/ClientHomePage';
 import ClientsList from './Pages/Admin/ClientsList';
 import ReportsInterface from './Pages/Admin/ReportsInterface';
+
+import ClientHome from './Pages/Client/ClientHomePage';
+import ClientEditProfile from './Pages/Client/ClientEditProfile';
 import ClientInterviewSchedule from './Pages/Client/ClientInterviews';
 import ClientProfilePage from './Pages/Client/ClientProfile';
+import ClientKanban from './Pages/Client/ClientKanban';
+
 
 import Profile from './components/Freelancer/Profile';
-import MissionDetails from './components/Freelancer/mission';
 import Chat from './components/Freelancer/chat';
 import History from './components/Freelancer/History';
 import { MainLayout } from './components/layout/MainLayout';
@@ -29,10 +29,14 @@ import FreelancerDashboard from './Pages/Freelancer/FreelancerDashboard';
 import FreelancerProfile from './Pages/Freelancer/FreelancerProfile';
 import FreelancerHistory from './Pages/Freelancer/FreelancerHistory';
 import FreelancerChat from './Pages/Freelancer/FreelancerChat';
+import ClientChat from './Pages/Client/ClientChat';
+import MissionDetails from './components/Freelancer/mission';
+import FreelancerClient from './Pages/Freelancer/FreelancerKanban';
+
 import GuestHome from './Pages/GuestHome';
+import { missions, profile, workHistory } from './Data/mockData';
 import { HomePage } from './components/client/home page/homePage';
 import FreelancerFeed from './Pages/Freelancer/feed';
-import ClientEditProfile from './Pages/Client/ClientEditProfile';
 import FreelancerEditProfile from './Pages/Freelancer/FreelancerEditProfile';
 import JalonsPage from './Pages/PaymentPage/JalonsPage';
 import NotFoundPage from './components/layout/NotFound';
@@ -40,14 +44,19 @@ import ReviewPage from './Pages/Review/ReviewPage';
 
 
 
+import NotificationContainer from './components/realtime_notification/NotificationContainer';
+import { useNotifications } from './hooks/useNotifications';
+import FreelancerKanban from './Pages/Freelancer/FreelancerKanban';
 
 function App() {
-
   return (
-    <Routes>
-  <Route path="/admin/clients" element={<ClientsList />} />
-  <Route path="/admin" element={<AdminDashboard />} />
-  <Route path="/admin/freelancers" element={<FreelancersList />} />
+    <>
+    <DndProvider backend={HTML5Backend}>
+        <Routes>
+          <Route path="/admin/clients" element={<ClientsList />} />
+          <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/admin/freelancers" element={<FreelancersList />} />
+          <Route path="/admin/reports" element={<ReportsInterface />} />
 
   <Route path="/Freelancer/profile" element={<FreelancerProfile />} />
   <Route path="/Freelancer/profile/:id" element={<FreelancerProfile />} />
@@ -61,12 +70,15 @@ function App() {
           
 <Route path="/reviews/:missionId" element={<ReviewPage />} />
 
-  <Route path="/admin/reports" element={<ReportsInterface />} />
+  <Route path="/
+  admin/reports" element={<ReportsInterface />} />
   <Route path="/client" element ={<ClientHome/>}/>
     <Route path="/client/editProfile" element ={<ClientEditProfile/>}/>
   <Route path="/client/interviews" element ={<ClientInterviewSchedule/>}/>
   <Route path="/client/profile" element ={<ClientProfilePage/>}/>
   <Route path="/client/profile/:id" element ={<ClientProfilePage/>}/>
+  <Route path="/client/chat" element={<ClientChat />} />
+  <Route path="/kanban/:id" element={<ClientKanban />} />
   <Route path="/jalons" element ={<JalonsPage/>}/>
 
   <Route path="/signup" element={<SignUpPage />} />
@@ -77,7 +89,15 @@ function App() {
         <Route path="*" element={<NotFoundPage />} />
 
 
-</Routes>
+          <Route path="/signup" element={<SignUpPage />} />
+          <Route path="/signin" element={<SignInPage />} />
+          <Route path="/paym²ent" element={<PaymentPage />} />
+          <Route path="/notifications" element={<NotificationsPage />} />
+
+          <Route path="/" element={<GuestHome />} />
+        </Routes>
+    </DndProvider>
+    </>
   );
 }
 

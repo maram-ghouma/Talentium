@@ -10,11 +10,15 @@ import { ClientProfile } from 'src/client-profile/entities/client-profile.entity
 import { Dispute } from 'src/dispute/entities/dispute.entity';
 import { Review } from 'src/review/entities/review.entity';
 import { Application } from 'src/application/entities/application.entity';
+import { Task } from './entities/task.entity';
+import { NotificationModule } from 'src/notification/notification.module';
 
 @Module({
-  imports : [TypeOrmModule.forFeature([Mission, User,FreelancerProfile,Dispute,ClientProfile,Review,Application])],
-  controllers: [MissionController],
+  imports : [TypeOrmModule.forFeature([Mission, User,FreelancerProfile,Dispute,ClientProfile,Review,Application, Task]),
+    NotificationModule],
   providers: [MissionResolver, MissionService],
-  exports: [MissionService, TypeOrmModule], 
+  controllers: [MissionController],
+  exports: [MissionService, TypeOrmModule],
+
 })
 export class MissionModule {}

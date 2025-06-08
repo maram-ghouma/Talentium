@@ -12,6 +12,8 @@ import { User } from 'src/user/entities/user.entity';
 import { ObjectType, Field, Int, GraphQLISODateTime, registerEnumType } from '@nestjs/graphql';
 import { FreelancerProfile } from 'src/freelancer-profile/entities/freelancer-profile.entity';
 import { GraphQLDate } from 'graphql-scalars';
+import { Conversation } from 'src/conversation/entities/conversation.entity';
+import { Task } from './task.entity';
 import { Dispute } from 'src/dispute/entities/dispute.entity';
 import { ClientProfile } from 'src/client-profile/entities/client-profile.entity';
 import { Application } from 'src/application/entities/application.entity';
@@ -32,7 +34,7 @@ registerEnumType(PaymentStatus, {
 
 @ObjectType()
 @Entity()
-export class Mission {
+export class Mission { 
   @Field(() => Int)
   @PrimaryGeneratedColumn()
   id: number;
@@ -66,7 +68,6 @@ export class Mission {
   requiredSkills: string[];
 
   @Field(() => GraphQLDate)
-  @Field(() => GraphQLDate)
   @Column({ type: 'date' })
   deadline: Date;
 
@@ -87,7 +88,7 @@ export class Mission {
   progress: number;
 
   @Field(() => TaskStats)
-  @Column('json',  { nullable: true })
+  @Column('json', { nullable: true })
   tasks: {
     total: number;
     completed: number;
@@ -129,6 +130,13 @@ export class Mission {
 
 
 
+  @OneToMany(() => Conversation, (conversation) => conversation.mission)
+  conversations: Conversation[];
+
+  // New tasklist attribute
+  @Field(() => [Task])
+  @OneToMany(() => Task, (task) => task.mission, { cascade: true })
+  tasklist: Task[];
 }
 
 
