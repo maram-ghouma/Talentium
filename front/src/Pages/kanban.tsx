@@ -61,7 +61,7 @@ const Kanban: React.FC = () => {
           throw new Error('Mission ID is missing');
         }
         console.log('Checking access for mission ID:', missionId);
-        const response = await api.get(`/missions/kanban/${missionId}`);
+        const response = await api.get(`/mission/kanban/${missionId}`);
         console.log('Mission access response:', response.data);
         // If request succeeds, user is either the client or selected freelancer
         setLoading(false);
