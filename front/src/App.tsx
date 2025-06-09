@@ -48,6 +48,7 @@ import DisputeForm from './components/dispute/dispute';
 import NotificationContainer from './components/realtime_notification/NotificationContainer';
 import { useNotifications } from './hooks/useNotifications';
 import FreelancerKanban from './Pages/Freelancer/FreelancerKanban';
+import { MissionCard } from './components/Freelancer/freelancerfeed/freelancerMissionCard';
 
 function App() {
   return (
@@ -91,7 +92,23 @@ function App() {
     <Route path="/" element={<GuestHome />} />
         <Route path="*" element={<NotFoundPage />} />
 
-
+<Route path="missiontest/:missionId" element={<MissionCard mission={{
+  id: "1",
+  title: "Hourglass",
+  description: "A mission to build a hourglass",
+  status: "completed",
+  price: 1000,
+  date: "2024-06-01",
+  clientId: "client1",
+  clientName: "Client One",
+  tasks: {
+    total: 1,
+    completed: 0,
+    //items: [{ title: "Task 1", duration: 2 }]
+  },
+  //freelancerId: "freelancer1",
+  // add any other required fields if present in Mission
+}} isDarkMode={false} />} />
           <Route path="/signup" element={<SignUpPage />} />
           <Route path="/signin" element={<SignInPage />} />
           <Route path="/paym²ent" element={<PaymentPage />} />

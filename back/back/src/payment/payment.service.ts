@@ -143,8 +143,22 @@ async createEscrowPayment(missionId: number, clientId: number) {
         amount_to_capture: releaseAmount,
       });
 
+    /*  const token = await this.stripe.tokens.create({
+  card: {
+    number: '4000000000000077',
+    exp_month: 12,
+    exp_year: 2026,
+    cvc: '123',
+  },
+});
+
+const charge = await this.stripe.charges.create({
+  amount: 10000, // $100 in cents
+  currency: 'usd',
+  source: token.id,
+});*/
       // Create transfer to freelancer
-      await this.stripe.transfers.create({
+     /* await this.stripe.transfers.create({
         amount: releaseAmount,
         currency: 'eur',
         //destination: mission.selectedFreelancer.stripeAccountId,
@@ -153,7 +167,7 @@ async createEscrowPayment(missionId: number, clientId: number) {
           missionId: missionId.toString(),
           milestone: milestonePercentage.toString()
         }
-      });
+      });*/
       
 
       // Generate invoice
