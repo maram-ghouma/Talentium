@@ -22,10 +22,10 @@ export class ConversationController {
     return this.conversationService.findOne(+id);
   }
 
-  @Patch(':id')
+  /*@Patch(':id')
   update(@Param('id') id: string, @Body() updateConversationDto: UpdateConversationDto) {
     return this.conversationService.update(+id, updateConversationDto);
-  }
+  }*/
 
   @Delete(':id')
   remove(@Param('id') id: string) {

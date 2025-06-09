@@ -10,6 +10,6 @@ import { ClientProfileModule } from 'src/client-profile/client-profile.module';
     imports: [TypeOrmModule.forFeature([User]),ClientProfileModule],
   controllers: [UserController],
   providers: [UserService],
-  exports: [UserService],
+  exports: [UserService, TypeOrmModule.forFeature([User])],
 })
 export class UserModule {}

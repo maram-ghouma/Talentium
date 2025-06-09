@@ -187,119 +187,146 @@ async findMineByMission(missionId: string, user: any): Promise<Application[]> {
   }
 
   async updateApplicationStatus(
-    applicationId: string,
-    newStatus: ApplicationStatus,
-  ): Promise<Application> {
-    const application = await this.applicationRepository.findOne({
-      where: { id: applicationId },
-      relations: ['mission', 'freelancer', 'freelancer.user'],
-    });
+  applicationId: string,
+  newStatus: ApplicationStatus,
+): Promise<Application> {
+  const application = await this.applicationRepository.findOne({
+    where: { id: applicationId },
+    relations: ['mission', 'freelancer', 'freelancer.user'],
+  });
 
-    if (!application) {
-      throw new NotFoundException('Application not found');
-    }
-
-    const mission = await this.missionRepository.findOne({
-      where: { id: application.mission.id },
-      relations: ['preselectedFreelancers', 'selectedFreelancer', 'applications'],
-    });
-
-    if (!mission) {
-      throw new NotFoundException('Mission not found');
-    }
-
-    application.status = newStatus;
-
-    if (newStatus === ApplicationStatus.PRE_SELECTED) {
-      const alreadyPreselected = mission.preselectedFreelancers.some(
-        f => f.id === application.freelancer.id,
-      );
-      if (!alreadyPreselected) {
-        mission.preselectedFreelancers.push(application.freelancer);
-      }
-      await this.missionRepository.save(mission);
-
-      // Notify the freelancer of pre-selection
-      try {
-        if (!application.freelancer.user) {
-          throw new Error('User not found for freelancer');
-        }
-        await this.notificationService.createNotification({
-          userId: application.freelancer.user.id,
-          content: `You have been pre-selected for the mission "${mission.title || 'Untitled'}"`,
-          type: 'pre_selection',
-        });
-      } catch (error) {
-        console.error('Failed to create pre-selection notification:', error.message);
-      }
-    } else if (newStatus === ApplicationStatus.ACCEPTED) {
-      mission.selectedFreelancer = application.freelancer;
-      mission.preselectedFreelancers = mission.preselectedFreelancers.filter(
-        f => f.id === application.freelancer.id,
-      );
-      const applications = mission.applications ?? [];
-      for (const app of applications) {
-        if (app.id !== application.id && app.status === ApplicationStatus.PRE_SELECTED) {
-          app.status = ApplicationStatus.REJECTED;
-          await this.applicationRepository.save(app);
-          await this.missionRepository
-            .createQueryBuilder()
-            .relation(Mission, "preselectedFreelancers")
-            .of(app.missionId)
-            .remove(app.freelancerId);
-
-          // Notify rejected preselected freelancers
-          try {
-            const rejectedApp = await this.applicationRepository.findOne({
-              where: { id: app.id },
-              relations: ['freelancer', 'freelancer.user'],
-            });
-            if (rejectedApp && rejectedApp.freelancer.user) {
-              await this.notificationService.createNotification({
-                userId: rejectedApp.freelancer.user.id,
-                content: `You were not selected for the mission "${mission.title || 'Untitled'}"`,
-                type: 'rejection',
-              });
-            }
-          } catch (error) {
-            console.error('Failed to create rejection notification:', error.message);
-          }
-        }
-      }
-      mission.status = 'in_progress';
-      await this.missionRepository.save(mission);
-
-      // Notify the selected freelancer
-      try {
-        if (!application.freelancer.user) {
-          throw new Error('User not found for freelancer');
-        }
-        await this.notificationService.createNotification({
-          userId: application.freelancer.user.id,
-          content: `Congratulations! You have been selected for the mission "${mission.title || 'Untitled'}"`,
-          type: 'selection',
-        });
-      } catch (error) {
-        console.error('Failed to create selection notification:', error.message);
-      }
-    }
-
-    const updatedApplication = await this.applicationRepository.save(application);
-    if (newStatus === ApplicationStatus.ACCEPTED) {
-      const { mission, freelancer } = updatedApplication;
-
-      // Create a conversation between client and freelancer
-      const conversationDto: CreateConversationDto = {
-        participantIds: [mission.client.user.id, freelancer.user.id],
-        missionId: mission.id,
-      };
-
-      await this.conversationService.create(conversationDto);
-    }
-
-
-    return application;
+  if (!application) {
+    throw new NotFoundException('Application not found');
   }
+
+  const mission = await this.missionRepository.findOne({
+    where: { id: application.mission.id },
+    relations: ['preselectedFreelancers', 'selectedFreelancer', 'applications', 'client', 'client.user'],
+  });
+
+  if (!mission) {
+    throw new NotFoundException('Mission not found');
+  }
+
+  application.status = newStatus;
+
+  if (newStatus === ApplicationStatus.PRE_SELECTED) {
+    const alreadyPreselected = mission.preselectedFreelancers.some(
+      f => f.id === application.freelancer.id,
+    );
+    if (!alreadyPreselected) {
+      mission.preselectedFreelancers.push(application.freelancer);
+    }
+    await this.missionRepository.save(mission);
+
+    try {
+      if (!application.freelancer.user) {
+        throw new Error('User not found for freelancer');
+      }
+      await this.notificationService.createNotification({
+        userId: application.freelancer.user.id,
+        content: `You have been pre-selected for the mission "${mission.title || 'Untitled'}"`,
+        type: 'pre_selection',
+      });
+    } catch (error) {
+      console.error('Failed to create pre-selection notification:', error.message);
+    }
+  } else if (newStatus === ApplicationStatus.ACCEPTED) {
+    mission.selectedFreelancer = application.freelancer;
+    mission.preselectedFreelancers = mission.preselectedFreelancers.filter(
+      f => f.id === application.freelancer.id,
+    );
+    const applications = mission.applications ?? [];
+    for (const app of applications) {
+      if (app.id !== application.id && app.status === ApplicationStatus.PRE_SELECTED) {
+        app.status = ApplicationStatus.REJECTED;
+        await this.applicationRepository.save(app);
+        await this.missionRepository
+          .createQueryBuilder()
+          .relation(Mission, "preselectedFreelancers")
+          .of(app.missionId)
+          .remove(app.freelancerId);
+
+        try {
+          const rejectedApp = await this.applicationRepository.findOne({
+            where: { id: app.id },
+            relations: ['freelancer', 'freelancer.user'],
+          });
+          if (rejectedApp && rejectedApp.freelancer.user) {
+            await this.notificationService.createNotification({
+              userId: rejectedApp.freelancer.user.id,
+              content: `You were not selected for the mission "${mission.title || 'Untitled'}"`,
+              type: 'rejection',
+            });
+          }
+        } catch (error) {
+          console.error('Failed to create rejection notification:', error.message);
+        }
+      }
+    }
+    mission.status = 'in_progress';
+    await this.missionRepository.save(mission);
+
+    try {
+      if (!application.freelancer.user) {
+        throw new Error('User not found for freelancer');
+      }
+      await this.notificationService.createNotification({
+        userId: application.freelancer.user.id,
+        content: `Congratulations! You have been selected for the mission "${mission.title || 'Untitled'}"`,
+        type: 'selection',
+      });
+    } catch (error) {
+      console.error('Failed to create selection notification:', error.message);
+    }
+  }
+
+  const updatedApplication = await this.applicationRepository.save(application);
+  if (newStatus === ApplicationStatus.ACCEPTED) {
+    const fullyLoadedApplication = await this.applicationRepository.findOne({
+      where: { id: updatedApplication.id },
+      relations: ['mission', 'mission.client', 'mission.client.user', 'freelancer', 'freelancer.user'],
+    });
+    if (!fullyLoadedApplication) {
+      console.error('Updated application not found:', updatedApplication.id);
+      throw new NotFoundException('Updated application not found');
+    }
+    const { mission, freelancer } = fullyLoadedApplication;
+    if (!mission.client?.user?.id || !freelancer.user?.id) {
+      console.error('Missing user IDs for conversation:', {
+        clientUserId: mission.client?.user?.id,
+        freelancerUserId: freelancer.user?.id,
+      });
+      throw new BadRequestException('Client or freelancer user ID is missing');
+    }
+    // Validate IDs (no parseInt needed if IDs are already numbers)
+    const missionId = mission.id;
+    const clientUserId = mission.client.user.id;
+    const freelancerUserId = freelancer.user.id;
+    if (typeof missionId !== 'number' || typeof clientUserId !== 'number' || typeof freelancerUserId !== 'number') {
+      console.error('Invalid ID types:', {
+        missionId: typeof missionId,
+        clientUserId: typeof clientUserId,
+        freelancerUserId: typeof freelancerUserId,
+      });
+      throw new BadRequestException('Mission or user IDs must be numbers');
+    }
+    const conversationDto: CreateConversationDto = {
+      participantIds: [clientUserId, freelancerUserId],
+      missionId: missionId,
+    };
+    try {
+      console.log('Creating conversation with DTO:', conversationDto);
+      const conversation = await this.conversationService.create(conversationDto);
+      console.log('Conversation created:', conversation);
+    } catch (error) {
+      console.error('Failed to create conversation:', error.message);
+      throw new Error('Could not create conversation: ' + error.message);
+    }
+  }
+
+  return updatedApplication;
+}
 
   async getFreelancersByClient(userId: string): Promise<FreelancerProfile[]> {
   const missions = await this.missionRepository.find({

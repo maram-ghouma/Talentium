@@ -70,7 +70,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ missionId }) => {
       // Map frontend status to backend enum
       const backendStatus = targetStatus.toUpperCase().replace('-', '_') as 'NOT_STARTED' | 'IN_PROGRESS' | 'COMPLETED';
       // Update backend
-      await api.patch(`missions/task/${taskId}`, { status: backendStatus });
+      await api.patch(`mission/task/${taskId}`, { status: backendStatus });
       // Update local state
       setTasks(prevTasks =>
         prevTasks.map(task =>
@@ -84,7 +84,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ missionId }) => {
   };
   const addTask = async (title: string, description: string) => {
   try {
-    const response = await api.post('missions/task', {
+    const response = await api.post('mission/task', {
       title,
       description,
       status: 'NOT_STARTED',
@@ -112,7 +112,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ missionId }) => {
 
   const deleteTask = async (taskId: string) => {
   try {
-    await api.delete(`missions/task/delete/${taskId}`);
+    await api.delete(`mission/task/delete/${taskId}`);
     setTasks(prev => prev.filter(task => task.id !== taskId));
   } catch (err: any) {
     console.error('Error deleting task:', err);
