@@ -68,7 +68,7 @@ const PaymentConfirmationView = ({ missions }: { missions: MissionLight[]; }) =>
 
     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
-    // Download the PDF
+    // PDF
     const blob = await response.blob();
     const url = window.URL.createObjectURL(blob);
     const link = document.createElement('a');

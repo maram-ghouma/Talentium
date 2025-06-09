@@ -14,6 +14,7 @@ const History: React.FC<HistoryProps> = ({ historyItems }) => {
     const [showModal, setShowModal] = useState(false);
     const [reason, setReason] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
+    
   const formatDate = (dateString: string | null) => {
     if (!dateString) return 'Present';
     
@@ -48,7 +49,10 @@ handleOpenModal();
       setShowModal(false);
       setReason('');
     };
-
+     const handleReviewClick = (e: React.MouseEvent,itemid:number) => {
+        e.stopPropagation(); // Prevent triggering the card's onClick
+        navigate(`/reviews/${itemid}`);
+      };
     const handleSubmitReport = async (itemId: number) => {
       if (!reason.trim()) {
         alert('Please enter a reason');
@@ -132,6 +136,13 @@ handleOpenModal();
               <button className="report-button" style={{marginLeft: '10px'}} onClick={handleReportClick}>
                 Report
               </button>
+               
+            <button 
+              className="review-btn"
+              onClick={(e) => handleReviewClick(e, item.id)}
+            >
+              Review
+            </button>
               
               </div>
             </div>
