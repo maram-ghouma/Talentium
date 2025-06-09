@@ -41,7 +41,7 @@ export class InterviewService {
     }
 
     const client = await this.clientRepo.findOne({
-      where: { user: {id:fullUser.id} },
+      where: { user: fullUser },
     });
     if (!client) {
       throw new Error('Client not found');
@@ -85,13 +85,13 @@ export class InterviewService {
     }
     if (type === 'client') {
       const client = await this.clientRepo.findOne({
-        where: { user: {id: fullUser.id} },
+        where: { user: fullUser },
       });
       if (!client) {
         throw new Error('Client not found');
       }
       return this.interviewRepository.find({
-        where: { client :{id:client.id}},
+        where: { client },
         relations: ['freelancer', 'freelancer.user', 'client', 'client.user'],
       });
     } else {
@@ -102,7 +102,7 @@ export class InterviewService {
         throw new Error('Freelancer not found');
       }
       return this.interviewRepository.find({
-        where: { freelancer:{id:freelancer.id} },
+        where: { freelancer },
         relations: ['freelancer', 'freelancer.user', 'client', 'client.user'],
       });
     }

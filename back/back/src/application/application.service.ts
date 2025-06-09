@@ -12,6 +12,8 @@ import { FreelancerProfile } from 'src/freelancer-profile/entities/freelancer-pr
 import { FileUpload } from 'graphql-upload-ts';
 import { Mission } from 'src/mission/entities/mission.entity';
 import { NotificationService } from '../notification/notification.service'; // Import NotificationService
+import { ConversationService } from '../conversation/conversation.service'; 
+import { CreateConversationDto } from 'src/conversation/dto/create-conversation.dto';
 
 
 @Injectable()
@@ -26,6 +28,7 @@ export class ApplicationService {
     @InjectRepository(Mission)
     private missionRepository: Repository<Mission>,
     private notificationService: NotificationService,
+    private conversationService: ConversationService,
   ) {}
 
   async create(createApplicationInput: CreateApplicationInput, user: any): Promise<Application> {
@@ -281,7 +284,19 @@ async findMineByMission(missionId: string, user: any): Promise<Application[]> {
       }
     }
 
-    await this.applicationRepository.save(application);
+    const updatedApplication = await this.applicationRepository.save(application);
+    if (newStatus === ApplicationStatus.ACCEPTED) {
+      const { mission, freelancer } = updatedApplication;
+
+      // Create a conversation between client and freelancer
+      const conversationDto: CreateConversationDto = {
+        participantIds: [mission.client.user.id, freelancer.user.id],
+        missionId: mission.id,
+      };
+
+      await this.conversationService.create(conversationDto);
+    }
+
 
     return application;
   }

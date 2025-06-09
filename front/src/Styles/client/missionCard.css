@@ -16,22 +16,22 @@
   }
   
   .mission-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 1rem;
-    min-height: 50px;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: flex-start !important;
+    margin-bottom: 1rem !important;
+    min-height: 50px !important;
   }
   
   .mission-title {
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: var(--navy-primary);
+    font-size: 1.25rem !important;
+    font-weight: 600 !important;
+    color: var(--navy-primary) !important;
     margin: 0;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 85%;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    max-width: 85% !important;
   }
   
   .mission-status {
@@ -44,12 +44,12 @@
   }
   
   .mission-description {
-    color: var(--navy-secondary);
-    margin-bottom: 1rem;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+    color: var(--navy-secondary) !important;
+    margin-bottom: 1rem !important;
+    display: -webkit-box !important;
+    -webkit-line-clamp: 2 !important;
+    -webkit-box-orient: vertical !important;
+    overflow: hidden !important;
   }
   .review-btn {
   background-color: var(--navy-primary, #2C3850);
